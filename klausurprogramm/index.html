@@ -426,7 +426,7 @@
       </div><button id="endExamBtn" class="px-6 py-3 bg-gray-300 hover-bg-gray-400 text-gray-800 font-bold rounded-lg shadow-lg transition-all"> Prüfung beenden </button>
      </div>
     </div><!-- Toolbar -->
-    <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 90px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
+    <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Ausschneiden">✂</button> <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Kopieren">📋</button> <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Einfügen">📄</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Seitenumbruch">⎯⎯</button>
      <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="p">Absatz</option> <option value="h2">Kopfzeile</option> </select>
@@ -447,7 +447,7 @@
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="specialChar" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">Ω</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="find" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">🔍</button>
     </div>
-    <div style="height: 220px;"></div><!-- Editor Content -->
+    <div style="height: 210px;"></div><!-- Editor Content -->
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg mb-8 flex" style="min-height: 600px;">
      <div class="w-1/3 bg-white p-4"></div>
      <div class="w-2/3 p-8">
@@ -481,6 +481,17 @@
      <div class="flex gap-2"><button id="replaceOneBtn" class="flex-1 px-4 py-2 bg-green-600 hover-bg-green-700 text-white font-semibold rounded-lg transition-all"> Ersetzen </button> <button id="replaceAllBtn" class="flex-1 px-4 py-2 bg-orange-600 hover-bg-orange-700 text-white font-semibold rounded-lg transition-all"> Alle ersetzen </button>
      </div>
     </div>
+   </div><!-- Autosave Restore Dialog -->
+   <div id="autosaveDialog" class="hidden dialog-overlay">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-xl w-full mx-4">
+     <h2 class="text-2xl font-bold text-gray-800 mb-4">Autosave gefunden</h2>
+     <p class="text-gray-700 mb-4">Es wurde ein automatisch gespeicherter Entwurf gefunden.</p>
+     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+      <p class="text-gray-800 text-sm leading-relaxed"><strong>Name:</strong> <span id="autosave-kennummer"></span><br><strong>Prüfung:</strong> <span id="autosave-pruefungsname"></span><br><strong>Gespeichert:</strong> <span id="autosave-timestamp"></span></p>
+     </div>
+     <div class="flex gap-4 justify-end"><button id="autosaveNewBtn" class="px-6 py-3 bg-gray-300 hover-bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">Neu anfangen</button> <button id="autosaveRestoreBtn" class="px-6 py-3 bg-green-600 hover-bg-green-700 text-white font-bold rounded-lg transition-all">Wiederherstellen</button>
+     </div>
+    </div>
    </div><!-- End Exam Dialog -->
    <div id="endExamDialog" class="hidden dialog-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-xl w-full mx-4">
@@ -511,7 +522,7 @@
         searchMatches: [],
         contextMenu: null,
         AUTOSAVE_KEY: 'probeklausur_autosave',
-        AUTOSAVE_INTERVAL: 30000 // 30 seconds
+        AUTOSAVE_INTERVAL: 120000 // 120 seconds
       };
       
       // ============================================
@@ -679,12 +690,53 @@
         // Check for autosaved content
         const saved = loadFromLocalStorage();
         if (saved && saved.kennummer === AppState.userKennummer && saved.pruefungsname === AppState.pruefungsname) {
-          if (confirm('Es wurde ein automatisch gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?')) {
-            document.getElementById('editor').innerHTML = saved.content;
-            AppState.remainingMinutes = saved.remainingMinutes;
-          }
+          showAutosaveDialog(saved);
+        } else {
+          startTimer();
+          startAutosave();
+        }
+      }
+      
+      function showAutosaveDialog(savedData) {
+        document.getElementById('autosave-kennummer').textContent = savedData.kennummer;
+        document.getElementById('autosave-pruefungsname').textContent = savedData.pruefungsname;
+        
+        const timestamp = new Date(savedData.timestamp);
+        const now = new Date();
+        const diffMinutes = Math.floor((now - timestamp) / 60000);
+        
+        let timeText = '';
+        if (diffMinutes < 1) {
+          timeText = 'gerade eben';
+        } else if (diffMinutes < 60) {
+          timeText = 'vor ' + diffMinutes + ' Minute' + (diffMinutes > 1 ? 'n' : '');
+        } else {
+          const diffHours = Math.floor(diffMinutes / 60);
+          timeText = 'vor ' + diffHours + ' Stunde' + (diffHours > 1 ? 'n' : '');
         }
         
+        document.getElementById('autosave-timestamp').textContent = timeText;
+        document.getElementById('autosaveDialog').classList.remove('hidden');
+      }
+      
+      function hideAutosaveDialog() {
+        document.getElementById('autosaveDialog').classList.add('hidden');
+      }
+      
+      function restoreAutosave() {
+        const saved = loadFromLocalStorage();
+        if (saved) {
+          document.getElementById('editor').innerHTML = saved.content;
+          AppState.remainingMinutes = saved.remainingMinutes;
+        }
+        hideAutosaveDialog();
+        startTimer();
+        startAutosave();
+      }
+      
+      function startNewDocument() {
+        clearLocalStorage();
+        hideAutosaveDialog();
         startTimer();
         startAutosave();
       }
@@ -1502,6 +1554,10 @@
         // Start editor
         document.getElementById('startEditorBtn').addEventListener('click', startEditor);
         
+        // Autosave dialog
+        document.getElementById('autosaveRestoreBtn').addEventListener('click', restoreAutosave);
+        document.getElementById('autosaveNewBtn').addEventListener('click', startNewDocument);
+        
         // End exam
         document.getElementById('endExamBtn').addEventListener('click', showEndExamDialog);
         document.getElementById('cancelEndBtn').addEventListener('click', hideEndExamDialog);
@@ -1668,5 +1724,5 @@
       
     })();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae7066a27799884',t:'MTc2NTgxMzA3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae7211f567fe0d3',t:'MTc2NTgxNDE2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
