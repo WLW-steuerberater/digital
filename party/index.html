@@ -571,7 +571,6 @@
     const dataHandler = {
       onDataChanged(data) {
         completedTasks = data;
-        saveToLocalStorage();
         updateUI();
       }
     };
@@ -594,6 +593,41 @@
       } catch (e) {
         console.error('Failed to load from localStorage:', e);
       }
+    }
+
+    async function completeTask(taskId, taskNumber, unlockedDigit) {
+      // Check if task already completed
+      if (completedTasks.some(t => t.task_number === taskNumber)) {
+        return true;
+      }
+
+      // Add to local array
+      completedTasks.push({
+        id: taskId,
+        task_number: taskNumber,
+        unlocked_digit: unlockedDigit,
+        completed_at: new Date().toISOString()
+      });
+
+      // Save to localStorage
+      saveToLocalStorage();
+      updateUI();
+
+      // Try to save to Data SDK if available
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          id: taskId,
+          task_number: taskNumber,
+          unlocked_digit: unlockedDigit,
+          completed_at: new Date().toISOString()
+        });
+        
+        if (!result.isOk) {
+          console.log('Data SDK save failed, but localStorage saved successfully');
+        }
+      }
+
+      return true;
     }
 
     async function init() {
@@ -1052,36 +1086,21 @@
           submitBtn.disabled = true;
           submitBtn.textContent = 'Wird gespeichert...';
 
-          if (window.dataSdk) {
-            const result = await window.dataSdk.create({
-              id: 'task-1',
-              task_number: 1,
-              unlocked_digit: '7',
-              completed_at: new Date().toISOString()
-            });
+          await completeTask('task-1', 1, '7');
 
-            if (result.isOk) {
-              setTimeout(() => {
-                document.getElementById('question4').classList.add('hidden');
-                document.getElementById('task1Complete').classList.remove('hidden');
-                document.getElementById('task1Complete').classList.add('success-animation');
-                document.getElementById('task1ProgressBar').style.width = '100%';
-              }, 100);
+          setTimeout(() => {
+            document.getElementById('question4').classList.add('hidden');
+            document.getElementById('task1Complete').classList.remove('hidden');
+            document.getElementById('task1Complete').classList.add('success-animation');
+            document.getElementById('task1ProgressBar').style.width = '100%';
+          }, 100);
 
-              setTimeout(() => {
-                document.getElementById('task1Modal').classList.add('hidden');
-                resetTask1();
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Antwort prüfen';
-              }, 3500);
-            } else {
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'Antwort prüfen';
-              errorDiv.textContent = 'Fehler beim Speichern. Bitte versuche es erneut.';
-              errorDiv.classList.remove('hidden');
-              errorDiv.classList.add('error-animation');
-            }
-          }
+          setTimeout(() => {
+            document.getElementById('task1Modal').classList.add('hidden');
+            resetTask1();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Antwort prüfen';
+          }, 3500);
         }
       } else {
         // Error animation
@@ -1329,21 +1348,12 @@
         document.getElementById('droneSuccess').classList.remove('hidden');
         document.getElementById('droneSuccess').classList.add('success-animation');
         
-        if (window.dataSdk) {
-          const result = await window.dataSdk.create({
-            id: 'task-2',
-            task_number: 2,
-            unlocked_digit: '3',
-            completed_at: new Date().toISOString()
-          });
+        await completeTask('task-2', 2, '3');
 
-          if (result.isOk) {
-            setTimeout(() => {
-              document.getElementById('task2Modal').classList.add('hidden');
-              stopDroneGame();
-            }, 3500);
-          }
-        }
+        setTimeout(() => {
+          document.getElementById('task2Modal').classList.add('hidden');
+          stopDroneGame();
+        }, 3500);
       } else {
         document.getElementById('droneGameOver').classList.remove('hidden');
         document.getElementById('droneGameOver').classList.add('error-animation');
@@ -1556,21 +1566,12 @@
         document.getElementById('shootingSuccess').classList.remove('hidden');
         document.getElementById('shootingSuccess').classList.add('success-animation');
 
-        if (window.dataSdk) {
-          const result = await window.dataSdk.create({
-            id: 'task-3',
-            task_number: 3,
-            unlocked_digit: '5',
-            completed_at: new Date().toISOString()
-          });
+        await completeTask('task-3', 3, '5');
 
-          if (result.isOk) {
-            setTimeout(() => {
-              document.getElementById('task3Modal').classList.add('hidden');
-              stopShootingGame();
-            }, 2500);
-          }
-        }
+        setTimeout(() => {
+          document.getElementById('task3Modal').classList.add('hidden');
+          stopShootingGame();
+        }, 2500);
       } else {
         document.getElementById('shootingGameOver').classList.remove('hidden');
         document.getElementById('shootingGameOver').classList.add('error-animation');
@@ -1663,21 +1664,12 @@
               document.getElementById('task4Complete').classList.add('success-animation');
               document.getElementById('task4ProgressBar').style.width = '100%';
 
-              if (window.dataSdk) {
-                const result = await window.dataSdk.create({
-                  id: 'task-4',
-                  task_number: 4,
-                  unlocked_digit: '2',
-                  completed_at: new Date().toISOString()
-                });
+              await completeTask('task-4', 4, '2');
 
-                if (result.isOk) {
-                  setTimeout(() => {
-                    document.getElementById('task4Modal').classList.add('hidden');
-                    resetTask4();
-                  }, 2500);
-                }
-              }
+              setTimeout(() => {
+                document.getElementById('task4Modal').classList.add('hidden');
+                resetTask4();
+              }, 2500);
             }
           }, 1200);
         } else {
@@ -1989,21 +1981,12 @@
         document.getElementById('escapeSuccess').classList.remove('hidden');
         document.getElementById('escapeSuccess').classList.add('success-animation');
         
-        if (window.dataSdk) {
-          const result = await window.dataSdk.create({
-            id: 'task-5',
-            task_number: 5,
-            unlocked_digit: '9',
-            completed_at: new Date().toISOString()
-          });
+        await completeTask('task-5', 5, '9');
 
-          if (result.isOk) {
-            setTimeout(() => {
-              document.getElementById('task5Modal').classList.add('hidden');
-              stopEscapeGame();
-            }, 2500);
-          }
-        }
+        setTimeout(() => {
+          document.getElementById('task5Modal').classList.add('hidden');
+          stopEscapeGame();
+        }, 2500);
       } else {
         document.getElementById('escapeGameOver').classList.remove('hidden');
         document.getElementById('escapeGameOver').classList.add('error-animation');
@@ -2157,5 +2140,5 @@
       init();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe75f9a709e0d3',t:'MTc2NjA1ODgxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe7fbf263be0d3',t:'MTc2NjA1OTIxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
