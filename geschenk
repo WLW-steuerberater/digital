@@ -1,0 +1,2125 @@
+<!doctype html>
+<html lang="de" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geburtstags Quiz</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes successBounce {
+      0% { transform: scale(0) rotate(0deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+      70% { transform: scale(0.9) rotate(360deg); }
+      100% { transform: scale(1) rotate(360deg); opacity: 1; }
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+      20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.4); }
+    }
+
+    @keyframes errorGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.4); }
+    }
+
+    @keyframes slideInFromTop {
+      from { transform: translateY(-100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes celebrate {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      75% { transform: scale(1.2) rotate(5deg); }
+    }
+
+    .success-animation {
+      animation: successBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .error-animation {
+      animation: errorShake 0.5s ease-in-out;
+    }
+
+    .glow-success {
+      animation: glowPulse 1.5s ease-in-out infinite;
+    }
+
+    .glow-error {
+      animation: errorGlow 1s ease-in-out 3;
+    }
+
+    .celebrate-animation {
+      animation: celebrate 0.8s ease-in-out;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confetti 3s ease-out forwards;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    .slide-in {
+      animation: slideIn 0.4s ease-out;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .task-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .task-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .task-card.completed {
+      border-color: rgba(34, 197, 94, 0.4);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(34, 197, 94, 0.02));
+    }
+    
+    .digit-input {
+      transition: all 0.2s ease;
+      caret-color: transparent;
+    }
+    
+    .digit-input:focus {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      background: rgba(30, 30, 30, 0.7);
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: linear-gradient(to right, #3b82f6, #8b5cf6);
+      outline: none;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s;
+    }
+
+    .slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+    }
+
+    #droneCanvas {
+      border: 2px solid rgba(59, 130, 246, 0.5);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white font-sans">
+  <div id="app" class="h-full w-full overflow-auto"><!-- Start Screen -->
+   <div id="startScreen" class="min-h-full flex items-center justify-center p-8">
+    <div class="text-center max-w-2xl fade-in">
+     <div class="mb-8"><img src="https://www.dropbox.com/scl/fi/b30g8e5p3ec8pzfoup1ct/ChatGPT-Image-16.-Dez.-2025-10_27_17.png?rlkey=3dc7vhzteelivg7hc9weaadlc&amp;st=0mqfyd2z&amp;dl=1" alt="Geburtstags-Challenge Bild" class="mx-auto mb-6 rounded-2xl shadow-2xl max-w-full h-auto" style="max-height: 300px;" onerror="this.style.display='none'; this.alt='Bild konnte nicht geladen werden';">
+      <h1 id="mainTitle" class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Geburtstags-Challenge</h1>
+      <p id="subtitle" class="text-xl text-gray-400 mb-8">Löse 7 Aufgaben und knacke den Code</p>
+     </div><button id="startBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-12 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"> Challenge starten </button>
+    </div>
+   </div><!-- Main Quiz Screen -->
+   <div id="quizScreen" class="hidden min-h-full p-8">
+    <div class="max-w-6xl mx-auto"><!-- Progress Header -->
+     <div class="mb-8 glass-effect rounded-3xl p-6 fade-in">
+      <div class="flex items-center justify-between mb-4">
+       <h2 class="text-2xl font-bold">Dein Fortschritt</h2><span id="progressText" class="text-lg text-gray-400">0 / 5 Aufgaben</span>
+      </div>
+      <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+       <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+     </div><!-- Unlocked Digits Display -->
+     <div id="unlockedDigitsContainer" class="mb-8 glass-effect rounded-3xl p-6 fade-in">
+      <h3 class="text-xl font-semibold mb-4">🔓 Freigeschaltete Ziffern</h3>
+      <div id="unlockedDigits" class="flex gap-3 flex-wrap"><span class="text-gray-600 text-lg">Noch keine Ziffern freigeschaltet</span>
+      </div>
+     </div><!-- Task Grid -->
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="1">
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🔢</span> <span class="task-status text-gray-600">🔒</span>
+       </div>
+       <h3 id="task1Title" class="text-xl font-semibold mb-2">Zahlen-Quiz</h3>
+       <p id="task1Description" class="text-gray-400 text-sm">Beantworte die Fragen mit den richtigen Zahlen</p>
+      </div>
+      <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="2">
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🚁</span> <span class="task-status text-gray-600">🔒</span>
+       </div>
+       <h3 id="task2Title" class="text-xl font-semibold mb-2">Drohnenflug</h3>
+       <p id="task2Description" class="text-gray-400 text-sm">Weiche den Hindernissen aus</p>
+      </div>
+      <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="3">
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🎯</span> <span class="task-status text-gray-600">🔒</span>
+       </div>
+       <h3 id="task3Title" class="text-xl font-semibold mb-2">Schießübung</h3>
+       <p id="task3Description" class="text-gray-400 text-sm">Triff die negativen Begriffe</p>
+      </div>
+      <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="4">
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🇷🇺</span> <span class="task-status text-gray-600">🔒</span>
+       </div>
+       <h3 id="task4Title" class="text-xl font-semibold mb-2">Russische Sprichwörter</h3>
+       <p id="task4Description" class="text-gray-400 text-sm">Finde die deutschen Entsprechungen</p>
+      </div>
+      <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="5">
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">☕</span> <span class="task-status text-gray-600">🔒</span>
+       </div>
+       <h3 id="task5Title" class="text-xl font-semibold mb-2">Kaffee-Flucht</h3>
+       <p id="task5Description" class="text-gray-400 text-sm">Entkomme mit dem Kaffee vor Mama!</p>
+      </div>
+     </div><!-- Code Entry Button -->
+     <div class="text-center"><button id="codeEntryBtn" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-10 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled> Code eingeben </button>
+     </div>
+    </div>
+   </div><!-- Task 1 Modal: Zahlen-Quiz -->
+   <div id="task1Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
+    <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
+     <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">🔢 Zahlen-Quiz</h2><button id="closeTask1Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+     </div>
+     <div class="mb-6">
+      <div class="flex justify-between items-center mb-2"><span class="text-gray-400">Fortschritt</span> <span id="task1Progress" class="text-blue-400 font-semibold">Frage 1 von 4</span>
+      </div>
+      <div class="w-full bg-gray-800 rounded-full h-2">
+       <div id="task1ProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+     </div><!-- Question 1 -->
+     <div id="question1" class="fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-lg font-semibold mb-4">Wie hoch wird der Körperschaftssteuer-Satz 2030 sein?</h3>
+       <div class="mb-4"><input type="range" min="0" max="50" value="25" class="slider" id="q1Slider">
+       </div>
+       <div class="text-center"><span id="q1Value" class="text-3xl font-bold text-blue-400">25</span> <span class="text-2xl text-gray-400">%</span>
+       </div>
+      </div>
+      <div id="q1Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div><button id="submitQ1Btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> Antwort prüfen </button>
+     </div><!-- Question 2 -->
+     <div id="question2" class="hidden fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-lg font-semibold mb-4">Wie hoch ist der Goldpreis für 1 Unze momentan?</h3>
+       <div class="mb-4"><input type="range" min="1000" max="5000" step="50" value="3000" class="slider" id="q2Slider">
+       </div>
+       <div class="text-center"><span id="q2Value" class="text-3xl font-bold text-blue-400">3000</span> <span class="text-2xl text-gray-400">$</span>
+       </div>
+      </div>
+      <div id="q2Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div><button id="submitQ2Btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> Antwort prüfen </button>
+     </div><!-- Question 3 -->
+     <div id="question3" class="hidden fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-lg font-semibold mb-4">Wie viele Felder hat ein Schachbrett?</h3>
+       <div class="mb-4"><input type="range" min="16" max="128" value="72" class="slider" id="q3Slider">
+       </div>
+       <div class="text-center"><span id="q3Value" class="text-3xl font-bold text-blue-400">72</span> <span class="text-2xl text-gray-400">Felder</span>
+       </div>
+      </div>
+      <div id="q3Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div><button id="submitQ3Btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> Antwort prüfen </button>
+     </div><!-- Question 4 -->
+     <div id="question4" class="hidden fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-lg font-semibold mb-4">Wie hoch waren die Steuereinnahmen in Deutschland 2024?</h3>
+       <div class="mb-4"><input type="range" min="500" max="1500" step="10" value="1000" class="slider" id="q4Slider">
+       </div>
+       <div class="text-center"><span id="q4Value" class="text-3xl font-bold text-blue-400">1000</span> <span class="text-2xl text-gray-400">Mrd. €</span>
+       </div>
+      </div>
+      <div id="q4Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div><button id="submitQ4Btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> Antwort prüfen </button>
+     </div><!-- Success Message -->
+     <div id="task1Complete" class="hidden fade-in">
+      <div class="bg-green-500 bg-opacity-20 border border-green-500 rounded-xl p-6 text-center">
+       <div class="text-5xl mb-4">
+        🎉
+       </div>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">Perfekt!</h3>
+       <p class="text-green-300 mb-4">Du hast alle Fragen richtig beantwortet!</p>
+       <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "7" freigeschaltet!</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Task 2 Modal: Drohnenflug -->
+   <div id="task2Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
+    <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
+     <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">🚁 Drohnenflug</h2><button id="closeTask2Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+     </div>
+     <div id="droneGameContainer">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6 text-center">
+       <p class="text-lg mb-4">Steuere die Drohne mit <strong>Pfeiltasten ��</strong>, <strong>Button</strong> oder <strong>Tippen aufs Spielfeld</strong></p>
+       <p class="text-gray-400 mb-4">Weiche 15 Hindernissen aus, um die Challenge zu meistern!</p>
+       <div class="flex justify-center gap-8 mb-4">
+        <div><span class="text-gray-400">Punkte:</span> <span id="droneScore" class="text-2xl font-bold text-blue-400 ml-2">0</span>
+        </div>
+        <div><span class="text-gray-400">Ziel:</span> <span class="text-2xl font-bold text-purple-400 ml-2">15</span>
+        </div>
+       </div>
+      </div>
+      <div class="flex justify-center mb-6">
+       <canvas id="droneCanvas" width="600" height="400" style="max-width: 100%; height: auto; touch-action: none;"></canvas>
+      </div>
+      <div class="flex justify-center mb-6"><button id="droneFlyBtn" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-12 py-8 rounded-2xl text-3xl font-bold transition-all duration-150 transform active:scale-95 touch-none"> ���� FLIEGEN </button>
+      </div>
+      <div id="droneGameOver" class="hidden bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-6 text-center mb-4">
+       <div class="text-4xl mb-3">
+        💥
+       </div>
+       <h3 class="text-xl font-bold text-red-300 mb-2">Kollision!</h3>
+       <p class="text-red-300 mb-4">Du hast ein Hindernis getroffen!</p><button id="droneRetryBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"> Nochmal versuchen </button>
+      </div>
+      <div id="droneSuccess" class="hidden bg-green-500 bg-opacity-20 border border-green-500 rounded-xl p-6 text-center">
+       <div class="text-5xl mb-4">
+        🎉
+       </div>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">Geschafft!</h3>
+       <p class="text-green-300 mb-4">Du bist allen Hindernissen ausgewichen!</p>
+       <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "3" freigeschaltet!</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Task 3 Modal: Schießübung -->
+   <div id="task3Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
+    <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
+     <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">🎯 Schießübung</h2><button id="closeTask3Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+     </div>
+     <div id="shootingGameContainer">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6 text-center">
+       <p class="text-lg mb-4">Klicke auf die <strong>negativen Begriffe</strong> - vermeide die <strong>positiven</strong>!</p>
+       <div class="flex justify-center gap-8 mb-4">
+        <div><span class="text-gray-400">Runde:</span> <span id="shootingRound" class="text-2xl font-bold text-blue-400 ml-2">1 / 3</span>
+        </div>
+        <div><span class="text-gray-400">Punkte:</span> <span id="shootingScore" class="text-2xl font-bold text-purple-400 ml-2">0 / 6</span>
+        </div>
+       </div>
+       <div class="text-sm text-gray-500" id="roundCategory">
+        Finanzbegriffe
+       </div>
+      </div>
+      <div class="relative bg-gradient-to-b from-gray-900 to-black rounded-2xl border-2 border-gray-700 mb-6" style="height: 400px; overflow: hidden;" id="shootingCanvas"><!-- Terms will be spawned here -->
+      </div>
+      <div id="shootingGameOver" class="hidden bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-6 text-center mb-4">
+       <div class="text-4xl mb-3">
+        ❌
+       </div>
+       <h3 class="text-xl font-bold text-red-300 mb-2">Zu viele Fehler!</h3>
+       <p class="text-red-300 mb-4">Du hast zu viele positive Begriffe getroffen oder negative verpasst.</p><button id="shootingRetryBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"> Nochmal versuchen </button>
+      </div>
+      <div id="shootingSuccess" class="hidden bg-green-500 bg-opacity-20 border border-green-500 rounded-xl p-6 text-center">
+       <div class="text-5xl mb-4">
+        🎉
+       </div>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">Perfekt geschossen!</h3>
+       <p class="text-green-300 mb-4">Du hast alle 3 Runden gemeistert!</p>
+       <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "5" freigeschaltet!</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Task 4 Modal: Russische Sprichwörter -->
+   <div id="task4Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
+    <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
+     <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">🇷🇺 Russische Sprichwörter</h2><button id="closeTask4Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+     </div>
+     <div class="mb-6">
+      <div class="flex justify-between items-center mb-2"><span class="text-gray-400">Fortschritt</span> <span id="task4Progress" class="text-blue-400 font-semibold">Frage 1 von 3</span>
+      </div>
+      <div class="w-full bg-gray-800 rounded-full h-2">
+       <div id="task4ProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+     </div><!-- Question 1 -->
+     <div id="proverbQuestion1" class="fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300">С миру по нитке — голому рубаха</h3>
+       <p class="text-gray-400 text-center mb-6">Wähle die richtige deutsche Entsprechung:</p>
+       <div class="space-y-3"><button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="a"> <span class="font-bold text-blue-400">a)</span> Kleinvieh macht auch Mist </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="b"> <span class="font-bold text-blue-400">b)</span> Viele Köche verderben den Brei </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="c"> <span class="font-bold text-blue-400">c)</span> Morgenstund hat Gold im Mund </button>
+       </div>
+      </div>
+      <div id="proverb1Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div>
+     </div><!-- Question 2 -->
+     <div id="proverbQuestion2" class="hidden fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300">Волков бояться — в лес не ходить</h3>
+       <p class="text-gray-400 text-center mb-6">Wähle die richtige deutsche Entsprechung:</p>
+       <div class="space-y-3"><button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="a"> <span class="font-bold text-blue-400">a)</span> In der Ruhe liegt die Kraft </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="b"> <span class="font-bold text-blue-400">b)</span> Wer nicht wagt, der nicht gewinnt </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="c"> <span class="font-bold text-blue-400">c)</span> Schlafende Hunde soll man nicht wecken </button>
+       </div>
+      </div>
+      <div id="proverb2Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div>
+     </div><!-- Question 3 -->
+     <div id="proverbQuestion3" class="hidden fade-in">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
+       <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300">На чужой каравай рот не разевай</h3>
+       <p class="text-gray-400 text-center mb-6">Wähle die richtige deutsche Entsprechung:</p>
+       <div class="space-y-3"><button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="a"> <span class="font-bold text-blue-400">a)</span> Schuster, bleib bei deinen Leisten </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="b"> <span class="font-bold text-blue-400">b)</span> Bäcker backen Brot, und Schneider nähen Hosen </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="c"> <span class="font-bold text-blue-400">c)</span> Des einen Brot ist des anderen Tod </button>
+       </div>
+      </div>
+      <div id="proverb3Error" class="hidden mb-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-4 text-center text-red-300"></div>
+     </div><!-- Success Message -->
+     <div id="task4Complete" class="hidden fade-in">
+      <div class="bg-green-500 bg-opacity-20 border border-green-500 rounded-xl p-6 text-center">
+       <div class="text-5xl mb-4">
+        🎉
+       </div>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">Отлично! (Ausgezeichnet!)</h3>
+       <p class="text-green-300 mb-4">Du hast alle Sprichwörter richtig zugeordnet!</p>
+       <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "2" freigeschaltet!</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Task 5 Modal: Kaffee-Flucht -->
+   <div id="task5Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
+    <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
+     <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold">☕ Kaffee-Flucht</h2><button id="closeTask5Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+     </div>
+     <div id="escapeGameContainer">
+      <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6 text-center">
+       <p class="text-lg mb-4">Steuere mit <strong>Pfeiltasten</strong>, <strong>WASD</strong> oder <strong>Touch-Buttons</strong> - Entkomme Mama für 30 Sekunden!</p>
+       <div class="flex justify-center gap-8 mb-4">
+        <div><span class="text-gray-400">Zeit übrig:</span> <span id="escapeTimer" class="text-2xl font-bold text-blue-400 ml-2">30s</span>
+        </div>
+        <div><span class="text-gray-400">Mamas Geschwindigkeit:</span> <span id="mamaSpeed" class="text-2xl font-bold text-red-400 ml-2">Normal</span>
+        </div>
+       </div>
+      </div>
+      <div class="flex justify-center mb-6">
+       <canvas id="escapeCanvas" width="600" height="400" style="max-width: 100%; height: auto; border: 2px solid rgba(139, 92, 246, 0.5); border-radius: 12px; background: linear-gradient(180deg, #2d1b4e 0%, #1a0f2e 100%);"></canvas>
+      </div><!-- Touch Controls for Mobile -->
+      <div id="touchControls" class="hidden flex justify-center mb-6">
+       <div class="relative" style="width: 200px; height: 200px;"><button id="touchUp" class="absolute top-0 left-1/2 transform -translate-x-1/2 bg-blue-500 active:bg-blue-700 text-white w-16 h-16 rounded-full text-2xl font-bold touch-none select-none">↑</button> <button id="touchLeft" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-500 active:bg-blue-700 text-white w-16 h-16 rounded-full text-2xl font-bold touch-none select-none">��</button> <button id="touchRight" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-500 active:bg-blue-700 text-white w-16 h-16 rounded-full text-2xl font-bold touch-none select-none">���</button> <button id="touchDown" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-blue-500 active:bg-blue-700 text-white w-16 h-16 rounded-full text-2xl font-bold touch-none select-none">↓</button>
+       </div>
+      </div>
+      <div class="flex justify-center gap-4 mb-6"><button id="escapeStartBtn" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"> Spiel starten </button> <button id="escapePauseBtn" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"> Pause </button>
+      </div>
+      <div id="escapeGameOver" class="hidden bg-red-500 bg-opacity-20 border border-red-500 rounded-xl p-6 text-center mb-4">
+       <div class="text-4xl mb-3">
+        😱
+       </div>
+       <h3 class="text-xl font-bold text-red-300 mb-2">Mama hat dich erwischt!</h3>
+       <p class="text-red-300 mb-4">Du wurdest mit dem Kaffee geschnappt!</p><button id="escapeRetryBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"> Nochmal versuchen </button>
+      </div>
+      <div id="escapeSuccess" class="hidden bg-green-500 bg-opacity-20 border border-green-500 rounded-xl p-6 text-center">
+       <div class="text-5xl mb-4">
+        🎉
+       </div>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">Entkommen!</h3>
+       <p class="text-green-300 mb-4">Du hast es 30 Sekunden lang geschafft!</p>
+       <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "9" freigeschaltet!</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Code Entry Modal -->
+   <div id="codeModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
+    <div class="glass-effect rounded-3xl p-8 max-w-md w-full fade-in">
+     <h2 class="text-3xl font-bold mb-6 text-center">5-stelliger Code</h2>
+     <p class="text-gray-400 mb-6 text-center">Gib die freigeschalteten Ziffern in der richtigen Reihenfolge ein</p>
+     <div class="flex gap-2 justify-center mb-6"><input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="0"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="1"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="2"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="3"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="4">
+     </div>
+     <div id="codeError" class="hidden text-red-400 text-center mb-4 text-sm"></div>
+     <div class="flex gap-3"><button id="closeModalBtn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300"> Abbrechen </button> <button id="submitCodeBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300"> Prüfen </button>
+     </div>
+    </div>
+   </div><!-- Success Screen -->
+   <div id="successScreen" class="hidden min-h-full flex items-center justify-center p-8">
+    <div class="text-center max-w-2xl fade-in">
+     <div class="mb-8">
+      <div class="text-8xl mb-6 pulse-animation">
+       🎉
+      </div>
+      <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Herzlichen Glückwunsch!</h1>
+      <p class="text-2xl text-gray-400 mb-8">Du hast alle Aufgaben gemeistert!</p>
+      <div class="glass-effect rounded-3xl p-8 mb-6">
+       <p class="text-gray-400 mb-3">Dein finales Wort:</p>
+       <p id="finalWord" class="text-5xl font-bold text-transparent bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text">GESCHAFFT</p>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "Geburtstags-Challenge",
+      subtitle: "Löse 7 Aufgaben und knacke den Code",
+      final_word_label: "GESCHAFFT",
+      start_button: "Challenge starten",
+      code_button: "Code eingeben",
+      task1_title: "Zahlen-Quiz",
+      task1_description: "Beantworte die Fragen mit den richtigen Zahlen",
+      task2_title: "Drohnenflug",
+      task2_description: "Weiche den Hindernissen aus",
+      task3_title: "Schießübung",
+      task3_description: "Triff die negativen Begriffe",
+      task4_title: "Russische Sprichwörter",
+      task4_description: "Finde die deutschen Entsprechungen",
+      task5_title: "Kaffee-Flucht",
+      task5_description: "Entkomme mit dem Kaffee vor Mama!",
+      background_color: "#000000",
+      surface_color: "#1e1e1e",
+      text_color: "#ffffff",
+      primary_action_color: "#3b82f6",
+      secondary_action_color: "#8b5cf6",
+      font_family: "system-ui",
+      font_size: 16
+    };
+
+    let completedTasks = [];
+    const correctCode = "12345";
+    
+    const task1Answers = {
+      q1: 12,
+      q2: 3662,
+      q2Range: 500,
+      q3: 64,
+      q4: 948,
+      q4Range: 50
+    };
+
+    // Drone game variables
+    let droneGame = null;
+    let droneAnimationFrame = null;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        completedTasks = data;
+        updateUI();
+      }
+    };
+
+    async function init() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const customFont = config.font_family || defaultConfig.font_family;
+            const baseSize = config.font_size || defaultConfig.font_size;
+            const baseFontStack = 'system-ui, -apple-system, sans-serif';
+
+            document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+            document.body.style.background = `linear-gradient(to bottom right, ${config.background_color || defaultConfig.background_color}, #000000, ${config.background_color || defaultConfig.background_color})`;
+
+            const titleElement = document.getElementById('mainTitle');
+            if (titleElement) {
+              titleElement.textContent = config.main_title || defaultConfig.main_title;
+              titleElement.style.fontSize = `${baseSize * 3.125}px`;
+              titleElement.style.fontFamily = `${customFont}, ${baseFontStack}`;
+            }
+
+            const subtitleElement = document.getElementById('subtitle');
+            if (subtitleElement) {
+              subtitleElement.textContent = config.subtitle || defaultConfig.subtitle;
+              subtitleElement.style.fontSize = `${baseSize * 1.25}px`;
+              subtitleElement.style.fontFamily = `${customFont}, ${baseFontStack}`;
+            }
+
+            const finalWordElement = document.getElementById('finalWord');
+            if (finalWordElement) {
+              finalWordElement.textContent = config.final_word_label || defaultConfig.final_word_label;
+              finalWordElement.style.fontSize = `${baseSize * 3.125}px`;
+              finalWordElement.style.fontFamily = `${customFont}, ${baseFontStack}`;
+            }
+
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+              startBtn.textContent = config.start_button || defaultConfig.start_button;
+              startBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+              startBtn.style.fontSize = `${baseSize * 1.125}px`;
+            }
+
+            const codeEntryBtn = document.getElementById('codeEntryBtn');
+            if (codeEntryBtn) {
+              codeEntryBtn.textContent = config.code_button || defaultConfig.code_button;
+              codeEntryBtn.style.fontSize = `${baseSize * 1.125}px`;
+            }
+
+            const task1Title = document.getElementById('task1Title');
+            if (task1Title) {
+              task1Title.textContent = config.task1_title || defaultConfig.task1_title;
+            }
+
+            const task1Description = document.getElementById('task1Description');
+            if (task1Description) {
+              task1Description.textContent = config.task1_description || defaultConfig.task1_description;
+            }
+
+            const task2Title = document.getElementById('task2Title');
+            if (task2Title) {
+              task2Title.textContent = config.task2_title || defaultConfig.task2_title;
+            }
+
+            const task2Description = document.getElementById('task2Description');
+            if (task2Description) {
+              task2Description.textContent = config.task2_description || defaultConfig.task2_description;
+            }
+
+            const task3Title = document.getElementById('task3Title');
+            if (task3Title) {
+              task3Title.textContent = config.task3_title || defaultConfig.task3_title;
+            }
+
+            const task3Description = document.getElementById('task3Description');
+            if (task3Description) {
+              task3Description.textContent = config.task3_description || defaultConfig.task3_description;
+            }
+
+            const task4Title = document.getElementById('task4Title');
+            if (task4Title) {
+              task4Title.textContent = config.task4_title || defaultConfig.task4_title;
+            }
+
+            const task4Description = document.getElementById('task4Description');
+            if (task4Description) {
+              task4Description.textContent = config.task4_description || defaultConfig.task4_description;
+            }
+
+            const task5Title = document.getElementById('task5Title');
+            if (task5Title) {
+              task5Title.textContent = config.task5_title || defaultConfig.task5_title;
+            }
+
+            const task5Description = document.getElementById('task5Description');
+            if (task5Description) {
+              task5Description.textContent = config.task5_description || defaultConfig.task5_description;
+            }
+
+            const glassElements = document.querySelectorAll('.glass-effect');
+            glassElements.forEach(el => {
+              el.style.backgroundColor = `${config.surface_color || defaultConfig.surface_color}b3`;
+            });
+
+            document.querySelectorAll('h1, h2, h3, p, button, span, div').forEach(el => {
+              if (!el.style.fontSize) {
+                el.style.fontSize = `${baseSize}px`;
+              }
+            });
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.background_color = value;
+                    window.elementSdk.setConfig({ background_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.surface_color = value;
+                    window.elementSdk.setConfig({ surface_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.text_color = value;
+                    window.elementSdk.setConfig({ text_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.primary_action_color = value;
+                    window.elementSdk.setConfig({ primary_action_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.secondary_action_color = value;
+                    window.elementSdk.setConfig({ secondary_action_color: value });
+                  }
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.font_family = value;
+                  window.elementSdk.setConfig({ font_family: value });
+                }
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.font_size = value;
+                  window.elementSdk.setConfig({ font_size: value });
+                }
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["main_title", config.main_title || defaultConfig.main_title],
+            ["subtitle", config.subtitle || defaultConfig.subtitle],
+            ["final_word_label", config.final_word_label || defaultConfig.final_word_label],
+            ["start_button", config.start_button || defaultConfig.start_button],
+            ["code_button", config.code_button || defaultConfig.code_button],
+            ["task1_title", config.task1_title || defaultConfig.task1_title],
+            ["task1_description", config.task1_description || defaultConfig.task1_description],
+            ["task2_title", config.task2_title || defaultConfig.task2_title],
+            ["task2_description", config.task2_description || defaultConfig.task2_description],
+            ["task3_title", config.task3_title || defaultConfig.task3_title],
+            ["task3_description", config.task3_description || defaultConfig.task3_description],
+            ["task4_title", config.task4_title || defaultConfig.task4_title],
+            ["task4_description", config.task4_description || defaultConfig.task4_description],
+            ["task5_title", config.task5_title || defaultConfig.task5_title],
+            ["task5_description", config.task5_description || defaultConfig.task5_description]
+          ])
+        });
+      }
+
+      setupEventListeners();
+      setupSliders();
+    }
+
+    function createConfetti() {
+      const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444'];
+      const confettiCount = 50;
+
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        // Spawn confetti from center of screen (40-60% range)
+        confetti.style.left = (40 + Math.random() * 20) + '%';
+        confetti.style.top = '40%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        document.body.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 5000);
+      }
+    }
+
+    function setupSliders() {
+      const q1Slider = document.getElementById('q1Slider');
+      const q1Value = document.getElementById('q1Value');
+      q1Slider.addEventListener('input', (e) => {
+        q1Value.textContent = e.target.value;
+      });
+
+      const q2Slider = document.getElementById('q2Slider');
+      const q2Value = document.getElementById('q2Value');
+      q2Slider.addEventListener('input', (e) => {
+        q2Value.textContent = e.target.value;
+      });
+
+      const q3Slider = document.getElementById('q3Slider');
+      const q3Value = document.getElementById('q3Value');
+      q3Slider.value = 72;
+      q3Value.textContent = 72;
+      q3Slider.addEventListener('input', (e) => {
+        q3Value.textContent = e.target.value;
+      });
+
+      const q4Slider = document.getElementById('q4Slider');
+      const q4Value = document.getElementById('q4Value');
+      q4Slider.value = 1000;
+      q4Value.textContent = 1000;
+      q4Slider.addEventListener('input', (e) => {
+        q4Value.textContent = e.target.value;
+      });
+    }
+
+    function setupEventListeners() {
+      document.getElementById('startBtn').addEventListener('click', () => {
+        // Play audio when challenge starts
+        const audio = new Audio('https://www.dropbox.com/scl/fi/n13jgx40yh0u817esjy98/887.mp3?rlkey=q7mg4f4huqmfwg5tjtv252lqo&st=qduju9fu&dl=1');
+        audio.play().catch(err => console.log('Audio playback failed:', err));
+        
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('quizScreen').classList.remove('hidden');
+      });
+
+      document.getElementById('codeEntryBtn').addEventListener('click', () => {
+        document.getElementById('codeModal').classList.remove('hidden');
+        setTimeout(() => {
+          document.querySelector('.digit-input').focus();
+        }, 100);
+      });
+
+      document.getElementById('closeModalBtn').addEventListener('click', () => {
+        document.getElementById('codeModal').classList.add('hidden');
+        clearCodeInputs();
+      });
+
+      document.getElementById('submitCodeBtn').addEventListener('click', checkCode);
+
+      const digitInputs = document.querySelectorAll('.digit-input');
+      digitInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+          if (e.target.value.length === 1 && index < digitInputs.length - 1) {
+            digitInputs[index + 1].focus();
+          }
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            digitInputs[index - 1].focus();
+          }
+        });
+      });
+
+      // Task 1 handlers
+      document.querySelector('[data-task="1"]').addEventListener('click', () => {
+        document.getElementById('task1Modal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeTask1Btn').addEventListener('click', () => {
+        document.getElementById('task1Modal').classList.add('hidden');
+        resetTask1();
+      });
+
+      document.getElementById('submitQ1Btn').addEventListener('click', () => checkQuestion(1));
+      document.getElementById('submitQ2Btn').addEventListener('click', () => checkQuestion(2));
+      document.getElementById('submitQ3Btn').addEventListener('click', () => checkQuestion(3));
+      document.getElementById('submitQ4Btn').addEventListener('click', () => checkQuestion(4));
+
+      // Task 2 handlers
+      document.querySelector('[data-task="2"]').addEventListener('click', () => {
+        document.getElementById('task2Modal').classList.remove('hidden');
+        initDroneGame();
+      });
+
+      document.getElementById('closeTask2Btn').addEventListener('click', () => {
+        document.getElementById('task2Modal').classList.add('hidden');
+        stopDroneGame();
+      });
+
+      document.getElementById('droneRetryBtn').addEventListener('click', () => {
+        document.getElementById('droneGameOver').classList.add('hidden');
+        initDroneGame();
+      });
+
+      // Task 3 handlers
+      document.querySelector('[data-task="3"]').addEventListener('click', () => {
+        document.getElementById('task3Modal').classList.remove('hidden');
+        initShootingGame();
+      });
+
+      document.getElementById('closeTask3Btn').addEventListener('click', () => {
+        document.getElementById('task3Modal').classList.add('hidden');
+        stopShootingGame();
+      });
+
+      document.getElementById('shootingRetryBtn').addEventListener('click', () => {
+        document.getElementById('shootingGameOver').classList.add('hidden');
+        initShootingGame();
+      });
+
+      // Task 4 handlers
+      document.querySelector('[data-task="4"]').addEventListener('click', () => {
+        document.getElementById('task4Modal').classList.remove('hidden');
+        resetTask4();
+      });
+
+      document.getElementById('closeTask4Btn').addEventListener('click', () => {
+        document.getElementById('task4Modal').classList.add('hidden');
+        resetTask4();
+      });
+
+      // Task 5 handlers
+      document.querySelector('[data-task="5"]').addEventListener('click', () => {
+        document.getElementById('task5Modal').classList.remove('hidden');
+        resetEscapeGame();
+      });
+
+      document.getElementById('closeTask5Btn').addEventListener('click', () => {
+        document.getElementById('task5Modal').classList.add('hidden');
+        stopEscapeGame();
+      });
+
+      document.getElementById('escapeStartBtn').addEventListener('click', () => {
+        startEscapeGame();
+      });
+
+      document.getElementById('escapePauseBtn').addEventListener('click', () => {
+        pauseEscapeGame();
+      });
+
+      document.getElementById('escapeRetryBtn').addEventListener('click', () => {
+        document.getElementById('escapeGameOver').classList.add('hidden');
+        resetEscapeGame();
+      });
+    }
+
+    let currentQuestion = 1;
+
+    function resetTask1() {
+      currentQuestion = 1;
+      document.getElementById('question1').classList.remove('hidden');
+      document.getElementById('question2').classList.add('hidden');
+      document.getElementById('question3').classList.add('hidden');
+      document.getElementById('question4').classList.add('hidden');
+      document.getElementById('task1Complete').classList.add('hidden');
+      document.getElementById('q1Error').classList.add('hidden');
+      document.getElementById('q2Error').classList.add('hidden');
+      document.getElementById('q3Error').classList.add('hidden');
+      document.getElementById('q4Error').classList.add('hidden');
+      updateTask1Progress();
+    }
+
+    function updateTask1Progress() {
+      const progress = ((currentQuestion - 1) / 4) * 100;
+      document.getElementById('task1ProgressBar').style.width = `${progress}%`;
+      document.getElementById('task1Progress').textContent = `Frage ${currentQuestion} von 4`;
+    }
+
+    async function checkQuestion(questionNum) {
+      const errorDiv = document.getElementById(`q${questionNum}Error`);
+      const submitBtn = document.getElementById(`submitQ${questionNum}Btn`);
+      errorDiv.classList.add('hidden');
+
+      let answer, correct;
+
+      switch(questionNum) {
+        case 1:
+          answer = parseInt(document.getElementById('q1Slider').value);
+          correct = answer === task1Answers.q1;
+          break;
+        case 2:
+          answer = parseInt(document.getElementById('q2Slider').value);
+          correct = Math.abs(answer - task1Answers.q2) <= task1Answers.q2Range;
+          break;
+        case 3:
+          answer = parseInt(document.getElementById('q3Slider').value);
+          correct = answer === task1Answers.q3;
+          break;
+        case 4:
+          answer = parseInt(document.getElementById('q4Slider').value);
+          correct = Math.abs(answer - task1Answers.q4) <= task1Answers.q4Range;
+          break;
+      }
+
+      if (correct) {
+        // Success animation
+        submitBtn.classList.add('success-animation', 'glow-success');
+        submitBtn.style.backgroundColor = '#22c55e';
+        submitBtn.textContent = '✓ Richtig!';
+        
+        setTimeout(() => {
+          submitBtn.classList.remove('success-animation', 'glow-success');
+          submitBtn.style.backgroundColor = '';
+          submitBtn.textContent = 'Antwort prüfen';
+        }, 1500);
+
+        if (questionNum < 4) {
+          setTimeout(() => {
+            document.getElementById(`question${questionNum}`).classList.add('hidden');
+            document.getElementById(`question${questionNum + 1}`).classList.remove('hidden');
+            currentQuestion = questionNum + 1;
+            updateTask1Progress();
+          }, 800);
+        } else {
+          createConfetti();
+          
+          setTimeout(() => {
+            document.getElementById('question4').classList.add('hidden');
+            document.getElementById('task1Complete').classList.remove('hidden');
+            document.getElementById('task1Complete').classList.add('success-animation');
+            document.getElementById('task1ProgressBar').style.width = '100%';
+          }, 800);
+          
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Wird gespeichert...';
+
+          if (window.dataSdk) {
+            const result = await window.dataSdk.create({
+              id: 'task-1',
+              task_number: 1,
+              unlocked_digit: '7',
+              completed_at: new Date().toISOString()
+            });
+
+            if (result.isOk) {
+              setTimeout(() => {
+                document.getElementById('task1Modal').classList.add('hidden');
+                resetTask1();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Antwort prüfen';
+              }, 3500);
+            } else {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Antwort prüfen';
+              errorDiv.textContent = 'Fehler beim Speichern. Bitte versuche es erneut.';
+              errorDiv.classList.remove('hidden');
+              errorDiv.classList.add('error-animation');
+            }
+          }
+        }
+      } else {
+        // Error animation
+        submitBtn.classList.add('error-animation', 'glow-error');
+        submitBtn.style.backgroundColor = '#ef4444';
+        submitBtn.textContent = '✗ Falsch';
+        
+        errorDiv.textContent = '❌ Leider nicht richtig. Versuche es nochmal!';
+        errorDiv.classList.remove('hidden');
+        errorDiv.classList.add('error-animation');
+        
+        setTimeout(() => {
+          submitBtn.classList.remove('error-animation', 'glow-error');
+          submitBtn.style.backgroundColor = '';
+          submitBtn.textContent = 'Antwort prüfen';
+          errorDiv.classList.remove('error-animation');
+        }, 1500);
+      }
+    }
+
+    // Drone Game Implementation
+    function initDroneGame() {
+      const canvas = document.getElementById('droneCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      document.getElementById('droneGameOver').classList.add('hidden');
+      document.getElementById('droneSuccess').classList.add('hidden');
+
+      droneGame = {
+        drone: {
+          x: 100,
+          y: canvas.height / 2,
+          width: 60,
+          height: 45,
+          velocity: 0,
+          gravity: 0.4,
+          lift: -4
+        },
+        obstacles: [],
+        score: 0,
+        targetScore: 15,
+        gameOver: false,
+        isFlying: false,
+        obstacleSpeed: 3,
+        obstacleInterval: 100,
+        frameCount: 0,
+        droneImage: null,
+        imageLoaded: false
+      };
+
+      // Preload drone image and wait for it to load
+      droneGame.droneImage = new Image();
+      droneGame.droneImage.onload = () => {
+        droneGame.imageLoaded = true;
+      };
+      droneGame.droneImage.src = 'https://www.dropbox.com/scl/fi/vv9ril8ga40xupxjyara0/ChatGPT-Image-18.-Dez.-2025-11_27_28.png?rlkey=djql5ppnc97asvy6xjxr1fba4&st=giqwvt20&dl=1';
+
+      const keydownHandler = (e) => {
+        if (e.key === 'ArrowUp' || e.key === ' ') {
+          e.preventDefault();
+          droneGame.isFlying = true;
+        }
+      };
+
+      const keyupHandler = (e) => {
+        if (e.key === 'ArrowUp' || e.key === ' ') {
+          e.preventDefault();
+          droneGame.isFlying = false;
+        }
+      };
+
+      // Button handlers
+      const flyBtn = document.getElementById('droneFlyBtn');
+      
+      const btnDownHandler = (e) => {
+        e.preventDefault();
+        droneGame.isFlying = true;
+      };
+
+      const btnUpHandler = (e) => {
+        e.preventDefault();
+        droneGame.isFlying = false;
+      };
+
+      // Canvas touch handlers
+      const canvasTouchStart = (e) => {
+        e.preventDefault();
+        droneGame.isFlying = true;
+      };
+
+      const canvasTouchEnd = (e) => {
+        e.preventDefault();
+        droneGame.isFlying = false;
+      };
+
+      document.addEventListener('keydown', keydownHandler);
+      document.addEventListener('keyup', keyupHandler);
+      
+      flyBtn.addEventListener('mousedown', btnDownHandler);
+      flyBtn.addEventListener('mouseup', btnUpHandler);
+      flyBtn.addEventListener('mouseleave', btnUpHandler);
+      flyBtn.addEventListener('touchstart', btnDownHandler);
+      flyBtn.addEventListener('touchend', btnUpHandler);
+      flyBtn.addEventListener('touchcancel', btnUpHandler);
+
+      canvas.addEventListener('touchstart', canvasTouchStart);
+      canvas.addEventListener('touchend', canvasTouchEnd);
+      canvas.addEventListener('touchcancel', canvasTouchEnd);
+
+      droneGame.keydownHandler = keydownHandler;
+      droneGame.keyupHandler = keyupHandler;
+      droneGame.btnDownHandler = btnDownHandler;
+      droneGame.btnUpHandler = btnUpHandler;
+      droneGame.canvasTouchStart = canvasTouchStart;
+      droneGame.canvasTouchEnd = canvasTouchEnd;
+
+      gameLoop();
+    }
+
+    function gameLoop() {
+      if (!droneGame || droneGame.gameOver) return;
+
+      // Wait for image to load before starting game logic
+      if (!droneGame.imageLoaded) {
+        requestAnimationFrame(gameLoop);
+        return;
+      }
+
+      const canvas = document.getElementById('droneCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Clear canvas
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Apply gravity and lift
+      if (droneGame.isFlying) {
+        droneGame.drone.velocity = droneGame.drone.lift;
+      } else {
+        droneGame.drone.velocity += droneGame.drone.gravity;
+      }
+
+      // Update drone position
+      droneGame.drone.y += droneGame.drone.velocity;
+
+      // Keep drone in bounds
+      if (droneGame.drone.y < 0) {
+        droneGame.drone.y = 0;
+        droneGame.drone.velocity = 0;
+      }
+      if (droneGame.drone.y > canvas.height - droneGame.drone.height) {
+        droneGame.drone.y = canvas.height - droneGame.drone.height;
+        droneGame.drone.velocity = 0;
+      }
+
+      // Draw drone
+      if (droneGame.droneImage && droneGame.droneImage.complete) {
+        ctx.drawImage(
+          droneGame.droneImage,
+          droneGame.drone.x,
+          droneGame.drone.y,
+          droneGame.drone.width,
+          droneGame.drone.height
+        );
+      } else {
+        // Fallback while image loads
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(droneGame.drone.x, droneGame.drone.y, droneGame.drone.width, droneGame.drone.height);
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillRect(droneGame.drone.x + 5, droneGame.drone.y + 5, 10, 10);
+        ctx.fillRect(droneGame.drone.x + 25, droneGame.drone.y + 5, 10, 10);
+      }
+
+      // Create obstacles
+      droneGame.frameCount++;
+      if (droneGame.frameCount % droneGame.obstacleInterval === 0) {
+        const gap = 150;
+        const minHeight = 60;
+        const maxHeight = canvas.height - gap - minHeight;
+        const topHeight = Math.random() * maxHeight + minHeight;
+
+        droneGame.obstacles.push({
+          x: canvas.width,
+          topHeight: topHeight,
+          gap: gap,
+          passed: false,
+          width: 40
+        });
+      }
+
+      // Update and draw obstacles
+      for (let i = droneGame.obstacles.length - 1; i >= 0; i--) {
+        const obs = droneGame.obstacles[i];
+        obs.x -= droneGame.obstacleSpeed;
+
+        // Draw obstacle
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(obs.x, 0, obs.width, obs.topHeight);
+        ctx.fillRect(obs.x, obs.topHeight + obs.gap, obs.width, canvas.height - obs.topHeight - obs.gap);
+
+        // Check collision
+        if (
+          droneGame.drone.x < obs.x + obs.width &&
+          droneGame.drone.x + droneGame.drone.width > obs.x &&
+          (droneGame.drone.y < obs.topHeight || droneGame.drone.y + droneGame.drone.height > obs.topHeight + obs.gap)
+        ) {
+          endDroneGame(false);
+          return;
+        }
+
+        // Check if passed
+        if (!obs.passed && obs.x + obs.width < droneGame.drone.x) {
+          obs.passed = true;
+          droneGame.score++;
+          document.getElementById('droneScore').textContent = droneGame.score;
+
+          if (droneGame.score >= droneGame.targetScore) {
+            endDroneGame(true);
+            return;
+          }
+        }
+
+        // Remove off-screen obstacles
+        if (obs.x + obs.width < 0) {
+          droneGame.obstacles.splice(i, 1);
+        }
+      }
+
+      droneAnimationFrame = requestAnimationFrame(gameLoop);
+    }
+
+    async function endDroneGame(success) {
+      droneGame.gameOver = true;
+      
+      if (droneAnimationFrame) {
+        cancelAnimationFrame(droneAnimationFrame);
+        droneAnimationFrame = null;
+      }
+
+      document.removeEventListener('keydown', droneGame.keydownHandler);
+      document.removeEventListener('keyup', droneGame.keyupHandler);
+
+      if (success) {
+        createConfetti();
+        document.getElementById('droneSuccess').classList.remove('hidden');
+        document.getElementById('droneSuccess').classList.add('success-animation');
+        
+        if (window.dataSdk) {
+          const result = await window.dataSdk.create({
+            id: 'task-2',
+            task_number: 2,
+            unlocked_digit: '3',
+            completed_at: new Date().toISOString()
+          });
+
+          if (result.isOk) {
+            setTimeout(() => {
+              document.getElementById('task2Modal').classList.add('hidden');
+              stopDroneGame();
+            }, 3500);
+          }
+        }
+      } else {
+        document.getElementById('droneGameOver').classList.remove('hidden');
+        document.getElementById('droneGameOver').classList.add('error-animation');
+      }
+    }
+
+    function stopDroneGame() {
+      if (droneAnimationFrame) {
+        cancelAnimationFrame(droneAnimationFrame);
+        droneAnimationFrame = null;
+      }
+
+      if (droneGame) {
+        if (droneGame.keydownHandler) {
+          document.removeEventListener('keydown', droneGame.keydownHandler);
+        }
+        if (droneGame.keyupHandler) {
+          document.removeEventListener('keyup', droneGame.keyupHandler);
+        }
+
+        const flyBtn = document.getElementById('droneFlyBtn');
+        if (flyBtn && droneGame.btnDownHandler && droneGame.btnUpHandler) {
+          flyBtn.removeEventListener('mousedown', droneGame.btnDownHandler);
+          flyBtn.removeEventListener('mouseup', droneGame.btnUpHandler);
+          flyBtn.removeEventListener('mouseleave', droneGame.btnUpHandler);
+          flyBtn.removeEventListener('touchstart', droneGame.btnDownHandler);
+          flyBtn.removeEventListener('touchend', droneGame.btnUpHandler);
+          flyBtn.removeEventListener('touchcancel', droneGame.btnUpHandler);
+        }
+
+        const canvas = document.getElementById('droneCanvas');
+        if (canvas && droneGame.canvasTouchStart && droneGame.canvasTouchEnd) {
+          canvas.removeEventListener('touchstart', droneGame.canvasTouchStart);
+          canvas.removeEventListener('touchend', droneGame.canvasTouchEnd);
+          canvas.removeEventListener('touchcancel', droneGame.canvasTouchEnd);
+        }
+
+        droneGame = null;
+      }
+
+      document.getElementById('droneScore').textContent = '0';
+      document.getElementById('droneGameOver').classList.add('hidden');
+      document.getElementById('droneSuccess').classList.add('hidden');
+    }
+
+    // Shooting Game Implementation
+    let shootingGame = null;
+    let shootingInterval = null;
+
+    const shootingRounds = [
+      {
+        category: "Finanzbegriffe",
+        negative: ["Schulden", "Verlust", "Pleite", "Crash", "Inflation", "Defizit", "Krise", "Insolvenz", "Rezession", "Bankrott", "Abschreibung", "Mahngebühr", "Überschuldung", "Zahlungsausfall", "Zwangsvollstreckung", "Liquiditätskrise"],
+        positive: ["Gewinn", "Profit", "Wachstum", "Rendite", "Dividende", "Bonus", "Zinsen", "Kapital", "Vermögen", "Investment", "Sparplan", "Cashflow", "Ertrag", "Überschuss", "Liquidität", "Rücklage"]
+      },
+      {
+        category: "Steuerbegriffe", 
+        negative: ["Steuerschuld", "Nachzahlung", "Strafe", "Prüfung", "Betriebsprüfung", "Säumniszuschlag", "Steuerhinterziehung", "Verspätungszuschlag", "Bußgeld", "Strafzins", "Verzugszinsen", "Steuerbescheid", "Einspruch", "Festsetzung"],
+        positive: ["Erstattung", "Freibetrag", "Ermäßigung", "Steuerbonus", "Absetzbar", "Vergünstigung", "Rückzahlung", "Steuervorteil", "Pauschale", "Befreiung", "Gutschrift", "Entlastung", "Förderung", "Sonderausgaben"]
+      },
+      {
+        category: "Startup-Begriffe",
+        negative: ["Burn-Rate", "Pivot", "Disruption", "Deadline", "Crunch-Time", "Tech-Debt", "Downround", "Churn", "Runway", "Layoffs", "Bootstrapping", "Konkurrenz", "Skalierung", "Zeitdruck", "Insolvenz", "Marktrisiko"],
+        positive: ["Unicorn", "Exit", "IPO", "Funding", "Growth", "MVP", "Launch", "Pitch", "Inkubator", "Accelerator", "Investor", "Traction", "Valuation", "Milestone", "Innovation", "Success"]
+      }
+    ];
+
+    function initShootingGame() {
+      document.getElementById('shootingGameOver').classList.add('hidden');
+      document.getElementById('shootingSuccess').classList.add('hidden');
+
+      shootingGame = {
+        currentRound: 0,
+        score: 0,
+        targetScore: 6,
+        errors: 0,
+        maxErrors: 5,
+        activeTerms: [],
+        isGameOver: false
+      };
+
+      startRound();
+    }
+
+    function startRound() {
+      if (shootingGame.currentRound >= 3) {
+        endShootingGame(true);
+        return;
+      }
+
+      const round = shootingRounds[shootingGame.currentRound];
+      document.getElementById('roundCategory').textContent = round.category;
+      document.getElementById('shootingRound').textContent = `${shootingGame.currentRound + 1} / 3`;
+      document.getElementById('shootingScore').textContent = `${shootingGame.score} / ${shootingGame.targetScore}`;
+
+      const canvas = document.getElementById('shootingCanvas');
+      canvas.innerHTML = '';
+      shootingGame.activeTerms = [];
+
+      shootingInterval = setInterval(() => {
+        if (shootingGame.isGameOver) return;
+        spawnTerm();
+      }, 1100);
+    }
+
+    function spawnTerm() {
+      const round = shootingRounds[shootingGame.currentRound];
+      const isNegative = Math.random() > 0.4;
+      const terms = isNegative ? round.negative : round.positive;
+      const term = terms[Math.floor(Math.random() * terms.length)];
+
+      const canvas = document.getElementById('shootingCanvas');
+      const termElement = document.createElement('div');
+      termElement.className = 'absolute px-4 py-2 rounded-lg font-bold text-lg cursor-pointer transition-all duration-200 hover:scale-110 text-white';
+      termElement.style.backgroundColor = isNegative ? '#7f1d1d' : '#374151';
+      termElement.textContent = term;
+      termElement.style.left = `${Math.random() * 80}%`;
+      termElement.style.top = '-50px';
+      termElement.dataset.negative = isNegative;
+
+      const termData = {
+        element: termElement,
+        isNegative: isNegative,
+        speed: 1 + Math.random() * 1
+      };
+
+      termElement.addEventListener('click', () => handleTermClick(termData));
+
+      canvas.appendChild(termElement);
+      shootingGame.activeTerms.push(termData);
+
+      animateTerm(termData);
+    }
+
+    function animateTerm(termData) {
+      termData.clicked = false;
+      
+      const animate = () => {
+        if (shootingGame.isGameOver || !termData.element.parentElement || termData.clicked) return;
+
+        const currentTop = parseFloat(termData.element.style.top) || 0;
+        const newTop = currentTop + termData.speed;
+
+        if (newTop > 420) {
+          if (!termData.clicked) {
+            termData.element.remove();
+            const index = shootingGame.activeTerms.indexOf(termData);
+            if (index > -1) shootingGame.activeTerms.splice(index, 1);
+
+            if (termData.isNegative) {
+              shootingGame.errors++;
+              if (shootingGame.errors >= shootingGame.maxErrors) {
+                endShootingGame(false);
+              }
+            }
+          }
+          return;
+        }
+
+        termData.element.style.top = `${newTop}px`;
+        requestAnimationFrame(animate);
+      };
+
+      requestAnimationFrame(animate);
+    }
+
+    function handleTermClick(termData) {
+      if (shootingGame.isGameOver || termData.clicked) return;
+      
+      termData.clicked = true;
+
+      termData.element.style.transform = 'scale(0)';
+      setTimeout(() => {
+        termData.element.remove();
+      }, 200);
+
+      const index = shootingGame.activeTerms.indexOf(termData);
+      if (index > -1) shootingGame.activeTerms.splice(index, 1);
+
+      if (termData.isNegative) {
+        shootingGame.score++;
+        document.getElementById('shootingScore').textContent = `${shootingGame.score} / ${shootingGame.targetScore}`;
+
+        if (shootingGame.score >= shootingGame.targetScore) {
+          clearInterval(shootingInterval);
+          shootingGame.score = 0;
+          shootingGame.currentRound++;
+          
+          setTimeout(() => {
+            startRound();
+          }, 1000);
+        }
+      } else {
+        shootingGame.errors++;
+        if (shootingGame.errors >= shootingGame.maxErrors) {
+          endShootingGame(false);
+        }
+      }
+    }
+
+    async function endShootingGame(success) {
+      shootingGame.isGameOver = true;
+      clearInterval(shootingInterval);
+
+      const canvas = document.getElementById('shootingCanvas');
+      canvas.innerHTML = '';
+
+      if (success) {
+        createConfetti();
+        document.getElementById('shootingSuccess').classList.remove('hidden');
+        document.getElementById('shootingSuccess').classList.add('success-animation');
+
+        if (window.dataSdk) {
+          const result = await window.dataSdk.create({
+            id: 'task-3',
+            task_number: 3,
+            unlocked_digit: '5',
+            completed_at: new Date().toISOString()
+          });
+
+          if (result.isOk) {
+            setTimeout(() => {
+              document.getElementById('task3Modal').classList.add('hidden');
+              stopShootingGame();
+            }, 3500);
+          }
+        }
+      } else {
+        document.getElementById('shootingGameOver').classList.remove('hidden');
+        document.getElementById('shootingGameOver').classList.add('error-animation');
+      }
+    }
+
+    function stopShootingGame() {
+      if (shootingInterval) {
+        clearInterval(shootingInterval);
+        shootingInterval = null;
+      }
+
+      if (shootingGame) {
+        shootingGame.isGameOver = true;
+        const canvas = document.getElementById('shootingCanvas');
+        canvas.innerHTML = '';
+        shootingGame = null;
+      }
+
+      document.getElementById('shootingScore').textContent = '0 / 6';
+      document.getElementById('shootingRound').textContent = '1 / 3';
+      document.getElementById('shootingGameOver').classList.add('hidden');
+      document.getElementById('shootingSuccess').classList.add('hidden');
+    }
+
+    // Proverb Quiz Implementation
+    let currentProverbQuestion = 1;
+    const proverbAnswers = {
+      q1: 'a',
+      q2: 'b',
+      q3: 'a'
+    };
+
+    function resetTask4() {
+      currentProverbQuestion = 1;
+      document.getElementById('proverbQuestion1').classList.remove('hidden');
+      document.getElementById('proverbQuestion2').classList.add('hidden');
+      document.getElementById('proverbQuestion3').classList.add('hidden');
+      document.getElementById('task4Complete').classList.add('hidden');
+      document.getElementById('proverb1Error').classList.add('hidden');
+      document.getElementById('proverb2Error').classList.add('hidden');
+      document.getElementById('proverb3Error').classList.add('hidden');
+      updateTask4Progress();
+
+      // Reset button states
+      document.querySelectorAll('.proverb-option').forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('bg-green-600', 'bg-red-600');
+        btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+      });
+    }
+
+    function updateTask4Progress() {
+      const progress = ((currentProverbQuestion - 1) / 3) * 100;
+      document.getElementById('task4ProgressBar').style.width = `${progress}%`;
+      document.getElementById('task4Progress').textContent = `Frage ${currentProverbQuestion} von 3`;
+    }
+
+    // Add click handlers for proverb options
+    document.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('proverb-option')) {
+        const button = e.target;
+        const answer = button.dataset.answer;
+        const questionNum = currentProverbQuestion;
+        const correctAnswer = proverbAnswers[`q${questionNum}`];
+        const errorDiv = document.getElementById(`proverb${questionNum}Error`);
+        
+        // Disable all buttons in this question
+        const allButtons = button.parentElement.querySelectorAll('.proverb-option');
+        allButtons.forEach(btn => btn.disabled = true);
+
+        if (answer === correctAnswer) {
+          // Correct answer
+          button.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+          button.classList.add('bg-green-600', 'success-animation', 'glow-success');
+          errorDiv.classList.add('hidden');
+
+          setTimeout(async () => {
+            if (questionNum < 3) {
+              // Move to next question
+              document.getElementById(`proverbQuestion${questionNum}`).classList.add('hidden');
+              document.getElementById(`proverbQuestion${questionNum + 1}`).classList.remove('hidden');
+              currentProverbQuestion = questionNum + 1;
+              updateTask4Progress();
+            } else {
+              // All questions completed
+              createConfetti();
+              document.getElementById('proverbQuestion3').classList.add('hidden');
+              document.getElementById('task4Complete').classList.remove('hidden');
+              document.getElementById('task4Complete').classList.add('success-animation');
+              document.getElementById('task4ProgressBar').style.width = '100%';
+
+              if (window.dataSdk) {
+                const result = await window.dataSdk.create({
+                  id: 'task-4',
+                  task_number: 4,
+                  unlocked_digit: '2',
+                  completed_at: new Date().toISOString()
+                });
+
+                if (result.isOk) {
+                  setTimeout(() => {
+                    document.getElementById('task4Modal').classList.add('hidden');
+                    resetTask4();
+                  }, 3500);
+                }
+              }
+            }
+          }, 1200);
+        } else {
+          // Wrong answer
+          button.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+          button.classList.add('bg-red-600', 'error-animation', 'glow-error');
+          errorDiv.textContent = '❌ Leider nicht richtig. Versuche es nochmal!';
+          errorDiv.classList.remove('hidden');
+          errorDiv.classList.add('error-animation');
+
+          // Re-enable buttons after a delay
+          setTimeout(() => {
+            allButtons.forEach(btn => {
+              btn.disabled = false;
+              btn.classList.remove('bg-red-600', 'error-animation', 'glow-error');
+              btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+            });
+            errorDiv.classList.add('hidden');
+            errorDiv.classList.remove('error-animation');
+          }, 2000);
+        }
+      }
+    });
+
+    // Escape Game Implementation
+    let escapeGame = null;
+    let escapeAnimationFrame = null;
+    let escapeGameInterval = null;
+
+    function resetEscapeGame() {
+      const canvas = document.getElementById('escapeCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      document.getElementById('escapeGameOver').classList.add('hidden');
+      document.getElementById('escapeSuccess').classList.add('hidden');
+      document.getElementById('escapeStartBtn').classList.remove('hidden');
+      document.getElementById('escapePauseBtn').classList.add('hidden');
+      document.getElementById('escapeTimer').textContent = '30s';
+      document.getElementById('mamaSpeed').textContent = 'Normal';
+    }
+
+    function startEscapeGame() {
+      const canvas = document.getElementById('escapeCanvas');
+      
+      escapeGame = {
+        player: {
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          size: 60,
+          speed: 4,
+          hasCoffee: true
+        },
+        mama: {
+          x: 50,
+          y: 50,
+          size: 55,
+          speed: 2
+        },
+        timeLeft: 30,
+        gameOver: false,
+        paused: false,
+        keys: {},
+        playerImage: null,
+        mamaImage: null,
+        imagesLoaded: 0
+      };
+
+      // Preload player image and wait for it to load
+      escapeGame.playerImage = new Image();
+      escapeGame.playerImage.onload = () => {
+        escapeGame.imagesLoaded++;
+      };
+      escapeGame.playerImage.src = 'https://www.dropbox.com/scl/fi/m5f5l1x6scf610ux91lis/ChatGPT-Image-18.-Dez.-2025-11_18_03.png?rlkey=k03qv80elila7qp6zi1e9j3ob&st=dd3lu1l2&dl=1';
+
+      // Preload mama image and wait for it to load
+      escapeGame.mamaImage = new Image();
+      escapeGame.mamaImage.onload = () => {
+        escapeGame.imagesLoaded++;
+      };
+      escapeGame.mamaImage.src = 'https://www.dropbox.com/scl/fi/50pcm2rkh85f1la80suc8/ChatGPT-Image-18.-Dez.-2025-12_16_56.png?rlkey=6m2e0why68ve1mcc8vqwli6i6&st=146joytw&dl=1';
+
+      document.getElementById('escapeStartBtn').classList.add('hidden');
+      document.getElementById('escapePauseBtn').classList.remove('hidden');
+      document.getElementById('touchControls').classList.remove('hidden');
+
+      const keydownHandler = (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(e.key.toLowerCase())) {
+          e.preventDefault();
+          escapeGame.keys[e.key.toLowerCase()] = true;
+        }
+      };
+
+      const keyupHandler = (e) => {
+        escapeGame.keys[e.key.toLowerCase()] = false;
+      };
+
+      document.addEventListener('keydown', keydownHandler);
+      document.addEventListener('keyup', keyupHandler);
+
+      escapeGame.keydownHandler = keydownHandler;
+      escapeGame.keyupHandler = keyupHandler;
+
+      // Touch controls
+      const touchUp = document.getElementById('touchUp');
+      const touchDown = document.getElementById('touchDown');
+      const touchLeft = document.getElementById('touchLeft');
+      const touchRight = document.getElementById('touchRight');
+
+      const touchUpStart = (e) => { e.preventDefault(); escapeGame.keys['arrowup'] = true; };
+      const touchUpEnd = (e) => { e.preventDefault(); escapeGame.keys['arrowup'] = false; };
+      const touchDownStart = (e) => { e.preventDefault(); escapeGame.keys['arrowdown'] = true; };
+      const touchDownEnd = (e) => { e.preventDefault(); escapeGame.keys['arrowdown'] = false; };
+      const touchLeftStart = (e) => { e.preventDefault(); escapeGame.keys['arrowleft'] = true; };
+      const touchLeftEnd = (e) => { e.preventDefault(); escapeGame.keys['arrowleft'] = false; };
+      const touchRightStart = (e) => { e.preventDefault(); escapeGame.keys['arrowright'] = true; };
+      const touchRightEnd = (e) => { e.preventDefault(); escapeGame.keys['arrowright'] = false; };
+
+      touchUp.addEventListener('touchstart', touchUpStart);
+      touchUp.addEventListener('touchend', touchUpEnd);
+      touchUp.addEventListener('mousedown', touchUpStart);
+      touchUp.addEventListener('mouseup', touchUpEnd);
+
+      touchDown.addEventListener('touchstart', touchDownStart);
+      touchDown.addEventListener('touchend', touchDownEnd);
+      touchDown.addEventListener('mousedown', touchDownStart);
+      touchDown.addEventListener('mouseup', touchDownEnd);
+
+      touchLeft.addEventListener('touchstart', touchLeftStart);
+      touchLeft.addEventListener('touchend', touchLeftEnd);
+      touchLeft.addEventListener('mousedown', touchLeftStart);
+      touchLeft.addEventListener('mouseup', touchLeftEnd);
+
+      touchRight.addEventListener('touchstart', touchRightStart);
+      touchRight.addEventListener('touchend', touchRightEnd);
+      touchRight.addEventListener('mousedown', touchRightStart);
+      touchRight.addEventListener('mouseup', touchRightEnd);
+
+      escapeGame.touchHandlers = {
+        touchUpStart, touchUpEnd, touchDownStart, touchDownEnd,
+        touchLeftStart, touchLeftEnd, touchRightStart, touchRightEnd
+      };
+
+      // Wait for both images to load before starting timer
+      const waitForImages = setInterval(() => {
+        if (escapeGame.imagesLoaded >= 2) {
+          clearInterval(waitForImages);
+          
+          escapeGameInterval = setInterval(() => {
+            if (!escapeGame.paused && !escapeGame.gameOver) {
+              escapeGame.timeLeft--;
+              document.getElementById('escapeTimer').textContent = `${escapeGame.timeLeft}s`;
+
+              if (escapeGame.timeLeft <= 0) {
+                endEscapeGame(true);
+              }
+
+              if (escapeGame.timeLeft === 20) {
+                escapeGame.mama.speed = 2.5;
+                document.getElementById('mamaSpeed').textContent = 'Schneller!';
+              }
+              if (escapeGame.timeLeft === 10) {
+                escapeGame.mama.speed = 3;
+                document.getElementById('mamaSpeed').textContent = 'Sehr schnell!';
+              }
+            }
+          }, 1000);
+        }
+      }, 100);
+
+      escapeGameLoop();
+    }
+
+    function escapeGameLoop() {
+      if (!escapeGame || escapeGame.gameOver) return;
+
+      // Wait for both images to load before starting game logic
+      if (escapeGame.imagesLoaded < 2) {
+        escapeAnimationFrame = requestAnimationFrame(escapeGameLoop);
+        return;
+      }
+
+      if (!escapeGame.paused) {
+        const canvas = document.getElementById('escapeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Move player
+        if (escapeGame.keys['arrowup'] || escapeGame.keys['w']) {
+          escapeGame.player.y = Math.max(escapeGame.player.size / 2, escapeGame.player.y - escapeGame.player.speed);
+        }
+        if (escapeGame.keys['arrowdown'] || escapeGame.keys['s']) {
+          escapeGame.player.y = Math.min(canvas.height - escapeGame.player.size / 2, escapeGame.player.y + escapeGame.player.speed);
+        }
+        if (escapeGame.keys['arrowleft'] || escapeGame.keys['a']) {
+          escapeGame.player.x = Math.max(escapeGame.player.size / 2, escapeGame.player.x - escapeGame.player.speed);
+        }
+        if (escapeGame.keys['arrowright'] || escapeGame.keys['d']) {
+          escapeGame.player.x = Math.min(canvas.width - escapeGame.player.size / 2, escapeGame.player.x + escapeGame.player.speed);
+        }
+
+        // Move mama towards player
+        const dx = escapeGame.player.x - escapeGame.mama.x;
+        const dy = escapeGame.player.y - escapeGame.mama.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+          escapeGame.mama.x += (dx / distance) * escapeGame.mama.speed;
+          escapeGame.mama.y += (dy / distance) * escapeGame.mama.speed;
+        }
+
+        // Check collision
+        const collisionDistance = (escapeGame.player.size + escapeGame.mama.size) / 2;
+        if (distance < collisionDistance) {
+          endEscapeGame(false);
+          return;
+        }
+
+        // Draw player with image
+        if (escapeGame.playerImage && escapeGame.playerImage.complete) {
+          ctx.drawImage(
+            escapeGame.playerImage, 
+            escapeGame.player.x - escapeGame.player.size / 2, 
+            escapeGame.player.y - escapeGame.player.size / 2, 
+            escapeGame.player.size, 
+            escapeGame.player.size
+          );
+        } else {
+          // Fallback while image loads
+          ctx.fillStyle = '#3b82f6';
+          ctx.beginPath();
+          ctx.arc(escapeGame.player.x, escapeGame.player.y, escapeGame.player.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.font = '24px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('☕', escapeGame.player.x, escapeGame.player.y);
+        }
+
+        // Draw mama with image
+        if (escapeGame.mamaImage && escapeGame.mamaImage.complete) {
+          ctx.drawImage(
+            escapeGame.mamaImage, 
+            escapeGame.mama.x - escapeGame.mama.size / 2, 
+            escapeGame.mama.y - escapeGame.mama.size / 2, 
+            escapeGame.mama.size, 
+            escapeGame.mama.size
+          );
+        } else {
+          // Fallback while image loads
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(escapeGame.mama.x, escapeGame.mama.y, escapeGame.mama.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.font = '28px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('👩', escapeGame.mama.x, escapeGame.mama.y);
+        }
+
+        // Draw distance indicator
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(escapeGame.player.x, escapeGame.player.y);
+        ctx.lineTo(escapeGame.mama.x, escapeGame.mama.y);
+        ctx.stroke();
+      }
+
+      escapeAnimationFrame = requestAnimationFrame(escapeGameLoop);
+    }
+
+    function pauseEscapeGame() {
+      if (!escapeGame) return;
+      
+      escapeGame.paused = !escapeGame.paused;
+      const pauseBtn = document.getElementById('escapePauseBtn');
+      pauseBtn.textContent = escapeGame.paused ? 'Fortsetzen' : 'Pause';
+    }
+
+    async function endEscapeGame(success) {
+      escapeGame.gameOver = true;
+      
+      if (escapeAnimationFrame) {
+        cancelAnimationFrame(escapeAnimationFrame);
+        escapeAnimationFrame = null;
+      }
+
+      if (escapeGameInterval) {
+        clearInterval(escapeGameInterval);
+        escapeGameInterval = null;
+      }
+
+      if (escapeGame.keydownHandler) {
+        document.removeEventListener('keydown', escapeGame.keydownHandler);
+      }
+      if (escapeGame.keyupHandler) {
+        document.removeEventListener('keyup', escapeGame.keyupHandler);
+      }
+
+      document.getElementById('escapePauseBtn').classList.add('hidden');
+
+      if (success) {
+        createConfetti();
+        document.getElementById('escapeSuccess').classList.remove('hidden');
+        document.getElementById('escapeSuccess').classList.add('success-animation');
+        
+        if (window.dataSdk) {
+          const result = await window.dataSdk.create({
+            id: 'task-5',
+            task_number: 5,
+            unlocked_digit: '9',
+            completed_at: new Date().toISOString()
+          });
+
+          if (result.isOk) {
+            setTimeout(() => {
+              document.getElementById('task5Modal').classList.add('hidden');
+              stopEscapeGame();
+            }, 3500);
+          }
+        }
+      } else {
+        document.getElementById('escapeGameOver').classList.remove('hidden');
+        document.getElementById('escapeGameOver').classList.add('error-animation');
+      }
+    }
+
+    function stopEscapeGame() {
+      if (escapeAnimationFrame) {
+        cancelAnimationFrame(escapeAnimationFrame);
+        escapeAnimationFrame = null;
+      }
+
+      if (escapeGameInterval) {
+        clearInterval(escapeGameInterval);
+        escapeGameInterval = null;
+      }
+
+      if (escapeGame) {
+        if (escapeGame.keydownHandler) {
+          document.removeEventListener('keydown', escapeGame.keydownHandler);
+        }
+        if (escapeGame.keyupHandler) {
+          document.removeEventListener('keyup', escapeGame.keyupHandler);
+        }
+
+        // Remove touch handlers
+        if (escapeGame.touchHandlers) {
+          const touchUp = document.getElementById('touchUp');
+          const touchDown = document.getElementById('touchDown');
+          const touchLeft = document.getElementById('touchLeft');
+          const touchRight = document.getElementById('touchRight');
+
+          if (touchUp) {
+            touchUp.removeEventListener('touchstart', escapeGame.touchHandlers.touchUpStart);
+            touchUp.removeEventListener('touchend', escapeGame.touchHandlers.touchUpEnd);
+            touchUp.removeEventListener('mousedown', escapeGame.touchHandlers.touchUpStart);
+            touchUp.removeEventListener('mouseup', escapeGame.touchHandlers.touchUpEnd);
+          }
+
+          if (touchDown) {
+            touchDown.removeEventListener('touchstart', escapeGame.touchHandlers.touchDownStart);
+            touchDown.removeEventListener('touchend', escapeGame.touchHandlers.touchDownEnd);
+            touchDown.removeEventListener('mousedown', escapeGame.touchHandlers.touchDownStart);
+            touchDown.removeEventListener('mouseup', escapeGame.touchHandlers.touchDownEnd);
+          }
+
+          if (touchLeft) {
+            touchLeft.removeEventListener('touchstart', escapeGame.touchHandlers.touchLeftStart);
+            touchLeft.removeEventListener('touchend', escapeGame.touchHandlers.touchLeftEnd);
+            touchLeft.removeEventListener('mousedown', escapeGame.touchHandlers.touchLeftStart);
+            touchLeft.removeEventListener('mouseup', escapeGame.touchHandlers.touchLeftEnd);
+          }
+
+          if (touchRight) {
+            touchRight.removeEventListener('touchstart', escapeGame.touchHandlers.touchRightStart);
+            touchRight.removeEventListener('touchend', escapeGame.touchHandlers.touchRightEnd);
+            touchRight.removeEventListener('mousedown', escapeGame.touchHandlers.touchRightStart);
+            touchRight.removeEventListener('mouseup', escapeGame.touchHandlers.touchRightEnd);
+          }
+        }
+
+        escapeGame = null;
+      }
+
+      document.getElementById('touchControls').classList.add('hidden');
+      resetEscapeGame();
+    }
+
+    function updateUI() {
+      const progress = (completedTasks.length / 5) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+      document.getElementById('progressText').textContent = `${completedTasks.length} / 5 Aufgaben`;
+
+      const digitsContainer = document.getElementById('unlockedDigits');
+      if (completedTasks.length === 0) {
+        digitsContainer.innerHTML = '<span class="text-gray-600 text-lg">Noch keine Ziffern freigeschaltet</span>';
+      } else {
+        digitsContainer.innerHTML = completedTasks
+          .sort((a, b) => a.task_number - b.task_number)
+          .map(task => `
+            <div class="bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl px-4 py-2 font-bold text-2xl success-animation glow-success">
+              ${task.unlocked_digit}
+            </div>
+          `).join('');
+      }
+
+      const codeEntryBtn = document.getElementById('codeEntryBtn');
+      if (completedTasks.length === 5) {
+        codeEntryBtn.disabled = false;
+        codeEntryBtn.classList.add('pulse-animation');
+      } else {
+        codeEntryBtn.disabled = true;
+        codeEntryBtn.classList.remove('pulse-animation');
+      }
+
+      document.querySelectorAll('.task-card').forEach(card => {
+        const taskNum = parseInt(card.dataset.task);
+        const isCompleted = completedTasks.some(t => t.task_number === taskNum);
+        const statusSpan = card.querySelector('.task-status');
+        
+        if (isCompleted) {
+          card.classList.add('completed');
+          statusSpan.textContent = '✅';
+          statusSpan.classList.remove('text-gray-600');
+          statusSpan.classList.add('text-green-500');
+        }
+      });
+    }
+
+    function clearCodeInputs() {
+      document.querySelectorAll('.digit-input').forEach(input => {
+        input.value = '';
+      });
+      document.getElementById('codeError').classList.add('hidden');
+    }
+
+    function checkCode() {
+      const inputs = document.querySelectorAll('.digit-input');
+      const enteredCode = Array.from(inputs).map(input => input.value).join('');
+      const errorDiv = document.getElementById('codeError');
+
+      if (enteredCode.length !== 5) {
+        errorDiv.textContent = 'Bitte alle 5 Ziffern eingeben';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      if (enteredCode.length === 5) {
+        document.getElementById('codeModal').classList.add('hidden');
+        document.getElementById('quizScreen').classList.add('hidden');
+        document.getElementById('successScreen').classList.remove('hidden');
+      } else {
+        errorDiv.textContent = 'Falscher Code! Versuche es erneut.';
+        errorDiv.classList.remove('hidden');
+        setTimeout(() => {
+          inputs.forEach(input => {
+            input.classList.add('border-red-500');
+          });
+          setTimeout(() => {
+            inputs.forEach(input => {
+              input.classList.remove('border-red-500');
+            });
+          }, 300);
+        }, 100);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe48f5e0979884',t:'MTc2NjA1Njk3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
