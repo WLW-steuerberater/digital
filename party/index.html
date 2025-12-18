@@ -491,27 +491,31 @@
     </div>
    </div><!-- Code Entry Modal -->
    <div id="codeModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
-    <div class="glass-effect rounded-3xl p-8 max-w-md w-full fade-in">
-     <h2 class="text-3xl font-bold mb-6 text-center">5-stelliger Code</h2>
-     <p class="text-gray-400 mb-6 text-center">Gib die freigeschalteten Ziffern in der richtigen Reihenfolge ein</p>
-     <div class="flex gap-2 justify-center mb-6"><input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="0"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="1"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="2"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="3"> <input type="text" maxlength="1" class="digit-input w-12 h-16 text-center text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-blue-500" data-index="4">
+    <div class="glass-effect rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full fade-in">
+     <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center">5-stelliger Code</h2>
+     <p class="text-gray-400 mb-4 sm:mb-6 text-center text-sm sm:text-base">Gib die freigeschalteten Ziffern in der richtigen Reihenfolge ein</p>
+     <div class="flex gap-2 justify-center mb-4 sm:mb-6"><input type="text" maxlength="1" class="digit-input w-10 h-12 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500" data-index="0"> <input type="text" maxlength="1" class="digit-input w-10 h-12 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500" data-index="1"> <input type="text" maxlength="1" class="digit-input w-10 h-12 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500" data-index="2"> <input type="text" maxlength="1" class="digit-input w-10 h-12 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500" data-index="3"> <input type="text" maxlength="1" class="digit-input w-10 h-12 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-800 border-2 border-gray-700 rounded-lg sm:rounded-xl focus:outline-none focus:border-blue-500" data-index="4">
      </div>
-     <div id="codeError" class="hidden text-red-400 text-center mb-4 text-sm"></div>
-     <div class="flex gap-3"><button id="closeModalBtn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300"> Abbrechen </button> <button id="submitCodeBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300"> Prüfen </button>
+     <div id="codeError" class="hidden text-red-400 text-center mb-3 sm:mb-4 text-xs sm:text-sm"></div>
+     <div class="flex gap-2 sm:gap-3"><button id="closeModalBtn" class="flex-1 bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base"> Abbrechen </button> <button id="submitCodeBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base"> Prüfen </button>
      </div>
     </div>
    </div><!-- Success Screen -->
-   <div id="successScreen" class="hidden min-h-full flex items-center justify-center p-8">
-    <div class="text-center max-w-2xl fade-in">
-     <div class="mb-8">
-      <div class="text-8xl mb-6 pulse-animation">
-       🎉
+   <div id="successScreen" class="hidden min-h-full flex items-center justify-center p-4 sm:p-6 md:p-8">
+    <div class="text-center max-w-2xl w-full fade-in">
+     <div class="mb-6 sm:mb-8">
+      <div class="text-6xl sm:text-7xl md:text-8xl mb-4 sm:mb-6 celebrate-animation">
+       🎁
       </div>
-      <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Herzlichen Glückwunsch!</h1>
-      <p class="text-2xl text-gray-400 mb-8">Du hast alle Aufgaben gemeistert!</p>
-      <div class="glass-effect rounded-3xl p-8 mb-6">
-       <p class="text-gray-400 mb-3">Dein finales Wort:</p>
-       <p id="finalWord" class="text-5xl font-bold text-transparent bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text">GESCHAFFT</p>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent celebrate-animation px-2">Herzlichen Glückwunsch!</h1>
+      <p class="text-lg sm:text-xl md:text-2xl text-gray-400 mb-6 sm:mb-8 px-4">Du hast alle Aufgaben gemeistert!</p>
+      <div class="glass-effect rounded-2xl sm:rounded-3xl p-6 sm:p-8 mb-4 sm:mb-6 success-animation">
+       <p class="text-gray-400 mb-2 sm:mb-3 text-sm sm:text-base">Dein finales Wort:</p>
+       <p id="finalWord" class="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text mb-6 sm:mb-8">GESCHAFFT</p>
+       <div class="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-700">
+        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-pink-400 via-purple-500 to-blue-500 bg-clip-text mb-3 sm:mb-4 px-2">🎉 Dein Geschenk wartet auf dich! 🎉</p>
+        <p class="text-lg sm:text-xl md:text-2xl text-yellow-300 font-semibold px-4">Im Schrank über dem Kühlschrank</p>
+       </div>
       </div>
      </div>
     </div>
@@ -530,7 +534,7 @@
       task2_description: "Weiche den Hindernissen aus",
       task3_title: "Schießübung",
       task3_description: "Triff die negativen Begriffe",
-      task4_title: "Russische Sprichwörter",
+      task4_title: "Russische Sprichw����rter",
       task4_description: "Finde die deutschen Entsprechungen",
       task5_title: "Kaffee-Flucht",
       task5_description: "Entkomme mit dem Kaffee vor Mama!",
@@ -1360,7 +1364,7 @@
     const shootingRounds = [
       {
         category: "Finanzbegriffe",
-        negative: ["Schulden", "Verlust", "Pleite", "Crash", "Inflation", "Defizit", "Krise", "Insolvenz", "Rezession", "Bankrott", "Abschreibung", "Mahngebühr", "Überschuldung", "Zahlungsausfall", "Zwangsvollstreckung", "Liquiditätskrise"],
+        negative: ["Schulden", "Verlust", "Pleite", "Crash", "Inflation", "Defizit", "Krise", "Insolvenz", "Rezession", "Bankrott", "Abschreibung", "Mahngeb����hr", "Überschuldung", "Zahlungsausfall", "Zwangsvollstreckung", "Liquiditätskrise"],
         positive: ["Gewinn", "Profit", "Wachstum", "Rendite", "Dividende", "Bonus", "Zinsen", "Kapital", "Vermögen", "Investment", "Sparplan", "Cashflow", "Ertrag", "Überschuss", "Liquidität", "Rücklage"]
       },
       {
@@ -2121,5 +2125,5 @@
       init();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe48f5e0979884',t:'MTc2NjA1Njk3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe5724264b9884',t:'MTc2NjA1NzU1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
