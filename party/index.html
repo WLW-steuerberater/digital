@@ -240,7 +240,7 @@
        <p id="task3Description" class="text-gray-400 text-sm">Triff die negativen Begriffe</p>
       </div>
       <div class="task-card glass-effect rounded-3xl p-6 cursor-pointer" data-task="4">
-       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🇷🇺</span> <span class="task-status text-gray-600">🔒</span>
+       <div class="flex items-start justify-between mb-4"><span class="text-4xl">🇷��</span> <span class="task-status text-gray-600">🔒</span>
        </div>
        <h3 id="task4Title" class="text-xl font-semibold mb-2">Russische Sprichwörter</h3>
        <p id="task4Description" class="text-gray-400 text-sm">Finde die deutschen Entsprechungen</p>
@@ -270,7 +270,7 @@
      </div><!-- Question 1 -->
      <div id="question1" class="fade-in">
       <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
-       <h3 class="text-lg font-semibold mb-4">Wie hoch wird der Körperschaftssteuer-Satz 2030 sein?</h3>
+       <h3 class="text-lg font-semibold mb-4">Wie hoch wird der K����rperschaftssteuer-Satz 2030 sein?</h3>
        <div class="mb-4"><input type="range" min="0" max="50" value="25" class="slider" id="q1Slider">
        </div>
        <div class="text-center"><span id="q1Value" class="text-3xl font-bold text-blue-400">25</span> <span class="text-2xl text-gray-400">%</span>
@@ -362,7 +362,7 @@
    <div id="task3Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
     <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
      <div class="flex items-center justify-between mb-6">
-      <h2 class="text-3xl font-bold">🎯 Schießübung</h2><button id="closeTask3Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+      <h2 class="text-3xl font-bold">��� Schießübung</h2><button id="closeTask3Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
      </div>
      <div id="shootingGameContainer">
       <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6 text-center">
@@ -411,7 +411,7 @@
      </div><!-- Question 1 -->
      <div id="proverbQuestion1" class="fade-in">
       <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6">
-       <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300">С миру по нитке — голому рубаха</h3>
+       <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300">С миру по нитке ���� голому рубаха</h3>
        <p class="text-gray-400 text-center mb-6">Wähle die richtige deutsche Entsprechung:</p>
        <div class="space-y-3"><button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="a"> <span class="font-bold text-blue-400">a)</span> Kleinvieh macht auch Mist </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="b"> <span class="font-bold text-blue-400">b)</span> Viele Köche verderben den Brei </button> <button class="proverb-option w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl text-left transition-all duration-300 transform hover:scale-105" data-answer="c"> <span class="font-bold text-blue-400">c)</span> Morgenstund hat Gold im Mund </button>
        </div>
@@ -441,7 +441,7 @@
        <div class="text-5xl mb-4">
         🎉
        </div>
-       <h3 class="text-2xl font-bold text-green-300 mb-2">Отлично! (Ausgezeichnet!)</h3>
+       <h3 class="text-2xl font-bold text-green-300 mb-2">От��ично! (Ausgezeichnet!)</h3>
        <p class="text-green-300 mb-4">Du hast alle Sprichwörter richtig zugeordnet!</p>
        <p class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">Ziffer "2" freigeschaltet!</p>
       </div>
@@ -451,7 +451,7 @@
    <div id="task5Modal" class="hidden fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-auto">
     <div class="w-full max-w-4xl mx-auto py-8 px-4 fade-in">
      <div class="flex items-center justify-between mb-6">
-      <h2 class="text-3xl font-bold">☕ Kaffee-Flucht</h2><button id="closeTask5Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
+      <h2 class="text-3xl font-bold">�� Kaffee-Flucht</h2><button id="closeTask5Btn" class="text-gray-400 hover:text-white text-3xl leading-none">×</button>
      </div>
      <div id="escapeGameContainer">
       <div class="bg-gray-800 bg-opacity-50 rounded-2xl p-6 mb-6 text-center">
@@ -524,7 +524,7 @@
   <script>
     const defaultConfig = {
       main_title: "Geburtstags-Challenge",
-      subtitle: "Löse 7 Aufgaben und knacke den Code",
+      subtitle: "Löse 5 Aufgaben, knacke den Code und erhalte dein Geschenk",
       final_word_label: "GESCHAFFT",
       start_button: "Challenge starten",
       code_button: "Code eingeben",
@@ -566,11 +566,34 @@
     const dataHandler = {
       onDataChanged(data) {
         completedTasks = data;
+        saveToLocalStorage();
         updateUI();
       }
     };
 
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('birthdayChallenge_completedTasks', JSON.stringify(completedTasks));
+      } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+      }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem('birthdayChallenge_completedTasks');
+        if (saved) {
+          completedTasks = JSON.parse(saved);
+          updateUI();
+        }
+      } catch (e) {
+        console.error('Failed to load from localStorage:', e);
+      }
+    }
+
     async function init() {
+      loadFromLocalStorage();
+      
       if (window.dataSdk) {
         const initResult = await window.dataSdk.init(dataHandler);
         if (!initResult.isOk) {
@@ -1017,13 +1040,6 @@
         } else {
           createConfetti();
           
-          setTimeout(() => {
-            document.getElementById('question4').classList.add('hidden');
-            document.getElementById('task1Complete').classList.remove('hidden');
-            document.getElementById('task1Complete').classList.add('success-animation');
-            document.getElementById('task1ProgressBar').style.width = '100%';
-          }, 800);
-          
           submitBtn.disabled = true;
           submitBtn.textContent = 'Wird gespeichert...';
 
@@ -1036,6 +1052,13 @@
             });
 
             if (result.isOk) {
+              setTimeout(() => {
+                document.getElementById('question4').classList.add('hidden');
+                document.getElementById('task1Complete').classList.remove('hidden');
+                document.getElementById('task1Complete').classList.add('success-animation');
+                document.getElementById('task1ProgressBar').style.width = '100%';
+              }, 100);
+
               setTimeout(() => {
                 document.getElementById('task1Modal').classList.add('hidden');
                 resetTask1();
@@ -1536,7 +1559,7 @@
             setTimeout(() => {
               document.getElementById('task3Modal').classList.add('hidden');
               stopShootingGame();
-            }, 3500);
+            }, 2500);
           }
         }
       } else {
@@ -1643,7 +1666,7 @@
                   setTimeout(() => {
                     document.getElementById('task4Modal').classList.add('hidden');
                     resetTask4();
-                  }, 3500);
+                  }, 2500);
                 }
               }
             }
@@ -1969,7 +1992,7 @@
             setTimeout(() => {
               document.getElementById('task5Modal').classList.add('hidden');
               stopEscapeGame();
-            }, 3500);
+            }, 2500);
           }
         }
       } else {
@@ -2125,5 +2148,5 @@
       init();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe5caf115de0d3',t:'MTc2NjA1Nzc4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe679076b69884',t:'MTc2NjA1ODIyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
