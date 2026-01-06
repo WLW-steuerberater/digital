@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="de">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WLW Klausurenkurse 2026 - Steuerberaterprüfung</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(180deg, #6facff 0%, #aacfff 100%);
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+        .fade-in-delay-4 { animation-delay: 0.8s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hover-lift {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .hover-lift:hover,
+        .hover-lift:active,
+        .hover-lift:focus {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+
+        
+        .city-dot {
+            fill: #3b82f6;
+            stroke: white;
+            stroke-width: 3;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
+        }
+        
+        .city-dot:hover {
+            fill: #1e40af;
+            r: 12;
+            stroke-width: 4;
+            filter: drop-shadow(0 8px 16px rgba(30, 64, 175, 0.5));
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .city-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            fill: #1f2937;
+            text-anchor: middle;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(255,255,255,0.8));
+        }
+        
+        .city-dot:hover + .city-label {
+            font-size: 15px;
+            fill: #1e40af;
+        }
+        
+        .city-card {
+            border: 2px solid transparent;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .city-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 1s ease;
+        }
+        
+        .city-card:hover::before {
+            left: 100%;
+        }
+        
+        .city-card:hover,
+        .city-card:active,
+        .city-card:focus {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .city-card:active {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: 0 8px 15px rgba(59, 130, 246, 0.15);
+            }
+        }
+        
+        .city-card.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+        }
+        
+        .germany-map {
+            transition: all 0.5s ease;
+        }
+        
+        .germany-map:hover {
+            transform: scale(1.05);
+        }
+        
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .feature-card:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .feature-card:hover,
+        .feature-card:active,
+        .feature-card:focus {
+            transform: translateY(-8px) rotate(1deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .feature-card:active {
+                transform: translateY(-4px) rotate(0.5deg);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+        }
+        
+        .btn-hover {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn-hover:hover::before {
+            left: 100%;
+        }
+        
+        .btn-hover:hover,
+        .btn-hover:active,
+        .btn-hover:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .btn-hover:active {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            }
+        }
+        
+        .nav-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item:hover,
+        .nav-item:active,
+        .nav-item:focus {
+            transform: translateY(-2px);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item:active {
+                transform: translateY(-1px);
+            }
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+        
+        .dozent-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Timeline Styles */
+        .timeline-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+        
+        .timeline-card:hover::before {
+            left: 100%;
+        }
+        
+        .timeline-card:hover,
+        .timeline-card:active,
+        .timeline-card:focus {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .timeline-card:active {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            }
+        }
+        
+        .timeline-item {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .timeline-item:nth-child(1) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.8s; }
+        
+        /* Mobile Timeline Adjustments */
+        @media (max-width: 768px) {
+            .timeline-item {
+                flex-direction: column;
+            }
+            
+            .timeline-item .w-1\/2 {
+                width: 100%;
+                padding: 0;
+                text-align: left !important;
+            }
+            
+            .timeline-item .absolute {
+                position: relative !important;
+                left: auto !important;
+                transform: none !important;
+                margin: 1rem 0;
+                align-self: center;
+            }
+            
+            .timeline-item .pr-8,
+            .timeline-item .pl-8 {
+                padding: 0;
+            }
+        }
+        
+        /* Hero Slideshow Styles */
+        .hero-slideshow {
+            position: relative;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .slide.fade-out {
+            opacity: 0;
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="bg-gray-50"><!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-white z-50 shadow-md">
+   <div class="container mx-auto px-4 py-4">
+    <div class="flex justify-between items-center">
+     <div class="flex items-center"><img src="https://wlw-steuern.de/build/assets/logo-f86961a4.svg" alt="WLW Logo" class="h-12 w-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="text-gray-800 px-4 py-2 rounded font-bold text-xl hidden" style="background: linear-gradient(180deg, #b8d4f7 0%, #d9e9ff 100%);">
+       WLW
+      </div>
+     </div>
+     <div class="hidden md:flex space-x-6"><a href="#start" class="nav-item text-gray-600 hover:text-blue-600">Start</a> <a href="#klausur" class="nav-item text-gray-600 hover:text-blue-600">Klausur</a> <a href="#klausurenkurse" class="nav-item text-gray-600 hover:text-blue-600">Klausurenkurse</a> <a href="#dozenten" class="nav-item text-gray-600 hover:text-blue-600">Dozenten</a> <a href="#klausur" class="btn-hover text-white px-4 py-2 rounded" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);">Kostenlos testen</a>
+     </div><!-- Mobile Menu Button --> <button class="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none" onclick="toggleMobileMenu()"> <i class="fas fa-bars text-xl"></i> </button>
+    </div><!-- Mobile Menu -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200 py-4 shadow-lg">
+     <div class="flex flex-col space-y-2"><a href="#start" class="nav-item text-gray-600 hover:text-blue-600 py-2 px-4" onclick="closeMobileMenu()">Start</a> <a href="#klausur" class="nav-item text-gray-600 hover:text-blue-600 py-2 px-4" onclick="closeMobileMenu()">Klausur</a> <a href="#klausurenkurse" class="nav-item text-gray-600 hover:text-blue-600 py-2 px-4" onclick="closeMobileMenu()">Klausurenkurse</a> <a href="#dozenten" class="nav-item text-gray-600 hover:text-blue-600 py-2 px-4" onclick="closeMobileMenu()">Dozenten</a> <a href="#klausur" class="btn-hover text-white px-4 py-2 rounded mx-4 mt-2 text-center" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);">Kostenlos testen</a>
+     </div>
+    </div>
+   </div>
+  </nav><!-- Hero Section -->
+  <section id="start" class="relative text-white py-32 mt-16 overflow-hidden gradient-bg"><!-- Content -->
+   <div class="relative z-20 container mx-auto px-4 text-center">
+    <div class="fade-in bg-green-500 text-white font-bold py-3 px-6 rounded-full mb-6 inline-block floating text-sm md:text-base">
+     100% kostenlos - Jetzt testen!
+    </div>
+    <h1 class="fade-in fade-in-delay-1 hero-section text-2xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">Kostenlose Klausur Steuerberaterprüfung</h1>
+    <h2 class="fade-in fade-in-delay-2 hero-section text-lg md:text-xl lg:text-3xl font-semibold mb-6 md:mb-8">100% kostenlos | Die perfekte Vorbereitung</h2>
+    <div class="fade-in fade-in-delay-4 flex flex-col gap-4 justify-center items-center max-w-md mx-auto"><button onclick="downloadPDF('angabe')" class="btn-hover bg-green-500 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition w-full text-white hover:bg-green-600"> <i class="fas fa-download mr-2"></i>Jetzt kostenlos herunterladen </button> <a href="#klausurenkurse" class="btn-hover border-2 border-white text-white font-bold py-4 px-8 rounded-xl hover:bg-white transition hover:text-blue-600 w-full"> <i class="fas fa-graduation-cap mr-2"></i>Klausurenkurse ansehen </a>
+    </div>
+   </div>
+  </section><!-- Klausur Downloads Section -->
+  <section id="klausur" class="py-20 pb-4 bg-white">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+     <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800">Klausur kostenlos herunterladen</h2>
+     <p class="text-xl text-gray-600">Verschaffe dir einen ersten Eindruck von unserer WLW-Qualität. Lade dir die Klausur herunter und bearbeite sie in deinem eigenen Tempo - völlig kostenlos!</p>
+    </div><!-- Probeklausur Downloads -->
+    <div class="max-w-4xl mx-auto mb-16">
+     <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-8 border border-green-200">
+      <p class="text-lg text-gray-700 mb-8 text-center max-w-3xl mx-auto"><span class="font-bold text-green-600">100% kostenlos:</span> Lade dir unsere Klausur herunter und bearbeite sie in deinem eigenen Tempo - völlig unverbindlich und ohne versteckte Kosten.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><!-- Angabe Download -->
+       <div class="bg-white rounded-3xl p-6 shadow-lg hover-lift text-center">
+        <div class="text-green-600 text-4xl mb-4"><i class="fas fa-file-pdf"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4 text-gray-800">Kostenlose Klausur</h3>
+        <p class="text-gray-600 mb-6">Lade dir die Klausur herunter und bearbeite sie in deinem eigenen Tempo. Völlig kostenlos!</p><button onclick="downloadPDF('angabe')" class="btn-hover bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition w-full"> <i class="fas fa-download mr-2"></i>Klausur herunterladen </button>
+       </div><!-- Korrektur Info -->
+       <div class="bg-white rounded-3xl p-6 shadow-lg hover-lift text-center">
+        <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4 text-gray-800">Kostenlose Korrektur</h3>
+        <p class="text-gray-600 mb-6">Sende uns deine bearbeitete Klausur zu und erhalte eine professionelle Korrektur - kostenlos!</p><a href="#anmeldung-klausur" class="btn-hover bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition w-full inline-block"> <i class="fas fa-paper-plane mr-2"></i>Zur kostenlosen Korrektur </a>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Kostenlose Probeklausur Features Section -->
+  <section class="py-12 md:py-20 bg-gray-50">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-12 md:mb-16">
+     <h2 class="text-2xl md:text-3xl lg:text-5xl font-bold mb-4 md:mb-6 text-gray-800 px-2">Warum WLW?</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+     <div class="scroll-reveal feature-card bg-white text-center rounded-3xl p-6 md:p-8 hover-lift shadow-lg">
+      <div class="text-blue-500 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 text-xl md:text-2xl" style="background: linear-gradient(180deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-bolt text-white"></i>
+      </div>
+      <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-800">Super schnelle digitale Korrektur</h3>
+      <p class="text-sm md:text-base text-gray-700 leading-relaxed">Korrektur oftmals innerhalb von 24h, maximal 3 Tage. Bei WLW musst du nicht wochenlang warten</p>
+     </div>
+     <div class="scroll-reveal feature-card bg-white text-center rounded-3xl p-6 md:p-8 hover-lift shadow-lg" style="animation-delay: 0.2s;">
+      <div class="text-blue-500 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 text-xl md:text-2xl" style="background: linear-gradient(180deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-award text-white"></i>
+      </div>
+      <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-800">25+ Jahre Erfahrung</h3>
+      <p class="text-sm md:text-base text-gray-700 leading-relaxed">Top Dozenten, bewährte und modernste Methoden sowie langjähriges Know-how von absoluten Experten für deinen Prüfungserfolg</p>
+     </div>
+     <div class="scroll-reveal feature-card bg-white text-center rounded-3xl p-6 md:p-8 hover-lift shadow-lg" style="animation-delay: 0.4s;">
+      <div class="text-blue-500 w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 text-xl md:text-2xl" style="background: linear-gradient(180deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-box-open text-white"></i>
+      </div>
+      <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-800">Unvergleichliches Rundumpaket</h3>
+      <p class="text-sm md:text-base text-gray-700 leading-relaxed">Kurse, Klausuren, Karteikarten, Griffregister, Steuer-KI, Lernportal, vollständige Gesetzesmarkierungen - alles aus einer Hand</p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Klausurenkurse Timeline Section -->
+  <section id="klausurenkurse" class="py-20 bg-gray-50">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+     <div class="inline-block text-white px-4 py-2 md:px-6 md:py-3 rounded-full mb-4 md:mb-6 font-bold text-sm md:text-lg shadow-lg" style="background: linear-gradient(180deg, #6facff 0%, #aacfff 100%);">
+      Nach der kostenlosen Klausur
+     </div>
+     <h2 class="text-3xl md:text-5xl font-bold mb-6 text-gray-800">Klausurenkurse 2026</h2>
+     <p class="text-lg text-gray-600 mb-12">Dein Weg zur Steuerberaterprüfung - Wähle den passenden Kurs für deine Vorbereitung</p>
+    </div><!-- Timeline -->
+    <div class="max-w-5xl mx-auto mb-16">
+     <div class="relative"><!-- Timeline Line -->
+      <div class="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-blue-400 to-green-500 h-full"></div><!-- Timeline Items -->
+      <div class="space-y-8"><!-- Modul A -->
+       <div class="timeline-item relative flex items-center">
+        <div class="w-1/2 pr-6 text-right">
+         <div class="timeline-card bg-white rounded-3xl p-4 shadow-lg hover-lift cursor-pointer" onclick="showCourseDetails('modulA')">
+          <div class="flex items-center justify-end mb-3">
+           <div class="text-right mr-3">
+            <h3 class="text-lg font-bold text-gray-800">Modul A</h3>
+            <p class="font-semibold text-sm" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📅 Dezember - Mai</p>
+           </div>
+           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-calendar-alt text-sm"></i>
+           </div>
+          </div>
+          <p class="text-gray-600 text-xs mb-2">15 Klausuren - Grundlegende Examensvorbereitung mit monatlichen Lieferungen</p>
+          <div class="mt-3 text-right"><span class="px-2 py-1 rounded-full text-xs font-semibold text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);">📍 Bequem von Zuhause</span>
+          </div>
+         </div>
+        </div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-3 border-white shadow-lg" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"></div>
+        <div class="w-1/2 pl-6"></div>
+       </div><!-- Modul B -->
+       <div class="timeline-item relative flex items-center">
+        <div class="w-1/2 pr-6"></div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-3 border-white shadow-lg" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"></div>
+        <div class="w-1/2 pl-6">
+         <div class="timeline-card bg-white rounded-3xl p-4 shadow-lg hover-lift cursor-pointer" onclick="showCourseDetails('modulB')">
+          <div class="flex items-center mb-3">
+           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white mr-3" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-book-open text-sm"></i>
+           </div>
+           <div>
+            <h3 class="text-lg font-bold text-gray-800">Modul B</h3>
+            <p class="font-semibold text-sm" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📅 April - August</p>
+           </div>
+          </div>
+          <p class="text-gray-600 text-xs mb-2">15 Klausuren - Vertiefung und Wiederholung mit Live-Besprechungen</p>
+          <div class="mt-3"><span class="px-2 py-1 rounded-full text-xs font-semibold text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);">📍 Bequem von Zuhause</span>
+          </div>
+         </div>
+        </div>
+       </div><!-- Intensivklausuren I -->
+       <div class="timeline-item relative flex items-center">
+        <div class="w-1/2 pr-6 text-right">
+         <div class="timeline-card bg-white rounded-3xl p-4 shadow-lg hover-lift cursor-pointer" onclick="showCourseDetails('intensiv1')">
+          <div class="flex items-center justify-end mb-3">
+           <div class="text-right mr-3">
+            <h3 class="text-lg font-bold text-gray-800">Intensivklausuren I</h3>
+            <p class="font-semibold text-sm" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📅 07. - 12. September</p>
+           </div>
+           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-graduation-cap text-sm"></i>
+           </div>
+          </div>
+          <p class="text-gray-600 text-xs mb-2">6 Klausuren - Doppeltes Probeexamen in 5 Städten oder online</p>
+          <p class="text-gray-500 text-xs mb-3">📍 Berlin • Bamberg • Düsseldorf • Hamburg • München • Bequem von Zuhause</p>
+          <div class="text-right"><span class="px-2 py-1 rounded-full text-xs font-semibold text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);">Präsenz + Online</span>
+          </div>
+         </div>
+        </div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-3 border-white shadow-lg" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"></div>
+        <div class="w-1/2 pl-6"></div>
+       </div><!-- Intensivklausuren II -->
+       <div class="timeline-item relative flex items-center">
+        <div class="w-1/2 pr-6"></div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-3 border-white shadow-lg" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"></div>
+        <div class="w-1/2 pl-6">
+         <div class="timeline-card bg-white rounded-3xl p-4 shadow-lg hover-lift cursor-pointer" onclick="showCourseDetails('intensiv2')">
+          <div class="flex items-center mb-3">
+           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white mr-3" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);"><i class="fas fa-trophy text-sm"></i>
+           </div>
+           <div>
+            <h3 class="text-lg font-bold text-gray-800">Intensivklausuren II</h3>
+            <p class="font-semibold text-sm" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📅 14. - 19. September</p>
+           </div>
+          </div>
+          <p class="text-gray-600 text-xs mb-2">6 Klausuren - Finales Probeexamen zur Prüfungssimulation</p>
+          <p class="text-gray-500 text-xs mb-3">📍 Bamberg • Bequem von Zuhause</p>
+          <div><span class="px-2 py-1 rounded-full text-xs font-semibold text-white" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%);">Präsenz + Online</span>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Course Details Modal -->
+    <div id="courseModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+     <div class="bg-white rounded-2xl max-w-4xl w-full max-h-90vh overflow-y-auto">
+      <div class="p-6 md:p-8">
+       <div class="flex justify-between items-start mb-6">
+        <h2 id="modalTitle" class="text-2xl md:text-3xl font-bold text-gray-800"></h2><button onclick="closeCourseModal()" class="text-gray-500 hover:text-gray-700 text-2xl"> <i class="fas fa-times"></i> </button>
+       </div>
+       <div id="modalContent" class="space-y-6"><!-- Content wird dynamisch eingefügt -->
+       </div>
+      </div>
+     </div>
+    </div><!-- Standorte für Präsenzkurse -->
+    <div class="text-center mb-16">
+     <h3 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Deutschlandweite Standorte</h3>
+     <p class="text-lg text-gray-600 mb-8">Intensivklausuren können deutschlandweit besucht werden</p><!-- Bilder Slideshow -->
+     <div class="hero-slideshow relative overflow-hidden rounded-2xl mb-8 max-w-5xl mx-auto" style="height: 400px;">
+      <div class="slide active" style="background-image: url('https://www.dropbox.com/scl/fi/ir1b2e4p8lj0q0yejymvq/Design-ohne-Titel-13-1.png?rlkey=ra1xe4ip35arixyjwskzudbc1&amp;raw=1');"></div>
+      <div class="slide" style="background-image: url('https://www.dropbox.com/scl/fi/azjt2qf5etlxbcvojvskx/Design-ohne-Titel-14-1.png?rlkey=96flo0x0au1yfr1c2903rq4n9&amp;raw=1');"></div>
+      <div class="slide" style="background-image: url('https://www.dropbox.com/scl/fi/m2e1j07i48t4ikxm23rbf/Design-ohne-Titel-15-1.png?rlkey=o4e8ktd8u8usonhbomophwar8&amp;raw=1');"></div>
+      <div class="slide" style="background-image: url('https://www.dropbox.com/scl/fi/4pyyxffqdkcbyyk2g1zev/Design-ohne-Titel-16-1.png?rlkey=fp1cznjavjt3sot23t9n0ko4y&amp;raw=1');"></div>
+      <div class="slide" style="background-image: url('https://www.dropbox.com/scl/fi/d863nehgsutpmw45q0abl/Design-ohne-Titel-17-1.png?rlkey=rfbiuhnzi3k8h8gvx37iqkgdk&amp;raw=1');"></div>
+     </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"><!-- Deutschland Karte -->
+     <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg order-2 lg:order-1 flex flex-col">
+      <h3 class="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-center text-gray-800">Unsere Standorte</h3>
+      <div class="max-w-sm md:max-w-xl mx-auto germany-map"><img src="https://s1.directupload.eu/images/250927/fd9qovbf.png" alt="WLW Standorte Deutschlandkarte" class="w-full transition-transform duration-300 rounded-lg" loading="lazy" onerror="this.src=''; this.alt='Karte konnte nicht geladen werden'; this.style.display='none';">
+      </div>
+     </div><!-- Standort Details -->
+     <div class="space-y-3 md:space-y-4 order-1 lg:order-2">
+      <div class="scroll-reveal city-card bg-white rounded-3xl p-4 md:p-6 shadow-lg hover-lift" data-city="Berlin">
+       <div class="flex items-start md:items-center mb-4">
+        <div class="rounded-full p-2 md:p-3 mr-3 md:mr-4 text-lg md:text-xl flex-shrink-0" style="background: rgba(184, 212, 247, 0.3); color: #5b9be0;"><i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+         <div class="flex items-center gap-2 mb-1">
+          <h3 class="text-lg md:text-xl font-bold">Berlin</h3><span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">NEU</span>
+         </div>
+         <p class="text-gray-600 text-sm md:text-base">Hauptstadt-Standort</p>
+        </div>
+       </div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Datum:</p>
+         <p class="text-gray-600">07. - 12.09.2026</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Preis:</p>
+         <div class="flex flex-col"><span class="text-green-600 font-bold text-lg">ab € 549</span> <span class="text-xs text-gray-500">Willkommenspreis</span>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="scroll-reveal city-card bg-white rounded-3xl p-4 md:p-6 shadow-lg hover-lift" data-city="München" style="animation-delay: 0.1s;">
+       <div class="flex items-start md:items-center mb-4">
+        <div class="rounded-full p-2 md:p-3 mr-3 md:mr-4 text-lg md:text-xl flex-shrink-0" style="background: rgba(184, 212, 247, 0.3); color: #5b9be0;"><i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+         <h3 class="text-lg md:text-xl font-bold mb-1">München</h3>
+         <p class="text-gray-600 text-sm md:text-base">Bayern-Zentrum</p>
+        </div>
+       </div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Datum:</p>
+         <p class="text-gray-600">07. - 12.09.2026</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Preis:</p>
+         <div class="flex flex-col"><span class="text-green-600 font-bold text-lg">ab € 549</span> <span class="text-xs text-gray-500">Willkommenspreis</span>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="scroll-reveal city-card bg-white rounded-3xl p-4 md:p-6 shadow-lg hover-lift" data-city="Düsseldorf" style="animation-delay: 0.2s;">
+       <div class="flex items-start md:items-center mb-4">
+        <div class="rounded-full p-2 md:p-3 mr-3 md:mr-4 text-lg md:text-xl flex-shrink-0" style="background: rgba(184, 212, 247, 0.3); color: #5b9be0;"><i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+         <div class="flex items-center gap-2 mb-1">
+          <h3 class="text-lg md:text-xl font-bold">Düsseldorf</h3><span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">NEU</span>
+         </div>
+         <p class="text-gray-600 text-sm md:text-base">NRW-Standort</p>
+        </div>
+       </div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Datum:</p>
+         <p class="text-gray-600">07. - 12.09.2026</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Preis:</p>
+         <div class="flex flex-col"><span class="text-green-600 font-bold text-lg">ab € 549</span> <span class="text-xs text-gray-500">Willkommenspreis</span>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="scroll-reveal city-card bg-white rounded-3xl p-4 md:p-6 shadow-lg hover-lift" data-city="Hamburg" style="animation-delay: 0.3s;">
+       <div class="flex items-start md:items-center mb-4">
+        <div class="rounded-full p-2 md:p-3 mr-3 md:mr-4 text-lg md:text-xl flex-shrink-0" style="background: rgba(184, 212, 247, 0.3); color: #5b9be0;"><i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+         <div class="flex items-center gap-2 mb-1">
+          <h3 class="text-lg md:text-xl font-bold">Hamburg</h3><span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">NEU</span>
+         </div>
+         <p class="text-gray-600 text-sm md:text-base">Norddeutschland</p>
+        </div>
+       </div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Datum:</p>
+         <p class="text-gray-600">07. - 12.09.2026</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Preis:</p>
+         <div class="flex flex-col"><span class="text-green-600 font-bold text-lg">ab € 549</span> <span class="text-xs text-gray-500">Willkommenspreis</span>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="scroll-reveal city-card bg-white rounded-3xl p-4 md:p-6 shadow-lg hover-lift" data-city="Bamberg" style="animation-delay: 0.4s;">
+       <div class="flex items-start md:items-center mb-4">
+        <div class="rounded-full p-2 md:p-3 mr-3 md:mr-4 text-lg md:text-xl flex-shrink-0" style="background: rgba(184, 212, 247, 0.3); color: #5b9be0;"><i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+         <h3 class="text-lg md:text-xl font-bold mb-1">Bamberg</h3>
+         <p class="text-gray-600 text-sm md:text-base">Nordbayern</p>
+        </div>
+       </div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Datum:</p>
+         <p class="text-gray-600">07. - 12.09.2026</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+         <p class="font-semibold text-gray-700 mb-1">Preis:</p>
+         <div class="flex flex-col"><span class="text-blue-600 font-bold text-lg">ab € 640</span>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Bestehensquoten Section -->
+  <section class="py-20 bg-gray-50">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+     <h2 class="text-3xl md:text-5xl font-bold mb-6 text-gray-800">Bestehensquoten 2024</h2>
+     <p class="text-lg text-gray-600">Unsere Erfolgsstatistik spricht für sich</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"><!-- Deutschland Balken -->
+     <div class="scroll-reveal bg-white rounded-3xl p-8 shadow-lg text-center">
+      <h3 class="text-2xl font-bold mb-8 text-gray-800">Deutschlandweit</h3>
+      <div class="relative mb-6">
+       <div class="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+        <div class="progress-bar-germany h-full bg-gray-400 rounded-full flex items-center justify-end pr-4 transition-all duration-2000 ease-out" style="width: 0%;" data-target="52.1"><span class="text-white font-bold text-sm opacity-0 transition-opacity duration-500 delay-1500">52,1%</span>
+        </div>
+       </div>
+      </div>
+      <div class="text-4xl font-bold text-gray-600 mb-2 germany-percentage">
+       0,0%
+      </div>
+      <p class="text-gray-500">Bestehensquote bundesweit</p>
+     </div><!-- WLW Balken -->
+     <div class="scroll-reveal bg-white rounded-3xl p-8 shadow-lg text-center" style="animation-delay: 0.2s;">
+      <h3 class="text-2xl font-bold mb-8" style="color: #5b9be0;">WLW-Teilnehmer</h3>
+      <div class="relative mb-6">
+       <div class="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+        <div class="progress-bar-wlw h-full rounded-full flex items-center justify-end pr-4 transition-all duration-2000 ease-out" style="background: linear-gradient(135deg, #6facff 0%, #aacfff 100%); width: 0%;" data-target="79.6"><span class="text-white font-bold text-sm opacity-0 transition-opacity duration-500 delay-1500">79,6%</span>
+        </div>
+       </div>
+      </div>
+      <div class="text-4xl font-bold mb-2 wlw-percentage" style="color: #5b9be0;">
+       0,0%
+      </div>
+      <p class="text-gray-500">WLW-Teilnehmer Vollzeitkurs 17-Wochen Bamberg</p>
+     </div>
+    </div>
+    <div class="text-center mt-12">
+     <p class="text-lg text-gray-600 max-w-2xl mx-auto"><span class="font-bold" style="color: #5b9be0;">+27,5 Prozentpunkte</span> höhere Erfolgsquote bei WLW-Teilnehmern im Vergleich zum Bundesdurchschnitt</p>
+    </div>
+   </div>
+  </section><!-- Image Section -->
+  <section class="py-16 bg-white">
+   <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto"><img src="https://s1.directupload.eu/images/250829/55phpccn.jpg" alt="WLW Klausurenkurs Übersicht" class="w-full rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300" loading="lazy" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';">
+    </div>
+   </div>
+  </section><!-- Erfolgsgeschichten Section -->
+  <section class="py-20 bg-white">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+     <h2 class="text-3xl md:text-5xl font-bold mb-6 text-gray-800">Erfolgsgeschichten unserer Teilnehmer</h2>
+     <p class="text-lg text-gray-600 max-w-3xl mx-auto">Tausende Teilnehmer haben mit WLW erfolgreich die Steuerberaterprüfung bestanden. Ihre Erfolgsgeschichten motivieren und zeigen: Mit der richtigen Vorbereitung ist der Traum vom Steuerberater erreichbar!</p>
+    </div>
+    <div class="max-w-6xl mx-auto"><!-- Teilnehmer Bilder Karussell -->
+     <div class="relative overflow-hidden rounded-2xl bg-gray-50 p-8 mb-12">
+      <div class="participant-carousel flex transition-transform duration-1000 ease-in-out" id="participantCarousel"><!-- Alle Teilnehmer in einer Reihe -->
+       <div class="participant-slide flex space-x-6 min-w-max"><img src="https://wlw-steuern.de/storage/review-photos/MN3tDNg3kq6AoDuUgszP2lXAh9MmaKK4HFZj19ap.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/2H5LHus8DtP4Al6n2uZdkJEfFpVrHVo69OSrtGD9.png" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/A1NTsLuReb7k1DeBDkn6jbQqF6mTITzWs85AIgXt.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/MQk8bJpr9ipCjMaTMaytWZa8dUV9DbB9UfAzK7wf.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/VhmgY3xl4DsYnUQRAWbYj96lALUcfZU3wmNXEKJn.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/fEqao04zw4JxArK1mB1UhMMKefetebEwMnjXmHfM.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/qswE5ToJ6f8HFFmZd59KOTvlN65wDOXU6gWX6hfR.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/N8To3xabRAslcOUEtj6yK6663BkcW3AJyUaLQfLS.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/TGSz9lfyAw5q3PQI4V5eKpgUzCK1XmWMyjTgyuAg.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/ePHarfsH7lTxDLt4ifrdHpAILmV53fMaXSZ0V2W2.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <!-- Wiederholung der Bilder für nahtlose Animation --> <img src="https://wlw-steuern.de/storage/review-photos/MN3tDNg3kq6AoDuUgszP2lXAh9MmaKK4HFZj19ap.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/2H5LHus8DtP4Al6n2uZdkJEfFpVrHVo69OSrtGD9.png" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/A1NTsLuReb7k1DeBDkn6jbQqF6mTITzWs85AIgXt.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/MQk8bJpr9ipCjMaTMaytWZa8dUV9DbB9UfAzK7wf.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/VhmgY3xl4DsYnUQRAWbYj96lALUcfZU3wmNXEKJn.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/fEqao04zw4JxArK1mB1UhMMKefetebEwMnjXmHfM.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/qswE5ToJ6f8HFFmZd59KOTvlN65wDOXU6gWX6hfR.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/N8To3xabRAslcOUEtj6yK6663BkcW3AJyUaLQfLS.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/TGSz9lfyAw5q3PQI4V5eKpgUzCK1XmWMyjTgyuAg.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';"> <img src="https://wlw-steuern.de/storage/review-photos/ePHarfsH7lTxDLt4ifrdHpAILmV53fMaXSZ0V2W2.jpg" alt="WLW Teilnehmer" class="participant-avatar w-24 h-24 rounded-full object-cover shadow-lg hover:scale-110 transition-transform duration-300" onerror="this.src=''; this.alt='Bild konnte nicht geladen werden'; this.style.display='none';">
+       </div>
+      </div>
+     </div><!-- Bewertungen (fest) -->
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="testimonial-card bg-white rounded-3xl p-6 shadow-lg hover-lift text-center">
+       <div class="flex justify-center mb-4 text-xl"><span class="text-yellow-400">★★★★★</span>
+       </div>
+       <h4 class="font-bold text-gray-800 mb-3">Florian Schubert</h4>
+       <p class="text-gray-600 text-sm leading-relaxed">"Ich kann die Vorbereitung auf die Steuerberaterprüfung bei WLW wirklich uneingeschränkt empfehlen und werde diesen Lehrgangsanbieter auch künftig jedem empfehlen, der sich auf diese schwere Prüfung vorbereitet! Die Klausuren waren praxisnah, thematisch breit gefächert und optimal geeignet zur gezielten Wiederholung und Vertiefung."</p>
+      </div>
+      <div class="testimonial-card bg-white rounded-3xl p-6 shadow-lg hover-lift text-center">
+       <div class="flex justify-center mb-4 text-xl"><span class="text-yellow-400">★★★★★</span>
+       </div>
+       <h4 class="font-bold text-gray-800 mb-3">Paul Scherer</h4>
+       <p class="text-gray-600 text-sm leading-relaxed">"Ich hatte zum Ende der Kurse das Gefühl, zu jedem Problemgebiet etwas schreiben zu können. Hierzu hat nochmals der Klausurenkurs beigetragen, in welchem auf sehr hohem Niveau unterschiedlichste Problemstellungen angegangen wurden. Aufgrund dieser Kurse fühlte ich mich bestmöglichst auf das Examen im Oktober vorbereitet. Ich werde das WLW bei uns uneingeschränkt weiterempfehlen. Vielen Dank, dass ihr mich zum Steuerberater gemacht habt!"</p>
+      </div>
+      <div class="testimonial-card bg-white rounded-3xl p-6 shadow-lg hover-lift text-center">
+       <div class="flex justify-center mb-4 text-xl"><span class="text-yellow-400">★★★★★</span>
+       </div>
+       <h4 class="font-bold text-gray-800 mb-3">Dennis Schreyer</h4>
+       <p class="text-gray-600 text-sm leading-relaxed">"Es gab es für mich keine Zweifel, bei welchem Kursanbieter ich die Vorbereitung durchziehen will – beim WLW. Ich möchte hier keinem was vormachen – die Zeit wird hart, nervenzehrend und anstrengend – aber es lohnt sich! Das gesamte WLW Team steht einem hervorragend zur Seite um kümmert sich unglaublich gut um einen, sei es durch das Mitarbeiter-Team, die Dozenten oder durch die Familie Wirth selbst! Ich würde mich jederzeit wieder für das WLW entscheiden und kann es wirklich jedem empfehlen. Vielen, vielen Dank für die ganze Unterstützung!!"</p>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Dozenten Section -->
+  <section id="dozenten" class="py-16 bg-gray-50">
+   <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+     <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Unsere erfahrenen Dozenten</h2>
+     <p class="text-lg text-gray-600 max-w-2xl mx-auto">Lerne von den Besten! Unsere Dozenten bringen jahrelange Praxis- und Lehrerfahrung mit. Hier ein Teil unserer Dozenten:</p>
+    </div><!-- Dozenten Grid - kompakter mit nur 6 Dozenten -->
+    <div class="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto"><!-- Dozent 1 -->
+     <div class="scroll-reveal dozent-card bg-white rounded-3xl shadow-lg p-4 text-center">
+      <div class="mb-3"><img src="https://www.dropbox.com/scl/fi/arwsttu0i3r1sdfmzonbs/Foto-30.11.24-14-37-16.jpg?rlkey=4oi9aoe4pyzam4csd2bb83hdy&amp;raw=1" alt="Dr. Klaus Dumser" class="w-16 h-16 rounded-full object-cover shadow-lg mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+       <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xl text-blue-600 shadow-lg mx-auto" style="display: none;"><i class="fas fa-user-tie"></i>
+       </div>
+      </div>
+      <h3 class="text-sm font-bold mb-2 text-gray-800">Dr. Klaus Dumser</h3>
+      <p class="text-xs font-semibold" style="color: #5b9be0;">Steuerberater, Rechtsanwalt, Fachanwalt für Steuerrecht</p>
+     </div><!-- Dozent 2 -->
+     <div class="scroll-reveal dozent-card bg-white rounded-xl shadow-lg p-4 text-center" style="animation-delay: 0.1s;">
+      <div class="mb-3"><img src="https://www.dropbox.com/scl/fi/np0gb9ux5qfrncrze39rc/Foto-29.08.25-15-06-05.jpg?rlkey=0vk7831n4tdfcrcodzg0gghun&amp;raw=1" alt="Marcus Wirth" class="w-16 h-16 rounded-full object-cover shadow-lg mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+       <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xl text-blue-600 shadow-lg mx-auto" style="display: none;"><i class="fas fa-user-tie"></i>
+       </div>
+      </div>
+      <h3 class="text-sm font-bold mb-2 text-gray-800">Marcus Wirth</h3>
+      <p class="text-xs font-semibold" style="color: #5b9be0;">Steuerberater, Master of Science, Dipl.-Finanzwirt (FH)</p>
+     </div><!-- Dozent 4 -->
+     <div class="scroll-reveal dozent-card bg-white rounded-xl shadow-lg p-4 text-center" style="animation-delay: 0.3s;">
+      <div class="mb-3"><img src="https://www.dropbox.com/scl/fi/qyqeidazl8lnth5zy2rmz/Foto-30.11.24-14-33-29.jpg?rlkey=g0szwfk5qc456syouzgm3cs4i&amp;raw=1" alt="Barbara Würzburger" class="w-16 h-16 rounded-full object-cover shadow-lg mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+       <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xl text-blue-600 shadow-lg mx-auto" style="display: none;"><i class="fas fa-user-tie"></i>
+       </div>
+      </div>
+      <h3 class="text-sm font-bold mb-2 text-gray-800">Barbara Würzburger</h3>
+      <p class="text-xs font-semibold" style="color: #5b9be0;">exam. Steuerberaterin, Dipl.-Finanzwirtin (FH)</p>
+     </div><!-- Dozent 5 -->
+     <div class="scroll-reveal dozent-card bg-white rounded-xl shadow-lg p-4 text-center" style="animation-delay: 0.4s;">
+      <div class="mb-3"><img src="https://www.dropbox.com/scl/fi/wj1j994bpft25310463js/Foto-30.11.24-14-25-54.jpg?rlkey=45y0j06eaeu1f49422o54b1dq&amp;raw=1" alt="Dr. Carsten Farr" class="w-16 h-16 rounded-full object-cover shadow-lg mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+       <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xl text-blue-600 shadow-lg mx-auto" style="display: none;"><i class="fas fa-user-tie"></i>
+       </div>
+      </div>
+      <h3 class="text-sm font-bold mb-2 text-gray-800">Dr. Carsten Farr</h3>
+      <p class="text-xs font-semibold" style="color: #5b9be0;">Volljurist</p>
+     </div><!-- Dozent 6 -->
+     <div class="scroll-reveal dozent-card bg-white rounded-xl shadow-lg p-4 text-center" style="animation-delay: 0.5s;">
+      <div class="mb-3"><img src="https://www.dropbox.com/scl/fi/hp4gcnkxinqhd14tworyb/Foto-30.11.24-14-27-00.jpg?rlkey=ejr18ndjr9c707wa89mbg5xei&amp;raw=1" alt="Dr. Christian Baretti" class="w-16 h-16 rounded-full object-cover shadow-lg mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+       <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xl text-blue-600 shadow-lg mx-auto" style="display: none;"><i class="fas fa-user-tie"></i>
+       </div>
+      </div>
+      <h3 class="text-sm font-bold mb-2 text-gray-800">Dr. Christian Baretti</h3>
+      <p class="text-xs font-semibold" style="color: #5b9be0;">Steuerberater, Diplom-Volkswirt</p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Buchung/CTA Section -->
+  <section id="buchen" class="py-20 relative overflow-hidden"><!-- Gradient Background -->
+   <div class="absolute inset-0 gradient-bg"></div><!-- Content -->
+   <div class="relative z-10 container mx-auto px-4 text-center text-white">
+    <div class="max-w-4xl mx-auto">
+     <div class="fade-in bg-green-500 text-white font-bold py-3 px-8 rounded-full mb-8 inline-block floating"><i class="fas fa-gift mr-2"></i>100% kostenlos - Keine versteckten Kosten!
+     </div>
+     <h2 class="fade-in fade-in-delay-1 text-4xl md:text-6xl font-bold mb-6">Teste WLW kostenlos!</h2>
+     <p class="fade-in fade-in-delay-2 text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Überzeuge dich selbst von unserer <span class="font-bold text-yellow-300">WLW-Qualität</span> mit einer kostenlosen Probeklausur - völlig unverbindlich!</p><!-- Hauptbuttons -->
+     <div class="fade-in fade-in-delay-3 flex flex-col md:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto"><a href="#klausur" class="btn-hover bg-green-500 text-white font-bold py-6 px-8 rounded-xl shadow-2xl hover:shadow-3xl hover:bg-green-600 transition text-xl transform hover:scale-105 inline-block"> <i class="fas fa-gift mr-3"></i>Kostenlose Klausur </a> <a href="https://wlw-steuern.de/product/klausurenkurse" target="_blank" rel="noopener noreferrer" class="btn-hover bg-blue-500 text-white font-bold py-6 px-8 rounded-xl shadow-2xl hover:shadow-3xl hover:bg-blue-600 transition text-xl transform hover:scale-105 inline-block"> <i class="fas fa-graduation-cap mr-3"></i>Klausurenkurse buchen </a>
+     </div>
+     <div class="fade-in fade-in-delay-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-12 max-w-4xl mx-auto"><!-- Kontakt Karte -->
+      <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 md:p-8 hover-lift border border-white border-opacity-20">
+       <div class="text-3xl md:text-4xl mb-3 md:mb-4 text-center md:text-left"><i class="fas fa-phone"></i>
+       </div>
+       <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-center md:text-left">Telefonische Beratung</h3>
+       <p class="mb-4 md:mb-6 text-white text-opacity-90 text-center md:text-left text-sm md:text-base">Lass dich persönlich beraten und finde den perfekten Standort für dich</p><a href="tel:+49951700660" class="btn-hover bg-white text-blue-600 font-bold py-3 md:py-3 px-4 md:px-6 rounded-xl hover:bg-gray-100 transition block text-center md:inline-block"> <i class="fas fa-phone mr-2"></i>0951 700660 </a>
+      </div><!-- Email Karte -->
+      <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 md:p-8 hover-lift border border-white border-opacity-20">
+       <div class="text-3xl md:text-4xl mb-3 md:mb-4 text-center md:text-left"><i class="fas fa-envelope"></i>
+       </div>
+       <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-center md:text-left">E-Mail Anfrage</h3>
+       <p class="mb-4 md:mb-6 text-white text-opacity-90 text-center md:text-left text-sm md:text-base">Schreibe uns deine Fragen und erhalte alle Informationen per E-Mail</p><a href="mailto:info@wlw-bamberg.de" class="btn-hover bg-white text-blue-600 font-bold py-3 md:py-3 px-4 md:px-6 rounded-xl hover:bg-gray-100 transition block text-center md:inline-block"> <i class="fas fa-envelope mr-2"></i>E-Mail senden </a>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12">
+   <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8"><!-- Logo & Info -->
+     <div class="md:col-span-2">
+      <div class="flex items-center mb-4"><img src="https://wlw-steuern.de/build/assets/logo-f86961a4.svg" alt="WLW Logo" class="h-16 w-auto mr-4" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+       <div class="text-white px-4 py-2 rounded font-bold text-2xl mr-4 hidden" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        WLW
+       </div>
+      </div>
+      <p class="text-gray-300 mb-4">Mit über 25 Jahren Erfahrung in der Steuerberaterprüfung-Vorbereitung sind wir Ihr verlässlicher Partner auf dem Weg zum Steuerberater. Unsere Klausurenkurse haben bereits tausenden von Kandidaten zum Erfolg verholfen.</p>
+     </div><!-- Kontakt -->
+     <div>
+      <h4 class="text-lg font-bold mb-4">Kontakt</h4>
+      <div class="space-y-2 text-gray-300">
+       <p><i class="fas fa-phone mr-2"></i>0951 700660</p>
+       <p><i class="fas fa-envelope mr-2"></i>info@wlw-bamberg.de</p>
+       <div class="mt-4 space-y-2"><a href="https://wlw-steuern.de/impressum" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Impressum</a> <br><a href="https://wlw-steuern.de/datenschutz" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">Datenschutz</a>
+       </div>
+      </div>
+     </div><!-- Standorte -->
+     <div>
+      <h4 class="text-lg font-bold mb-4">Standorte 2026</h4>
+      <div class="space-y-1 text-gray-300 text-sm">
+       <p>• Bamberg</p>
+       <p>• Berlin</p>
+       <p>• Düsseldorf</p>
+       <p>• Hamburg</p>
+       <p>• München</p>
+      </div>
+     </div>
+    </div>
+    <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+     <p>© 2025 WLW. Alle Rechte vorbehalten.</p>
+     <p class="mt-2 text-sm">Klausurenkurse für die Steuerberaterprüfung 2026 • 07. - 12. September 2026</p>
+    </div>
+   </div>
+  </footer>
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hero Slideshow
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            
+            function nextSlide() {
+                // Entferne active Klasse vom aktuellen Slide
+                slides[currentSlide].classList.remove('active');
+                
+                // Gehe zum nächsten Slide
+                currentSlide = (currentSlide + 1) % slides.length;
+                
+                // Füge active Klasse zum neuen Slide hinzu
+                slides[currentSlide].classList.add('active');
+            }
+            
+            // Starte Slideshow nach 2.5 Sekunden
+            setInterval(nextSlide, 2500);
+            
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            // Interactive map
+            const cityDots = document.querySelectorAll('.city-dot');
+            const cityCards = document.querySelectorAll('.city-card');
+            
+            cityDots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    const cityName = this.getAttribute('data-city');
+                    
+                    // Remove active state from all cards
+                    cityCards.forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    
+                    // Add active state to selected city card
+                    const targetCard = document.querySelector(`.city-card[data-city="${cityName}"]`);
+                    if (targetCard) {
+                        targetCard.classList.add('active');
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+            });
+            
+            // Scroll reveal animation
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all scroll-reveal elements
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Progress bar animations with number counting
+            const progressObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const germanyBar = document.querySelector('.progress-bar-germany');
+                        const wlwBar = document.querySelector('.progress-bar-wlw');
+                        const germanyNumber = document.querySelector('.germany-percentage');
+                        const wlwNumber = document.querySelector('.wlw-percentage');
+                        
+                        if (germanyBar && !germanyBar.classList.contains('animated')) {
+                            germanyBar.classList.add('animated');
+                            
+                            // Animate Germany bar
+                            setTimeout(() => {
+                                germanyBar.style.width = '52.1%';
+                                germanyBar.style.transition = 'width 3s ease-out';
+                                
+                                // Animate Germany number
+                                if (germanyNumber) {
+                                    animateNumber(germanyNumber, 0, 52.1, 3000);
+                                }
+                                
+                                setTimeout(() => {
+                                    const span = germanyBar.querySelector('span');
+                                    if (span) span.style.opacity = '1';
+                                }, 2500);
+                            }, 500);
+                        }
+                        
+                        if (wlwBar && !wlwBar.classList.contains('animated')) {
+                            wlwBar.classList.add('animated');
+                            
+                            // Animate WLW bar
+                            setTimeout(() => {
+                                wlwBar.style.width = '79.6%';
+                                wlwBar.style.transition = 'width 3s ease-out';
+                                
+                                // Animate WLW number
+                                if (wlwNumber) {
+                                    animateNumber(wlwNumber, 0, 79.6, 3000);
+                                }
+                                
+                                setTimeout(() => {
+                                    const span = wlwBar.querySelector('span');
+                                    if (span) span.style.opacity = '1';
+                                }, 2500);
+                            }, 800);
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            // Number animation function
+            function animateNumber(element, start, end, duration) {
+                const startTime = performance.now();
+                
+                function updateNumber(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smooth animation
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const current = start + (end - start) * easeOut;
+                    
+                    element.textContent = current.toFixed(1) + '%';
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateNumber);
+                    }
+                }
+                
+                requestAnimationFrame(updateNumber);
+            }
+            
+            // Observe progress bars section
+            const progressBarsSection = document.querySelector('.progress-bar-germany');
+            if (progressBarsSection) {
+                const section = progressBarsSection.closest('section');
+                if (section) {
+                    progressObserver.observe(section);
+                }
+            }
+            
+            // Simplified scroll effects - only for essential animations
+            let ticking = false;
+            
+            function updateScrollEffects() {
+                // Only essential scroll effects here
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(updateScrollEffects);
+                    ticking = true;
+                }
+            });
+        });
+        
+        // Teilnehmer Karussell Animation - CSS-basiert für flüssige Bewegung
+        const participantCarousel = document.getElementById('participantCarousel');
+        
+        if (participantCarousel) {
+            // Füge CSS-Animation hinzu
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes scrollParticipants {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(-50%);
+                    }
+                }
+                
+                .participant-slide {
+                    animation: scrollParticipants 20s linear infinite;
+                }
+                
+                .participant-slide:hover {
+                    animation-play-state: paused;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+
+        
+        // PDF Download Funktion
+        function downloadPDF(type) {
+            const pdfUrls = {
+                'angabe': 'https://wlw-steuern.de/content/t0RloanRHPjMqstkylq5FrtfDN7ahMePhFB-MGyYxPU=.pdf',
+                'loesung': 'https://wlw-steuern.de/content/t0RloanRHPjMqstkylq5FqYbbO1q5NGdn4p1+xmA5lA=.pdf'
+            };
+            
+            const url = pdfUrls[type];
+            
+            if (url) {
+                // Öffne PDF in neuem Tab
+                window.open(url, '_blank', 'noopener,noreferrer');
+            } else {
+                // Create inline message instead of alert
+                const message = document.createElement('div');
+                message.textContent = 'PDF konnte nicht gefunden werden.';
+                message.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ef4444;color:white;padding:1rem 2rem;border-radius:0.5rem;z-index:9999;';
+                document.body.appendChild(message);
+                setTimeout(() => message.remove(), 3000);
+            }
+        }
+        
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"] i');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                menuButton.classList.remove('fa-bars');
+                menuButton.classList.add('fa-times');
+            } else {
+                mobileMenu.classList.add('hidden');
+                menuButton.classList.remove('fa-times');
+                menuButton.classList.add('fa-bars');
+            }
+        }
+        
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"] i');
+            
+            mobileMenu.classList.add('hidden');
+            menuButton.classList.remove('fa-times');
+            menuButton.classList.add('fa-bars');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileMenu.contains(event.target) && !menuButton.contains(event.target)) {
+                closeMobileMenu();
+            }
+        });
+        
+        // Course Details Modal Functions
+        function showCourseDetails(courseType) {
+            const modal = document.getElementById('courseModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            const courseData = {
+                modulA: {
+                    title: 'Modul A - Fernkurs',
+                    subtitle: 'Dezember 2025 - Mai 2026',
+                    color: 'blue',
+                    content: `
+                        <div class="bg-blue-50 rounded-xl p-6 mb-6">
+                            <h3 class="text-xl font-bold text-blue-800 mb-4">Kursübersicht</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div><strong>Klausuren:</strong> 15 sechsstündige Klausuren</div>
+                                <div><strong>Dauer:</strong> Dezember 2025 - Mai 2026</div>
+                                <div><strong>Format:</strong> Fernkurs - Bequem von Zuhause</div>
+                                <div><strong>Korrektur:</strong> Bis Ende Mai 2026</div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-4">
+                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                Grundlegende Examensvorbereitung mit monatlichen Lieferungen
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-bold text-gray-800">Liefertermine und Korrekturfristen</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white border border-blue-200 rounded-lg p-4">
+                                    <div class="font-semibold text-blue-600">Ende Dezember</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für Januar</div>
+                                </div>
+                                <div class="bg-white border border-blue-200 rounded-lg p-4">
+                                    <div class="font-semibold text-blue-600">Ende Januar</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für Februar</div>
+                                </div>
+                                <div class="bg-white border border-blue-200 rounded-lg p-4">
+                                    <div class="font-semibold text-blue-600">Ende Februar</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für März</div>
+                                </div>
+                                <div class="bg-white border border-blue-200 rounded-lg p-4">
+                                    <div class="font-semibold text-blue-600">Ende März</div>
+                                    <div class="text-sm text-gray-600">3 Klausurangaben zzgl. Lösungen für April</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 rounded-lg p-4 mt-6">
+                                <h5 class="font-semibold text-blue-800 mb-2">Inklusive Leistungen:</h5>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Aufzeichnung der Besprechungen</li>
+                                    <li><i class="fas fa-check text-blue-500 mr-2"></i>Korrekturanspruch bis Ende Mai</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                modulB: {
+                    title: 'Modul B - Fernkurs mit Live-Besprechung',
+                    subtitle: 'April - August 2026',
+                    color: 'purple',
+                    content: `
+                        <div class="bg-purple-50 rounded-xl p-6 mb-6">
+                            <h3 class="text-xl font-bold text-purple-800 mb-4">Kursübersicht</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div><strong>Klausuren:</strong> 15 sechsstündige Klausuren</div>
+                                <div><strong>Dauer:</strong> April - August 2026</div>
+                                <div><strong>Format:</strong> Fernkurs - Bequem von Zuhause</div>
+                                <div><strong>Korrektur:</strong> Bis Ende August 2026</div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-4">
+                                <i class="fas fa-info-circle text-purple-500 mr-2"></i>
+                                Vertiefung und Wiederholung mit Live-Besprechungen
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-bold text-gray-800">Liefertermine und Korrekturfristen</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white border border-purple-200 rounded-lg p-4">
+                                    <div class="font-semibold text-purple-600">Ende April</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für Mai</div>
+                                </div>
+                                <div class="bg-white border border-purple-200 rounded-lg p-4">
+                                    <div class="font-semibold text-purple-600">Ende Mai</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für Juni</div>
+                                </div>
+                                <div class="bg-white border border-purple-200 rounded-lg p-4">
+                                    <div class="font-semibold text-purple-600">Ende Juni</div>
+                                    <div class="text-sm text-gray-600">4 Klausurangaben zzgl. Lösungen für Juli</div>
+                                </div>
+                                <div class="bg-white border border-purple-200 rounded-lg p-4">
+                                    <div class="font-semibold text-purple-600">Ende Juli</div>
+                                    <div class="text-sm text-gray-600">3 Klausurangaben zzgl. Lösungen für August</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-purple-50 rounded-lg p-4 mt-6">
+                                <h5 class="font-semibold text-purple-800 mb-2">Inklusive Leistungen:</h5>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Live-Besprechung</li>
+                                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Zugriff auf Aufzeichnungen</li>
+                                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Korrekturanspruch bis Ende August</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                intensiv1: {
+                    title: 'Intensivklausuren I - Doppeltes Probeexamen',
+                    subtitle: '07. - 12. September 2026',
+                    color: 'green',
+                    content: `
+                        <div class="bg-green-50 rounded-xl p-6 mb-6">
+                            <h3 class="text-xl font-bold text-green-800 mb-4">Kursübersicht</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div><strong>Klausuren:</strong> 6 sechsstündige Klausuren</div>
+                                <div><strong>Dauer:</strong> 6 Tage (07. - 12. September)</div>
+                                <div><strong>Format:</strong> Präsenz + Online</div>
+                                <div><strong>Standorte:</strong> Berlin, Bamberg, Düsseldorf, Hamburg, München, Bequem von Zuhause</div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-4">
+                                <i class="fas fa-info-circle text-green-500 mr-2"></i>
+                                Doppeltes Probeexamen in 5 Städten oder online
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-bold text-gray-800">Verfügbare Kursstandorte</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6">
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Berlin</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Bamberg</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Düsseldorf</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Hamburg</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">München</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Bequem von Zuhause</span>
+                            </div>
+                            
+                            <h4 class="text-lg font-bold text-gray-800">Einsendefristen (Abgabe bis 14:45 Uhr)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">07.09.2026</div>
+                                    <div class="text-sm text-gray-600">Verfahrensrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">08.09.2026</div>
+                                    <div class="text-sm text-gray-600">Ertragsteuerrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">09.09.2026</div>
+                                    <div class="text-sm text-gray-600">Bilanzsteuerrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">10.09.2026</div>
+                                    <div class="text-sm text-gray-600">Verfahrensrecht 02</div>
+                                </div>
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">11.09.2026</div>
+                                    <div class="text-sm text-gray-600">Ertragsteuerrecht 02</div>
+                                </div>
+                                <div class="bg-white border border-green-200 rounded-lg p-4">
+                                    <div class="font-semibold text-green-600">12.09.2026</div>
+                                    <div class="text-sm text-gray-600">Bilanzsteuerrecht 02</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 rounded-lg p-4 mt-6">
+                                <h5 class="font-semibold text-green-800 mb-2">Inklusive Leistungen:</h5>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li><i class="fas fa-check text-green-500 mr-2"></i>Live-Besprechung enthalten</li>
+                                    <li><i class="fas fa-check text-green-500 mr-2"></i>In Berlin, Düsseldorf, Hamburg und München wird die Besprechung am Kursstandort gestreamt</li>
+                                    <li><i class="fas fa-check text-green-500 mr-2"></i>Zugriff auf Aufzeichnungen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                intensiv2: {
+                    title: 'Intensivklausuren II - Finales Probeexamen',
+                    subtitle: '14. - 19. September 2026',
+                    color: 'orange',
+                    content: `
+                        <div class="bg-orange-50 rounded-xl p-6 mb-6">
+                            <h3 class="text-xl font-bold text-orange-800 mb-4">Kursübersicht</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div><strong>Klausuren:</strong> 6 sechsstündige Klausuren</div>
+                                <div><strong>Dauer:</strong> 6 Tage (14. - 19. September)</div>
+                                <div><strong>Format:</strong> Präsenz + Online</div>
+                                <div><strong>Standorte:</strong> Bamberg, Bequem von Zuhause</div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-4">
+                                <i class="fas fa-info-circle text-orange-500 mr-2"></i>
+                                Finales Probeexamen zur Prüfungssimulation
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-bold text-gray-800">Verfügbare Kursstandorte</h4>
+                            <div class="grid grid-cols-2 gap-2 mb-6 max-w-md">
+                                <span class="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Bamberg</span>
+                                <span class="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-semibold text-center">Bequem von Zuhause</span>
+                            </div>
+                            
+                            <h4 class="text-lg font-bold text-gray-800">Einsendefristen (Abgabe bis 14:45 Uhr)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">14.09.2026</div>
+                                    <div class="text-sm text-gray-600">Verfahrensrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">15.09.2026</div>
+                                    <div class="text-sm text-gray-600">Ertragsteuerrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">16.09.2026</div>
+                                    <div class="text-sm text-gray-600">Bilanzsteuerrecht 01</div>
+                                </div>
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">17.09.2026</div>
+                                    <div class="text-sm text-gray-600">Verfahrensrecht 02</div>
+                                </div>
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">18.09.2026</div>
+                                    <div class="text-sm text-gray-600">Ertragsteuerrecht 02</div>
+                                </div>
+                                <div class="bg-white border border-orange-200 rounded-lg p-4">
+                                    <div class="font-semibold text-orange-600">19.09.2026</div>
+                                    <div class="text-sm text-gray-600">Bilanzsteuerrecht 02</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-orange-50 rounded-lg p-4 mt-6">
+                                <h5 class="font-semibold text-orange-800 mb-2">Inklusive Leistungen:</h5>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li><i class="fas fa-check text-orange-500 mr-2"></i>Live-Besprechung enthalten</li>
+                                    <li><i class="fas fa-check text-orange-500 mr-2"></i>Zugriff auf Aufzeichnungen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            const course = courseData[courseType];
+            if (course) {
+                modalTitle.innerHTML = `
+                    <div>
+                        <div class="text-${course.color}-600 text-sm font-semibold mb-1">${course.subtitle}</div>
+                        <div>${course.title}</div>
+                    </div>
+                `;
+                modalContent.innerHTML = course.content;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeCourseModal() {
+            const modal = document.getElementById('courseModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('courseModal');
+            if (event.target === modal) {
+                closeCourseModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCourseModal();
+            }
+        });
+        
+        // Neue Funktionen für die Buchungssektion
+        function buchungFormular() {
+            // Create inline message instead of alert
+            const message = document.createElement('div');
+            message.innerHTML = '<i class="fas fa-info-circle mr-2"></i>Buchungsformular wird geöffnet. Hier würde normalerweise das Anmeldeformular für den Klausurenkurs erscheinen.';
+            message.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#3b82f6;color:white;padding:1rem 2rem;border-radius:0.5rem;z-index:9999;max-width:90%;';
+            document.body.appendChild(message);
+            setTimeout(() => message.remove(), 4000);
+        }
+        
+        function showStandorte() {
+            // Scrolle zur Standorte-Sektion
+            const standorteSection = document.getElementById('standorte');
+            if (standorteSection) {
+                standorteSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9b098194d19884',t:'MTc2NzcwMDYzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
