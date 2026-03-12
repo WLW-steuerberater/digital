@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Die perfekte Vorbereitung Steuerberaterprüfung | WLW</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; }
+
+    body {
+      font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #1d1d1f;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ───── Hero ───── */
+    .hero {
+      text-align: center;
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease forwards;
+    }
+
+    .hero-logo { height: 100px; object-fit: contain; margin-bottom: 2rem; display: block; margin-left: auto; margin-right: auto; }
+
+    .hero-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6fac 0%, #e64a8f 100%);
+      color: white;
+      padding: .5rem 1.25rem;
+      border-radius: 2rem;
+      font-size: .85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .hero h1 {
+      font-size: 2.75rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      letter-spacing: -.02em;
+      color: #1d1d1f;
+      line-height: 1.15;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-intro {
+      font-size: 1.1rem;
+      color: #6e6e73;
+      max-width: 55rem;
+      margin: 0 auto 2rem;
+      line-height: 1.8;
+    }
+
+    /* ───── Event Info Box ───── */
+    .event-info-box {
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      margin: 2rem auto;
+      max-width: 55rem;
+      color: white;
+      box-shadow: 0 8px 30px rgba(111,172,255,.3);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .event-info-item { display: flex; flex-direction: column; align-items: center; }
+
+    .event-info-icon {
+      width: 3rem; height: 3rem;
+      background: rgba(255,255,255,.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: .75rem;
+    }
+    .event-info-icon svg { width: 24px; height: 24px; }
+
+    .event-info-label { font-size: .85rem; opacity: .9; margin-bottom: .25rem; }
+    .event-info-value { font-size: 1.2rem; font-weight: 700; }
+
+    @media (max-width: 768px) {
+      .event-info-box { grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 2rem; }
+      .hero h1 { font-size: 1.85rem; }
+    }
+    @media (max-width: 480px) {
+      .event-info-box { grid-template-columns: 1fr; }
+    }
+
+    /* ───── Inline Links ───── */
+    .inline-link {
+      color: #4a8fe6;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .inline-link:hover { color: #6facff; text-decoration: underline; }
+
+    /* ───── Section Titles ───── */
+    .section-title {
+      font-size: 2rem; font-weight: 700; text-align: center;
+      margin-bottom: 1rem; color: #1d1d1f; letter-spacing: -.02em;
+    }
+    .section-subtitle {
+      font-size: 1.05rem; text-align: center; color: #6e6e73;
+      max-width: 50rem; margin: 0 auto 3rem; line-height: 1.6;
+    }
+
+    /* ───── USP Section ───── */
+    .usp-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .2s forwards;
+    }
+
+    .usp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 70rem;
+      margin: 0 auto;
+    }
+
+    .usp-card {
+      background: linear-gradient(135deg, #f8faff 0%, #eef5ff 100%);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      border: 2px solid #d4e5ff;
+      transition: all .3s ease;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .usp-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(111,172,255,.2);
+      border-color: #6facff;
+    }
+
+    .usp-number {
+      font-size: 3rem; font-weight: 700; line-height: 1; margin-bottom: 1rem;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .usp-icon {
+      width: 4rem; height: 4rem;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .usp-icon svg { width: 28px; height: 28px; color: white; }
+
+    .usp-content h3 { font-size: 1.15rem; font-weight: 700; color: #1d1d1f; margin-bottom: .75rem; }
+    .usp-content p { font-size: .95rem; color: #6e6e73; line-height: 1.7; margin: 0; }
+    .usp-content strong { color: #1d1d1f; }
+
+    @media (max-width: 900px) {
+      .usp-grid { grid-template-columns: 1fr; max-width: 28rem; }
+    }
+
+    /* ───── Overview Cards ───── */
+    .overview-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .3s forwards;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      max-width: 70rem;
+      margin: 0 auto;
+    }
+
+    .overview-card {
+      background: #f9f9fb;
+      border-radius: 1.25rem;
+      padding: 2rem;
+      transition: all .3s ease;
+    }
+    .overview-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(111,172,255,.15);
+    }
+
+    .overview-card-icon {
+      width: 3.5rem; height: 3.5rem;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .overview-card-icon svg { width: 24px; height: 24px; color: white; }
+
+    .overview-card h3 { font-size: 1.25rem; font-weight: 700; color: #1d1d1f; margin-bottom: .75rem; }
+    .overview-card p { font-size: .95rem; color: #6e6e73; line-height: 1.7; margin: 0; }
+
+    @media (max-width: 768px) {
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ───── Timeline / Ablauf ───── */
+    .timeline-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .35s forwards;
+    }
+
+    .timeline {
+      max-width: 55rem;
+      margin: 0 auto;
+      position: relative;
+      padding-left: 3rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: .75rem;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+
+    .timeline-item:last-child { margin-bottom: 0; }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.5rem;
+      top: .25rem;
+      width: 1.5rem; height: 1.5rem;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(111,172,255,.35);
+    }
+
+    .timeline-item-card {
+      background: #f9f9fb;
+      border-radius: 1.25rem;
+      padding: 1.5rem 2rem;
+      transition: all .3s ease;
+    }
+    .timeline-item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(111,172,255,.12);
+    }
+
+    .timeline-phase {
+      font-size: .8rem; font-weight: 600;
+      color: #4a8fe6; text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: .4rem;
+    }
+
+    .timeline-item-card h4 { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; margin: 0 0 .5rem; }
+    .timeline-item-card p { font-size: .95rem; color: #6e6e73; line-height: 1.7; margin: 0; }
+
+    /* ───── Included Section ───── */
+    .included-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .4s forwards;
+    }
+
+    .included-box {
+      background: linear-gradient(135deg, #f9f9fb 0%, #f0f5ff 100%);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      max-width: 70rem;
+      margin: 0 auto;
+    }
+
+    .included-box h3 {
+      font-size: 1.5rem; font-weight: 700; color: #1d1d1f;
+      margin-bottom: 1.5rem; text-align: center;
+    }
+
+    .included-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .included-item { display: flex; align-items: flex-start; gap: .75rem; }
+
+    .included-check {
+      flex-shrink: 0;
+      width: 1.5rem; height: 1.5rem;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: .75rem; font-weight: 700; margin-top: .1rem;
+    }
+
+    .included-item span { font-size: .9rem; color: #1d1d1f; line-height: 1.5; }
+
+    @media (max-width: 968px) { .included-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .included-grid { grid-template-columns: 1fr; } }
+
+    /* ───── Pricing Section ───── */
+    .pricing-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .5s forwards;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 70rem;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      transition: all .3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(111,172,255,.2);
+    }
+
+    .pricing-card.featured {
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      color: white;
+      box-shadow: 0 8px 30px rgba(111,172,255,.3);
+      transform: scale(1.04);
+    }
+    .pricing-card.featured:hover {
+      transform: scale(1.04) translateY(-4px);
+    }
+
+    .pricing-card.featured .pricing-card-name,
+    .pricing-card.featured .pricing-card-desc,
+    .pricing-card.featured .pricing-feature { color: rgba(255,255,255,.9); }
+    .pricing-card.featured .pricing-card-price { color: white; }
+
+    .pricing-popular-badge {
+      position: absolute;
+      top: 1rem; right: -2rem;
+      background: linear-gradient(135deg, #ff6fac 0%, #e64a8f 100%);
+      color: white;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: .35rem 2.5rem;
+      transform: rotate(35deg);
+    }
+
+    .pricing-card-name {
+      font-size: 1.15rem; font-weight: 700; color: #1d1d1f;
+      margin-bottom: .5rem;
+    }
+
+    .pricing-card-price {
+      font-size: 2.75rem; font-weight: 700; color: #4a8fe6;
+      margin-bottom: .25rem;
+    }
+    .pricing-card-price small { font-size: 1rem; font-weight: 400; }
+
+    .pricing-card-desc {
+      font-size: .9rem; color: #6e6e73; margin-bottom: 1.5rem;
+    }
+
+    .pricing-features { text-align: left; margin-bottom: 1.5rem; }
+
+    .pricing-feature {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .9rem; color: #6e6e73; padding: .45rem 0;
+    }
+
+    .pricing-feature::before {
+      content: '✓'; font-weight: 700; color: #4a8fe6; flex-shrink: 0;
+    }
+    .pricing-card.featured .pricing-feature::before { color: rgba(255,255,255,.95); }
+
+    .pricing-btn {
+      display: inline-block;
+      width: 100%;
+      padding: .9rem 1.5rem;
+      font-size: 1rem; font-weight: 600; font-family: inherit;
+      border-radius: 3rem;
+      border: none;
+      cursor: pointer;
+      transition: all .3s ease;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .pricing-btn-outline {
+      background: transparent;
+      color: #4a8fe6;
+      border: 2px solid #4a8fe6;
+    }
+    .pricing-btn-outline:hover { background: #4a8fe6; color: white; }
+
+    .pricing-btn-white {
+      background: white;
+      color: #4a8fe6;
+      box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    }
+    .pricing-btn-white:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.15); }
+
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 26rem; }
+      .pricing-card.featured { transform: none; }
+      .pricing-card.featured:hover { transform: translateY(-4px); }
+    }
+
+    /* ───── Erfahrungsbericht Feature ───── */
+    .erfahrung-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .5s forwards;
+    }
+
+    .erfahrung-card {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 3rem;
+      max-width: 60rem;
+      margin: 0 auto;
+      background: #f9f9fb;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      align-items: center;
+    }
+
+    .erfahrung-image-wrapper {
+      padding: 2rem 0 2rem 2rem;
+    }
+
+    .erfahrung-image {
+      width: 100%;
+      border-radius: 1rem;
+      object-fit: cover;
+      aspect-ratio: 3/4;
+      display: block;
+    }
+
+    .erfahrung-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-top: .75rem;
+    }
+
+    .erfahrung-role {
+      font-size: .85rem;
+      color: #6e6e73;
+    }
+
+    .erfahrung-text {
+      padding: 2rem 2rem 2rem 0;
+    }
+
+    .erfahrung-text .erfahrung-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6fac 0%, #e64a8f 100%);
+      color: white;
+      padding: .35rem 1rem;
+      border-radius: 2rem;
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 1.25rem;
+    }
+
+    .erfahrung-text p {
+      font-size: 1.15rem;
+      color: #1d1d1f;
+      line-height: 1.8;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .erfahrung-card {
+        grid-template-columns: 1fr;
+        max-width: 22rem;
+        text-align: center;
+      }
+      .erfahrung-image-wrapper { padding: 2rem 2rem 0; }
+      .erfahrung-text { padding: 0 2rem 2rem; }
+    }
+
+    /* ───── Speakers Section ───── */
+    .speakers-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .55s forwards;
+    }
+
+    .speakers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      max-width: 40rem;
+      margin: 0 auto;
+    }
+
+    .speaker-card {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      text-align: center;
+      transition: all .3s ease;
+    }
+    .speaker-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(111,172,255,.2);
+    }
+
+    .speaker-image {
+      width: 80%; height: 268px;
+      object-fit: cover; object-position: top;
+    }
+
+    .speaker-info { padding: 1.5rem; }
+    .speaker-name { font-size: 1.15rem; font-weight: 700; color: #1d1d1f; margin-bottom: .25rem; }
+    .speaker-role { font-size: .9rem; color: #6e6e73; margin-bottom: .5rem; }
+
+    .speaker-org {
+      display: inline-block;
+      font-size: .8rem; font-weight: 600;
+      color: #4a8fe6; background: #e8f4ff;
+      padding: .25rem .75rem; border-radius: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .speakers-grid { grid-template-columns: 1fr; max-width: 20rem; }
+    }
+
+    /* ───── Testimonials ───── */
+    .testimonials-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .6s forwards;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 70rem;
+      margin: 0 auto;
+    }
+
+    .testimonial-card {
+      background: #f9f9fb;
+      border-radius: 1.25rem;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .testimonial-quote {
+      font-size: 2.5rem; font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: .5rem;
+    }
+
+    .testimonial-text {
+      font-size: .95rem; color: #6e6e73; line-height: 1.7;
+      font-style: italic; margin-bottom: 1.25rem;
+    }
+
+    .testimonial-author { font-size: .9rem; font-weight: 600; color: #1d1d1f; }
+    .testimonial-detail { font-size: .8rem; color: #6e6e73; }
+
+    @media (max-width: 900px) {
+      .testimonials-grid { grid-template-columns: 1fr; max-width: 30rem; }
+    }
+
+    /* ───── Registration Form ───── */
+    .registration-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .6s forwards;
+    }
+
+    .registration-container {
+      max-width: 40rem;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 30px rgba(0,0,0,.1);
+      overflow: hidden;
+    }
+
+    .registration-header {
+      background: linear-gradient(135deg, #ff6fac 0%, #e64a8f 100%);
+      padding: 2rem;
+      color: white;
+      text-align: center;
+    }
+
+    .registration-header h2 {
+      font-size: 1.75rem; font-weight: 700; margin: 0;
+    }
+
+    .registration-form { padding: 2rem; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-label {
+      display: block; font-size: .9rem; font-weight: 600;
+      color: #1d1d1f; margin-bottom: .5rem;
+    }
+
+    .form-label .required { color: #e64a8f; }
+
+    .form-input {
+      width: 100%;
+      padding: .875rem 1rem;
+      font-size: 1rem; font-family: inherit;
+      border: 2px solid #e5e5e7;
+      border-radius: .75rem;
+      background: #f9f9fb;
+      color: #1d1d1f;
+      transition: all .2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #6facff;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(111,172,255,.15);
+    }
+
+    .form-privacy-note {
+      font-size: .85rem; color: #6e6e73;
+      text-align: center; margin-bottom: 1.5rem;
+    }
+
+    .form-privacy-note a {
+      color: #4a8fe6; text-decoration: none;
+    }
+    .form-privacy-note a:hover { text-decoration: underline; }
+
+    .form-submit {
+      width: 100%;
+      padding: 1rem 2rem;
+      font-size: 1.1rem; font-weight: 600; font-family: inherit;
+      color: white;
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border: none; border-radius: 3rem;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 4px 15px rgba(111,172,255,.35);
+    }
+
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(111,172,255,.45);
+    }
+    .form-submit:active { transform: translateY(0); }
+
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .form-success.show { display: block; }
+
+    .form-success-icon {
+      width: 4.5rem; height: 4.5rem;
+      background: linear-gradient(135deg, #34c759 0%, #28a745 100%);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 6px 20px rgba(52,199,89,.3);
+    }
+
+    .form-success-icon svg { width: 36px; height: 36px; }
+
+    .form-success h3 {
+      font-size: 1.35rem; font-weight: 700; color: #1d1d1f;
+      margin-bottom: .75rem;
+    }
+
+    .form-success p {
+      font-size: 1rem; color: #6e6e73; line-height: 1.7;
+      max-width: 28rem; margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* ───── CTA Section ───── */
+    .cta-section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .65s forwards;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, #6facff 0%, #4a8fe6 100%);
+      border-radius: 1.5rem;
+      padding: 3.5rem 2rem;
+      max-width: 55rem;
+      margin: 0 auto;
+      text-align: center;
+      color: white;
+      box-shadow: 0 8px 30px rgba(111,172,255,.3);
+    }
+
+    .cta-box h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .cta-box p { font-size: 1.05rem; opacity: .95; margin-bottom: 2rem; max-width: 38rem; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+    .cta-btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem; font-weight: 600; font-family: inherit;
+      background: white; color: #4a8fe6;
+      border: none; border-radius: 3rem;
+      cursor: pointer; text-decoration: none;
+      transition: all .3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,.12);
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+
+    .cta-form {
+      max-width: 30rem;
+      margin: 0 auto;
+    }
+
+    .cta-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin-bottom: .75rem;
+    }
+
+    .cta-input {
+      width: 100%;
+      padding: .875rem 1rem;
+      font-size: 1rem; font-family: inherit;
+      border: 2px solid rgba(255,255,255,.35);
+      border-radius: .75rem;
+      background: rgba(255,255,255,.15);
+      color: white;
+      transition: all .2s ease;
+      margin-bottom: .75rem;
+    }
+    .cta-form-row .cta-input { margin-bottom: 0; }
+
+    .cta-input::placeholder { color: rgba(255,255,255,.65); }
+
+    .cta-input:focus {
+      outline: none;
+      border-color: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.1);
+    }
+
+    .cta-privacy {
+      font-size: .85rem; opacity: .85;
+      margin-bottom: 1.25rem;
+    }
+    .cta-privacy a { color: white; text-decoration: underline; }
+
+    .cta-submit {
+      width: 100%;
+      padding: 1rem 2rem;
+      font-size: 1.1rem; font-weight: 600; font-family: inherit;
+      background: white; color: #4a8fe6;
+      border: none; border-radius: 3rem;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,.12);
+    }
+    .cta-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+    .cta-submit:active { transform: translateY(0); }
+
+    .cta-success {
+      display: none;
+      text-align: center;
+      padding: 1.5rem 0 0;
+    }
+    .cta-success.show { display: block; }
+    .cta-success h3 { color: white; font-size: 1.35rem; font-weight: 700; margin-bottom: .75rem; }
+    .cta-success p { color: rgba(255,255,255,.9); font-size: 1rem; line-height: 1.7; max-width: 28rem; margin: 0 auto; }
+
+    @media (max-width: 600px) {
+      .cta-form-row { grid-template-columns: 1fr; }
+    }
+
+    /* ───── Contact Section ───── */
+    .contact-section {
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp .8s ease .7s forwards;
+    }
+
+    .contact-card {
+      background: #f9f9fb;
+      border-radius: 1.25rem;
+      padding: 2.5rem;
+      max-width: 36rem;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .contact-card-logo { height: 50px; margin-bottom: 1.25rem; object-fit: contain; }
+    .contact-card h4 { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; margin-bottom: 1rem; }
+    .contact-card p { font-size: .95rem; color: #6e6e73; margin: .5rem 0; }
+    .contact-card a { color: #4a8fe6; text-decoration: none; font-weight: 500; }
+    .contact-card a:hover { text-decoration: underline; }
+
+    /* ───── Footer ───── */
+    .site-footer {
+      border-top: 1px solid #f0f0f2;
+      padding: 1.25rem 0;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: .85rem;
+      color: #6e6e73;
+    }
+    .site-footer a { color: #6e6e73; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+    .site-footer .footer-divider { margin: 0 .5rem; opacity: .6; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="main-container">
+
+      <!-- ════════ Hero ════════ -->
+      <header class="hero">
+        <img src="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Logo%20transparent%203.png" alt="WLW Logo" class="hero-logo">
+        <h1>Die perfekte Vorbereitung<br><span>Steuerberaterprüfung</span></h1>
+        <p class="hero-intro">
+          Kostenloser Infoabend | Teilnehmer Erfahrungsbericht | Alle Infos zu unseren Kursen
+        </p>
+
+        <div class="event-info-box">
+          <div class="event-info-item">
+            <div class="event-info-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="2"/>
+                <path d="M16 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M3 10H21" stroke="white" stroke-width="2"/>
+              </svg>
+            </div>
+            <span class="event-info-label">Datum</span>
+            <span class="event-info-value">30.03.</span>
+          </div>
+          <div class="event-info-item">
+            <div class="event-info-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/>
+                <path d="M12 6V12L16 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="event-info-label">Uhrzeit</span>
+            <span class="event-info-value">19:00 Uhr</span>
+          </div>
+          <div class="event-info-item">
+            <div class="event-info-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke="white" stroke-width="2"/>
+                <path d="M8 21H16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M12 17V21" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="event-info-label">Format</span>
+            <span class="event-info-value">Online (Live)</span>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- ════════ Anmeldung (oben) ════════ -->
+      <section class="registration-section" id="anmeldung">
+        <div class="registration-container">
+          <div class="registration-header">
+            <h2>Jetzt zum kostenlosen Infotag anmelden!</h2>
+          </div>
+
+          <form class="registration-form" id="registrationFormTop">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="vorname-top">Vorname <span class="required">*</span></label>
+                <input type="text" class="form-input" id="vorname-top" name="vorname" required placeholder="Max">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="nachname-top">Nachname <span class="required">*</span></label>
+                <input type="text" class="form-input" id="nachname-top" name="nachname" required placeholder="Mustermann">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email-top">E-Mail-Adresse</label>
+              <input type="email" class="form-input" id="email-top" name="email" placeholder="max.mustermann@beispiel.de">
+            </div>
+
+            <p class="form-privacy-note">Mit der Anmeldung stimmst du unserer <a href="https://wlw-steuern.de/datenschutz" target="_blank">Datenschutzerklärung</a> zu.</p>
+
+            <button type="submit" class="form-submit">Kostenlos anmelden</button>
+          </form>
+
+          <div class="form-success" id="formSuccessTop">
+            <div class="form-success-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 6L9 17L4 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Super, das hat funktioniert!</h3>
+            <p>Du bist angemeldet. Wir schicken dir den Meeting Link kurz vor dem Seminar zu. Wir freuen uns auf dich!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ USP Highlights ════════ -->
+      <section class="usp-section">
+        <h2 class="section-title">Warum WLW?</h2>
+        <p class="section-subtitle">Deine Vorteile, die den Unterschied machen</p>
+
+        <div class="usp-grid">
+          <div class="usp-card">
+            <div class="usp-number">25+</div>
+            <div class="usp-content">
+              <h3>Über 25 Jahre Erfahrung</h3>
+              <p>Bewährte Methoden und kontinuierliche Weiterentwicklung unserer Ausbildungskonzepte</p>
+            </div>
+          </div>
+
+          <div class="usp-card">
+            <div class="usp-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M2 12H22" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="usp-content">
+              <h3>100 % Online möglich</h3>
+              <p>Alle Kurse finden <strong>live online</strong> statt und werden aufgezeichnet. Lerne flexibel von überall – zu jeder Zeit, in deinem Tempo.</p>
+            </div>
+          </div>
+
+          <div class="usp-card">
+            <div class="usp-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.6281 1.87979 13.4881 2.02168 11.3363C2.16356 9.18457 2.99721 7.13633 4.39828 5.49707C5.79935 3.85782 7.69279 2.71538 9.79619 2.24015C11.8996 1.76491 14.1003 1.98233 16.07 2.86" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="usp-content">
+              <h3>Hohe Erfolgsquote</h3>
+              <p>Überdurchschnittliche Bestehensquote durch gezielte und strukturierte Vorbereitung</p>
+            </div>
+          </div>
+
+          <div class="usp-card">
+            <div class="usp-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="usp-content">
+              <h3>Prüfungsorientiert</h3>
+              <p>Realitätsnahe Fallbeispiele und Übungen für die optimale Prüfungsvorbereitung</p>
+            </div>
+          </div>
+
+          <div class="usp-card">
+            <div class="usp-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M23 21V19C22.9986 17.1771 21.765 15.5857 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 3.13C17.7699 3.58317 19.0078 5.17799 19.0078 7.005C19.0078 8.83201 17.7699 10.4268 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="usp-content">
+              <h3>Umfassende Betreuung</h3>
+              <p>Von der Anmeldung bis zur Prüfung – wir begleiten dich auf jedem Schritt deines Weges</p>
+            </div>
+          </div>
+
+          <div class="usp-card">
+            <div class="usp-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="usp-content">
+              <h3>Aktuelle Materialien</h3>
+              <p>Stets auf dem neuesten Stand der Gesetzgebung und Rechtsprechung</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ════════ Erfahrungsbericht ════════ -->
+      <section class="erfahrung-section">
+        <h2 class="section-title">Echter Erfahrungsbericht</h2>
+
+        <div class="erfahrung-card">
+          <div class="erfahrung-image-wrapper">
+            <img src="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Design%20ohne%20Titel(27).png" alt="Michaela Heubeck" class="erfahrung-image">
+            <div class="erfahrung-name">Michaela Heubeck</div>
+            <div class="erfahrung-role">Steuerberaterin</div>
+          </div>
+          <div class="erfahrung-text">
+            <span class="erfahrung-badge">Erfahrungsbericht Teilnehmerin</span>
+            <p>Michaela konnte mit WLW ihren <strong>Traum vom Steuerberatertitel</strong> verwirklichen. Und sie berichtet dir am Infoabend davon, wie du es auch schaffst.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ Dozenten ════════ -->
+      <section class="speakers-section">
+        <h2 class="section-title">Deine Gastgeber</h2>
+        <p class="section-subtitle">Die Experten, die dich durch den Infoabend führen werden.</p>
+
+        <div class="speakers-grid">
+          <div class="speaker-card">
+            <img src="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Design%20ohne%20Titel(28).png" alt="Maria Wirth" class="speaker-image">
+            <div class="speaker-info">
+              <div class="speaker-name">Maria Wirth</div>
+              <div class="speaker-role">Steuerberaterin, Dipl.-Finanzwirtin (FH)</div>
+              <span class="speaker-org">WLW</span>
+            </div>
+          </div>
+
+          <div class="speaker-card">
+            <img src="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Design%20ohne%20Titel(29).png" alt="Marcus Wirth" class="speaker-image">
+            <div class="speaker-info">
+              <div class="speaker-name">Marcus Wirth</div>
+              <div class="speaker-role">Steuerberater, M.Sc., Dipl.-Finanzwirt (FH)</div>
+              <span class="speaker-org">WLW</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ CTA + Anmeldung ════════ -->
+      <section class="cta-section" id="anmeldung-unten">
+        <div class="cta-box">
+          <h2>Bereit für dein Steuerberaterexamen?</h2>
+          <p>Sichere dir jetzt deinen Platz beim kostenlosen Infoabend.</p>
+
+          <form class="cta-form" id="registrationFormBottom">
+            <div class="cta-form-row">
+              <input type="text" class="cta-input" name="vorname" required placeholder="Vorname *">
+              <input type="text" class="cta-input" name="nachname" required placeholder="Nachname *">
+            </div>
+            <input type="email" class="cta-input" name="email" placeholder="E-Mail-Adresse">
+            <p class="cta-privacy">Mit der Anmeldung stimmst du unserer <a href="https://wlw-steuern.de/datenschutz" target="_blank">Datenschutzerklärung</a> zu.</p>
+            <button type="submit" class="cta-submit">Kostenlos anmelden</button>
+          </form>
+
+          <div class="cta-success" id="formSuccessBottom">
+            <div class="form-success-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 6L9 17L4 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Super, das hat funktioniert!</h3>
+            <p>Du bist angemeldet. Wir schicken dir den Meeting Link kurz vor dem Seminar zu. Wir freuen uns auf dich!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ Kontakt ════════ -->
+      <section class="contact-section">
+        <h2 class="section-title">Noch Fragen?</h2>
+        <p class="section-subtitle">Wir beraten dich gerne persönlich.</p>
+
+        <div class="contact-card">
+          <img src="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Logo%20transparent%203.png" alt="WLW Logo" class="contact-card-logo">
+          <h4>WLW</h4>
+          <p><a href="https://wlw-steuern.de" target="_blank">www.wlw-steuern.de</a></p>
+          <p>Telefon: <a href="tel:+499517006600">0951 / 70066-0</a></p>
+          <p>E-Mail: <a href="/cdn-cgi/l/email-protection#2c45424a436c5b405b015f584959495e42024849"><span class="__cf_email__" data-cfemail="234a4d454c63544f540e5057465646514d0d4746">[email&#160;protected]</span></a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="https://wlw-steuern.de/impressum" target="_blank" rel="noopener">Impressum</a>
+    <span class="footer-divider">|</span>
+    <a href="https://wlw-steuern.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+  </footer>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    async function handleFormSubmit(form, successId) {
+      const btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Wird gesendet…';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('https://formspree.io/f/xyknwwrz', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.style.display = 'none';
+          document.getElementById(successId).classList.add('show');
+        } else {
+          btn.textContent = 'Fehler – erneut versuchen';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        btn.textContent = 'Fehler – erneut versuchen';
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('registrationFormTop').addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleFormSubmit
