@@ -797,6 +797,7 @@
       color: white;
       transition: all .2s ease;
       margin-bottom: .75rem;
+      box-sizing: border-box;
     }
     .cta-form-row .cta-input { margin-bottom: 0; }
 
@@ -824,6 +825,7 @@
       cursor: pointer;
       transition: all .3s ease;
       box-shadow: 0 4px 15px rgba(0,0,0,.12);
+      box-sizing: border-box;
     }
     .cta-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
     .cta-submit:active { transform: translateY(0); }
@@ -839,6 +841,14 @@
 
     @media (max-width: 600px) {
       .cta-form-row { grid-template-columns: 1fr; }
+      .cta-box { padding: 2rem 1.25rem; border-radius: 1rem; }
+      .cta-box h2 { font-size: 1.4rem; }
+      .cta-box p { font-size: .95rem; margin-bottom: 1.5rem; }
+      .cta-input { font-size: .95rem; padding: .75rem .875rem; }
+      .cta-submit { font-size: 1rem; padding: .875rem 1.5rem; }
+      .cta-privacy { font-size: .8rem; }
+      .cta-success h3 { font-size: 1.15rem; }
+      .cta-success p { font-size: .9rem; }
     }
 
     /* ───── Contact Section ───── */
@@ -934,7 +944,7 @@
             <h2>Jetzt zum kostenlosen Infotag anmelden!</h2>
           </div>
 
-          <form class="registration-form" id="registrationFormTop">
+          <form class="registration-form" id="registrationFormTop" action="https://formspree.io/f/xyknwwrz" method="POST">
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="vorname-top">Vorname <span class="required">*</span></label>
@@ -1103,7 +1113,7 @@
           <h2>Bereit für dein Steuerberaterexamen?</h2>
           <p>Sichere dir jetzt deinen Platz beim kostenlosen Infoabend.</p>
 
-          <form class="cta-form" id="registrationFormBottom">
+          <form class="cta-form" id="registrationFormBottom" action="https://formspree.io/f/xyknwwrz" method="POST">
             <div class="cta-form-row">
               <input type="text" class="cta-input" name="vorname" required placeholder="Vorname *">
               <input type="text" class="cta-input" name="nachname" required placeholder="Nachname *">
@@ -1135,7 +1145,6 @@
           <h4>WLW</h4>
           <p><a href="https://wlw-steuern.de" target="_blank">www.wlw-steuern.de</a></p>
           <p>Telefon: <a href="tel:+499517006600">0951 / 70066-0</a></p>
-          <p>E-Mail: <a href="/cdn-cgi/l/email-protection#2c45424a436c5b405b015f584959495e42024849"><span class="__cf_email__" data-cfemail="234a4d454c63544f540e5057465646514d0d4746">[email&#160;protected]</span></a></p>
         </div>
       </section>
 
@@ -1147,32 +1156,35 @@
     <span class="footer-divider">|</span>
     <a href="https://wlw-steuern.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
   </footer>
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    async function handleFormSubmit(form, successId) {
-      const btn = form.querySelector('button[type="submit"]');
-      btn.textContent = 'Wird gesendet…';
-      btn.disabled = true;
+  <script>
+    document.querySelectorAll('form[action*="formspree"]').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = form.querySelector('button[type="submit"]');
+        var successEl = form.nextElementSibling;
+        btn.textContent = 'Wird gesendet…';
+        btn.disabled = true;
 
-      try {
-        const response = await fetch('https://formspree.io/f/xyknwwrz', {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (response.ok) {
-          form.style.display = 'none';
-          document.getElementById(successId).classList.add('show');
-        } else {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action);
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState !== XMLHttpRequest.DONE) return;
+          if (xhr.status >= 200 && xhr.status < 300) {
+            form.style.display = 'none';
+            if (successEl) successEl.classList.add('show');
+          } else {
+            btn.textContent = 'Fehler – erneut versuchen';
+            btn.disabled = false;
+          }
+        };
+        xhr.onerror = function() {
           btn.textContent = 'Fehler – erneut versuchen';
           btn.disabled = false;
-        }
-      } catch (err) {
-        btn.textContent = 'Fehler – erneut versuchen';
-        btn.disabled = false;
-      }
-    }
-
-    document.getElementById('registrationFormTop').addEventListener('submit', function(e) {
-      e.preventDefault();
-      handleFormSubmit
+        };
+        xhr.send(new FormData(form));
+      });
+    });
+  </script>
+</body>
+</html>
