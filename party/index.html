@@ -1101,13 +1101,16 @@
         const inTable = !!ctx.table;
         const hasRowClip = !!tableState.rowClipboard;
         const hasColClip = !!tableState.colClipboard;
+        const selCells = inTable ? getSelectedCells() : [];
+        const canMerge = selCells.length > 1;
+        const canSplit = !!(ctx.cell && ((ctx.cell.colSpan || 1) > 1 || (ctx.cell.rowSpan || 1) > 1));
         return [
           { label: 'Tabelle', submenu: 'grid' },
           { label: 'Zelle', disabled: !inTable, submenu: [
             { label: 'Zelleneigenschaften', disabled: !inTable, action: function() { openCellProps(ctx); } },
             { sep: true },
-            { label: 'Zellen verbinden', disabled: true },
-            { label: 'Zelle aufteilen', disabled: true }
+            { label: 'Zellen verbinden', disabled: !canMerge, action: function() { doMergeCells(ctx, selCells); } },
+            { label: 'Zelle aufteilen', disabled: !canSplit, action: function() { doSplitCell(ctx); } }
           ]},
           { label: 'Zeile', disabled: !inTable, submenu: [
             { label: 'Neue Zeile davor einfügen', disabled: !inTable, action: function() { doRowInsert(ctx, 'before'); } },
@@ -1399,77 +1402,294 @@
         });
       }
 
+      // ---- Zellen verbinden / aufteilen ----
+      function getSelectedCells() {
+        const editor = document.getElementById('editor');
+        let range = null;
+        if (AppState.lastRange && editor.contains(AppState.lastRange.startContainer)) {
+          range = AppState.lastRange;
+        } else {
+          const sel = window.getSelection();
+          if (sel.rangeCount) range = sel.getRangeAt(0);
+        }
+        if (!range) return [];
+        let startEl = range.startContainer;
+        if (startEl && startEl.nodeType === Node.TEXT_NODE) startEl = startEl.parentElement;
+        const table = startEl ? startEl.closest('table') : null;
+        if (!table || !editor.contains(table)) return [];
+        const cells = Array.prototype.filter.call(table.querySelectorAll('td,th'), function(c) {
+          try { return range.intersectsNode(c); } catch (e) { return false; }
+        });
+        return cells;
+      }
+
+      // Raster der Tabelle inkl. vorhandener colspan/rowspan
+      function buildGrid(table) {
+        const grid = [];
+        const rows = table.rows;
+        for (let r = 0; r < rows.length; r++) {
+          if (!grid[r]) grid[r] = [];
+          let c = 0;
+          for (let i = 0; i < rows[r].cells.length; i++) {
+            const cell = rows[r].cells[i];
+            const rs = cell.rowSpan || 1, cs = cell.colSpan || 1;
+            while (grid[r][c]) c++;
+            for (let dr = 0; dr < rs; dr++) {
+              for (let dc = 0; dc < cs; dc++) {
+                if (!grid[r + dr]) grid[r + dr] = [];
+                grid[r + dr][c + dc] = cell;
+              }
+            }
+            c += cs;
+          }
+        }
+        return grid;
+      }
+
+      function cellGridPos(grid, cell) {
+        for (let r = 0; r < grid.length; r++) {
+          const rowArr = grid[r] || [];
+          for (let c = 0; c < rowArr.length; c++) {
+            if (rowArr[c] === cell) return { r: r, c: c };
+          }
+        }
+        return null;
+      }
+
+      function mergeCells(cells) {
+        if (cells.length < 2) return;
+        const table = cells[0].closest('table');
+        if (!table) return;
+        const grid = buildGrid(table);
+        let minR = Infinity, minC = Infinity, maxR = -1, maxC = -1;
+        cells.forEach(function(cell) {
+          const p = cellGridPos(grid, cell);
+          if (!p) return;
+          const rs = cell.rowSpan || 1, cs = cell.colSpan || 1;
+          minR = Math.min(minR, p.r); minC = Math.min(minC, p.c);
+          maxR = Math.max(maxR, p.r + rs - 1); maxC = Math.max(maxC, p.c + cs - 1);
+        });
+        if (maxR < 0) return;
+        const inRect = [];
+        for (let r = minR; r <= maxR; r++) {
+          for (let c = minC; c <= maxC; c++) {
+            const cell = grid[r] && grid[r][c];
+            if (cell && inRect.indexOf(cell) === -1) inRect.push(cell);
+          }
+        }
+        const target = grid[minR][minC];
+        let extra = '';
+        inRect.forEach(function(cell) {
+          if (cell === target) return;
+          const t = cell.innerHTML.replace(/&nbsp;/g, '').trim();
+          if (t) extra += (extra ? ' ' : '') + cell.innerHTML;
+        });
+        if (extra) {
+          const base = target.innerHTML.replace(/&nbsp;/g, '').trim();
+          target.innerHTML = (base ? target.innerHTML + ' ' : '') + extra;
+        }
+        inRect.forEach(function(cell) {
+          if (cell !== target && cell.parentNode) cell.parentNode.removeChild(cell);
+        });
+        const newCs = maxC - minC + 1;
+        const newRs = maxR - minR + 1;
+        if (newCs > 1) target.colSpan = newCs; else target.removeAttribute('colspan');
+        if (newRs > 1) target.rowSpan = newRs; else target.removeAttribute('rowspan');
+        return target;
+      }
+
+      function domIndexForCol(table, r, c) {
+        const grid = buildGrid(table);
+        const row = table.rows[r];
+        let idx = 0;
+        for (let i = 0; i < row.cells.length; i++) {
+          const cell = row.cells[i];
+          let startCol = -1;
+          const rowArr = grid[r] || [];
+          for (let cc = 0; cc < rowArr.length; cc++) {
+            if (rowArr[cc] === cell) { startCol = cc; break; }
+          }
+          if (startCol !== -1 && startCol < c) idx++;
+        }
+        return idx;
+      }
+
+      function splitCell(cell) {
+        const rs = cell.rowSpan || 1, cs = cell.colSpan || 1;
+        if (rs <= 1 && cs <= 1) return;
+        const table = cell.closest('table');
+        if (!table) return;
+        const grid = buildGrid(table);
+        const pos = cellGridPos(grid, cell);
+        if (!pos) return;
+        cell.removeAttribute('colspan');
+        cell.removeAttribute('rowspan');
+        for (let dr = 0; dr < rs; dr++) {
+          for (let dc = 0; dc < cs; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            const r = pos.r + dr, c = pos.c + dc;
+            const row = table.rows[r];
+            if (!row) continue;
+            const newCell = createTableCell();
+            const idx = domIndexForCol(table, r, c);
+            if (idx >= row.cells.length) row.appendChild(newCell);
+            else row.insertBefore(newCell, row.cells[idx]);
+          }
+        }
+      }
+
+      function doMergeCells(ctx, cells) {
+        const sel = cells || getSelectedCells();
+        if (!sel || sel.length < 2) { closeTableMenu(); return; }
+        runTableAction(ctx, function() { mergeCells(sel); });
+      }
+
+      function doSplitCell(ctx) {
+        if (!ctx.cell) { closeTableMenu(); return; }
+        runTableAction(ctx, function() { splitCell(ctx.cell); });
+      }
+
       // ---- Eigenschaften-Dialoge ----
+      function renderPropField(f, inputs) {
+        const wrap = document.createElement('div');
+        const lab = document.createElement('label');
+        lab.style.display = 'block';
+        lab.style.fontSize = '13px';
+        lab.style.color = '#374151';
+        lab.style.marginBottom = '4px';
+        lab.textContent = f.label;
+        wrap.appendChild(lab);
+        let inp;
+        if (f.type === 'select') {
+          inp = document.createElement('select');
+          f.options.forEach(function(o) {
+            const op = document.createElement('option');
+            op.value = o.value;
+            op.textContent = o.label;
+            if (o.value === f.value) op.selected = true;
+            inp.appendChild(op);
+          });
+        } else {
+          inp = document.createElement('input');
+          inp.type = (f.type === 'color') ? 'color' : 'text';
+          if (f.type !== 'color') inp.placeholder = f.placeholder || '';
+          inp.value = f.value || (f.type === 'color' ? '#ffffff' : '');
+        }
+        inp.style.width = '100%';
+        inp.style.padding = '8px 10px';
+        inp.style.border = '1px solid #cbd5e1';
+        inp.style.borderRadius = '4px';
+        inp.style.fontSize = '14px';
+        inp.style.boxSizing = 'border-box';
+        if (f.type === 'color') inp.style.height = '38px';
+        inputs[f.key] = inp;
+        wrap.appendChild(inp);
+        return wrap;
+      }
+
       function openPropsDialog(title, fields, onApply) {
         closeTableMenu();
+        const TEAL = '#0e7490';
         const overlay = document.createElement('div');
         overlay.className = 'dialog-overlay';
         overlay.style.zIndex = '100001';
+
         const box = document.createElement('div');
-        box.className = 'bg-white rounded-lg shadow-2xl p-6 max-w-md w-full mx-4';
-        const h = document.createElement('h3');
-        h.className = 'font-bold mb-4 text-xl text-gray-800';
-        h.textContent = title;
-        box.appendChild(h);
+        box.style.background = '#fff';
+        box.style.borderRadius = '8px';
+        box.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,.35)';
+        box.style.width = '440px';
+        box.style.maxWidth = '92vw';
+        box.style.overflow = 'hidden';
 
+        // Header (Teal)
+        const header = document.createElement('div');
+        header.style.background = TEAL;
+        header.style.color = '#fff';
+        header.style.padding = '14px 18px';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        const hTitle = document.createElement('div');
+        hTitle.style.fontSize = '18px';
+        hTitle.style.fontWeight = '600';
+        hTitle.textContent = title;
+        const hClose = document.createElement('button');
+        hClose.textContent = '\u00D7';
+        hClose.style.background = 'transparent';
+        hClose.style.border = 'none';
+        hClose.style.color = '#fff';
+        hClose.style.fontSize = '22px';
+        hClose.style.lineHeight = '1';
+        hClose.style.cursor = 'pointer';
+        header.appendChild(hTitle);
+        header.appendChild(hClose);
+        box.appendChild(header);
+
+        // Body
+        const body = document.createElement('div');
+        body.style.padding = '18px';
         const inputs = {};
-        fields.forEach(function(f) {
-          const wrap = document.createElement('div');
-          wrap.className = 'mb-3';
-          const lab = document.createElement('label');
-          lab.className = 'block text-sm font-semibold text-gray-700 mb-1';
-          lab.textContent = f.label;
-          wrap.appendChild(lab);
-          let inp;
-          if (f.type === 'select') {
-            inp = document.createElement('select');
-            inp.className = 'w-full px-3 py-2 border-2 border-gray-300 rounded-lg';
-            inp.style.border = '2px solid #d1d5db';
-            inp.style.borderRadius = '0.5rem';
-            f.options.forEach(function(o) {
-              const op = document.createElement('option');
-              op.value = o.value;
-              op.textContent = o.label;
-              if (o.value === f.value) op.selected = true;
-              inp.appendChild(op);
-            });
+        let k = 0;
+        while (k < fields.length) {
+          const f = fields[k];
+          if (f.half && fields[k + 1] && fields[k + 1].half) {
+            const rowWrap = document.createElement('div');
+            rowWrap.style.display = 'flex';
+            rowWrap.style.gap = '14px';
+            rowWrap.style.marginBottom = '14px';
+            const c1 = renderPropField(f, inputs); c1.style.flex = '1';
+            const c2 = renderPropField(fields[k + 1], inputs); c2.style.flex = '1';
+            rowWrap.appendChild(c1);
+            rowWrap.appendChild(c2);
+            body.appendChild(rowWrap);
+            k += 2;
           } else {
-            inp = document.createElement('input');
-            inp.type = (f.type === 'color') ? 'color' : 'text';
-            inp.className = 'w-full px-3 py-2 border-2 border-gray-300 rounded-lg';
-            inp.style.border = '2px solid #d1d5db';
-            inp.style.borderRadius = '0.5rem';
-            if (f.type !== 'color') inp.placeholder = f.placeholder || '';
-            inp.value = f.value || (f.type === 'color' ? '#ffffff' : '');
+            const w = renderPropField(f, inputs);
+            w.style.marginBottom = '14px';
+            body.appendChild(w);
+            k += 1;
           }
-          inputs[f.key] = inp;
-          wrap.appendChild(inp);
-          box.appendChild(wrap);
-        });
+        }
+        box.appendChild(body);
 
-        const btns = document.createElement('div');
-        btns.className = 'flex gap-2 justify-end mt-2';
+        // Footer
+        const footer = document.createElement('div');
+        footer.style.padding = '0 18px 18px 18px';
+        footer.style.display = 'flex';
+        footer.style.justifyContent = 'space-between';
         const cancel = document.createElement('button');
-        cancel.className = 'px-4 py-2 bg-gray-300 text-gray-800 font-bold rounded-lg transition-all';
-        cancel.style.cursor = 'pointer';
         cancel.textContent = 'Abbrechen';
+        cancel.style.padding = '8px 16px';
+        cancel.style.background = '#fff';
+        cancel.style.color = TEAL;
+        cancel.style.border = '1px solid ' + TEAL;
+        cancel.style.borderRadius = '4px';
+        cancel.style.fontWeight = '600';
+        cancel.style.cursor = 'pointer';
         const ok = document.createElement('button');
-        ok.className = 'px-4 py-2 bg-green-600 text-white font-bold rounded-lg transition-all';
+        ok.textContent = 'Speichern';
+        ok.style.padding = '8px 18px';
+        ok.style.background = TEAL;
+        ok.style.color = '#fff';
+        ok.style.border = '1px solid ' + TEAL;
+        ok.style.borderRadius = '4px';
+        ok.style.fontWeight = '600';
         ok.style.cursor = 'pointer';
-        ok.textContent = 'Übernehmen';
-        btns.appendChild(cancel);
-        btns.appendChild(ok);
-        box.appendChild(btns);
+        footer.appendChild(cancel);
+        footer.appendChild(ok);
+        box.appendChild(footer);
 
         overlay.appendChild(box);
         document.body.appendChild(overlay);
 
         function close() { overlay.remove(); }
+        hClose.addEventListener('click', close);
         cancel.addEventListener('click', close);
         overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
         ok.addEventListener('click', function() {
           const vals = {};
-          Object.keys(inputs).forEach(function(k) { vals[k] = inputs[k].value; });
+          Object.keys(inputs).forEach(function(key) { vals[key] = inputs[key].value; });
           const scroll = saveScroll();
           onApply(vals);
           restoreScroll(scroll);
@@ -1480,18 +1700,24 @@
       function openTableProps(ctx) {
         if (!ctx.table) return;
         const t = ctx.table;
-        const align = (t.style.marginLeft === 'auto' && t.style.marginRight === 'auto') ? 'center'
-                    : (t.style.marginLeft === 'auto') ? 'right' : 'left';
+        let align = '';
+        if (t.style.marginLeft === 'auto' && t.style.marginRight === 'auto') align = 'center';
+        else if (t.style.marginLeft === 'auto') align = 'right';
+        else if (t.style.marginLeft === '0px' || t.style.marginLeft === '0') align = 'left';
         openPropsDialog('Tabelleneigenschaften', [
-          { key: 'width', label: 'Breite (z. B. 100% oder 600px)', type: 'text', value: t.style.width || '100%', placeholder: '100%' },
+          { key: 'width', label: 'Breite', type: 'text', value: t.style.width || '', half: true, placeholder: 'z. B. 100%' },
+          { key: 'height', label: 'Höhe', type: 'text', value: t.style.height || '', half: true, placeholder: 'z. B. 200px' },
           { key: 'align', label: 'Ausrichtung', type: 'select', value: align, options: [
-            { value: 'left', label: 'Links' }, { value: 'center', label: 'Zentriert' }, { value: 'right', label: 'Rechts' }
+            { value: '', label: 'Keine' }, { value: 'left', label: 'Links' },
+            { value: 'center', label: 'Zentriert' }, { value: 'right', label: 'Rechts' }
           ]}
         ], function(vals) {
-          if (vals.width) t.style.width = vals.width;
+          t.style.width = vals.width || '';
+          t.style.height = vals.height || '';
           if (vals.align === 'center') { t.style.marginLeft = 'auto'; t.style.marginRight = 'auto'; }
           else if (vals.align === 'right') { t.style.marginLeft = 'auto'; t.style.marginRight = '0'; }
-          else { t.style.marginLeft = '0'; t.style.marginRight = 'auto'; }
+          else if (vals.align === 'left') { t.style.marginLeft = '0'; t.style.marginRight = 'auto'; }
+          else { t.style.marginLeft = ''; t.style.marginRight = ''; }
         });
       }
 
