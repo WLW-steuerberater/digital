@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Klausurprogramm</title> 
+  <script src="/_sdk/element_sdk.js"></script>
   <style>
     /* Reset & Base */
     * {
@@ -23,7 +24,7 @@
       width: 100%;
     }
 
-    /* Utility Classes */
+    /* Utility Classes (replacing Tailwind) */
     .h-full { height: 100%; }
     .w-full { width: 100%; }
     .min-h-full { min-height: 100%; }
@@ -45,7 +46,7 @@
     .gap-6 { gap: 1.5rem; }
     .gap-8 { gap: 2rem; }
     
-    .hidden { display: none !important; }
+    .hidden { display: none; }
     .block { display: block; }
     .inline-block { display: inline-block; }
     .grid { display: grid; }
@@ -117,6 +118,9 @@
     .cursor-pointer { cursor: pointer; }
     
     .transition-all { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    .transform { transform: translate(var(--tw-translate-x), var(--tw-translate-y)); }
+    .-translate-y-1\/2 { --tw-translate-y: -50%; transform: translateY(-50%); }
     
     .flex-1 { flex: 1 1 0%; }
     .w-1\/3 { width: 33.333333%; }
@@ -245,17 +249,6 @@
       line-height: 1.3;
     }
     
-    /* FIX 1: Seitenumbruch-Styling — als HR-artiges Element, nicht als div */
-    .page-break-marker {
-      display: block;
-      border: none;
-      border-top: 2px dashed #999;
-      margin: 20px 0;
-      padding: 0;
-      height: 0;
-      page-break-after: always;
-    }
-    
     .toolbar-button {
       transition: all 0.2s;
     }
@@ -303,45 +296,6 @@
       max-height: 80%;
     }
 
-    /* Table context menu styling */
-    .table-context-menu {
-      position: fixed;
-      background-color: white;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      min-width: 220px;
-      padding: 8px 0;
-    }
-    
-    .table-context-menu-item {
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      color: #333;
-      transition: background-color 0.1s;
-    }
-    
-    .table-context-menu-item:hover {
-      background-color: #f3f4f6;
-    }
-    
-    .table-context-menu-item.danger {
-      color: #dc2626;
-      font-weight: bold;
-    }
-    
-    .table-context-menu-item.danger:hover {
-      background-color: #fee2e2;
-    }
-    
-    .table-context-menu-divider {
-      height: 1px;
-      background-color: #e0e0e0;
-      margin: 4px 0;
-    }
-
     @media print {
       body * {
         visibility: hidden;
@@ -383,9 +337,8 @@
         color: #000;
       }
       
-      .print-content .page-break-marker {
+      .print-content div[style*="page-break-after: always"] {
         page-break-after: always;
-        visibility: hidden;
       }
       
       .print-content table {
@@ -409,149 +362,99 @@
       }
     }
   </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
  <body class="h-full">
-  <div id="app" class="app-container">
-   <!-- Password Screen -->
+  <div id="app" class="app-container"><!-- Password Screen -->
    <div id="passwordScreen" class="min-h-full flex items-center justify-center px-4 py-8 bg-image-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full card-overlay">
      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugangskontrolle</h1>
      <p class="text-gray-600 mb-6 text-center">Bitte geben Sie das Passwort ein, um fortzufahren.</p>
-     <form id="passwordForm">
-      <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Passwort:</label>
-      <div class="relative mb-4">
-       <input type="password" id="password" required class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg" placeholder="Passwort eingeben..." style="padding-right: 3rem; border: 2px solid #d1d5db; border-radius: 0.5rem;">
-       <button type="button" id="togglePasswordBtn" class="absolute right-3 text-gray-500" style="top: 50%; transform: translateY(-50%);" title="Passwort anzeigen/verbergen">
-        <svg id="eyeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-       </button>
+     <form id="passwordForm"><label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Passwort:</label>
+      <div class="relative mb-4"><input type="password" id="password" required class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Passwort eingeben..." style="padding-right: 3rem; border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button type="button" id="togglePasswordBtn" class="absolute right-3 text-gray-500 hover-text-gray-700 focus-outline-none" style="top: 50%; transform: translateY(-50%);" title="Passwort anzeigen/verbergen">
+        <svg id="eyeIcon" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>
+        </svg></button>
       </div>
-      <div id="passwordError" class="hidden text-red-600 text-sm font-semibold mb-4">❌ Falsches Passwort. Bitte versuchen Sie es erneut.</div>
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg">Weiter</button>
+      <div id="passwordError" class="hidden text-red-600 text-sm font-semibold mb-4">
+       ❌ Falsches Passwort. Bitte versuchen Sie es erneut.
+      </div><button type="submit" class="w-full bg-blue-600 hover-bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg"> Weiter </button>
      </form>
     </div>
-   </div>
-
-   <!-- Login Screen -->
+   </div><!-- Login Screen -->
    <div id="loginScreen" class="hidden min-h-full flex items-center justify-center px-4 py-8 bg-image-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full card-overlay">
      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Online-Prüfung Anmeldung</h1>
      <p class="text-gray-600 mb-6 text-center">Hier müssten Sie bei Ihrer Prüfung Ihre zugeteilte Nummer eingeben. Bei uns bitte Ihren Namen.</p>
-     <form id="loginForm">
-      <label for="kennummer" class="block text-sm font-semibold text-gray-700 mb-2">Name:</label>
-      <input type="text" id="kennummer" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4" placeholder="Bitte eingeben..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
-      <label for="pruefungsname" class="block text-sm font-semibold text-gray-700 mb-2">Name der Prüfung:</label>
-      <input type="text" id="pruefungsname" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-6" placeholder="Bitte eingeben..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg">Anmelden</button>
+     <form id="loginForm"><label for="kennummer" class="block text-sm font-semibold text-gray-700 mb-2">Name:</label> <input type="text" id="kennummer" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none mb-4" placeholder="Bitte eingeben..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;"> <label for="pruefungsname" class="block text-sm font-semibold text-gray-700 mb-2">Name der Prüfung:</label> <input type="text" id="pruefungsname" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none mb-6" placeholder="Bitte eingeben..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button type="submit" class="w-full bg-blue-600 hover-bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg"> Anmelden </button>
      </form>
     </div>
-   </div>
-
-   <!-- Confirmation Screen -->
+   </div><!-- Confirmation Screen -->
    <div id="confirmationScreen" class="hidden min-h-full flex items-center justify-center px-4 py-8 bg-image-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-2xl w-full card-overlay">
      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Bestätigung</h1>
      <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
       <p class="text-gray-800 text-lg leading-relaxed">Hiermit bestätige ich, dass ich mich mit meinem eigenen Namen <strong id="confirmedName" class="text-blue-600"></strong> eingeloggt habe und die nachfolgende Online-Prüfung alleine durchführen werde.<br><br>
        Ich sehe mich heute physisch und psychisch dazu in der Lage, die Prüfung zu absolvieren.</p>
-     </div>
-     <button id="startEditorBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg">Bestätigen</button>
+     </div><button id="startEditorBtn" class="w-full bg-green-600 hover-bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg"> Bestätigen </button>
     </div>
-   </div>
-
-   <!-- Editor Screen -->
-   <div id="editorScreen" class="hidden min-h-full flex flex-col items-center py-8 px-4">
-    <!-- Header Bar -->
+   </div><!-- Editor Screen -->
+   <div id="editorScreen" class="hidden min-h-full flex flex-col items-center py-8 px-4"><!-- Header Bar -->
     <div class="w-full bg-white shadow-lg p-4 mb-4 flex justify-between items-start fixed z-40" style="top: 0; left: 0; right: 0;">
      <div class="flex gap-8 items-center">
       <div>
-       <div class="text-sm font-semibold text-gray-600">Name:</div>
+       <div class="text-sm font-semibold text-gray-600">
+        Name:
+       </div>
        <div id="header-kennummer" class="text-lg font-bold text-gray-800"></div>
       </div>
       <div>
-       <div class="text-xs font-semibold text-red-600 mb-1">⚠ Bitte Seite nicht neuladen, da sonst Text verloren gehen kann.</div>
+       <div class="text-xs font-semibold text-red-600 mb-1">
+        ⚠ Bitte Seite nicht neuladen, da sonst Text verloren gehen kann.
+       </div>
        <div class="text-lg font-bold text-blue-600" id="header-pruefungsname"></div>
       </div>
      </div>
      <div class="flex items-center gap-4">
-      <div class="flex gap-2 items-center">
-       <button data-size="small" class="toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg text-sm">A</button>
-       <button data-size="medium" class="toolbar-size-btn px-3 py-2 border-2 border-blue-500 bg-blue-50 rounded-lg text-base font-semibold">A</button>
-       <button data-size="large" class="toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg text-lg font-bold">A</button>
+      <div class="flex gap-2 items-center"><button data-size="small" class="toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg hover-bg-gray-100 text-sm">A</button> <button data-size="medium" class="toolbar-size-btn px-3 py-2 border-2 border-blue-500 bg-blue-50 rounded-lg hover-bg-blue-100 text-base font-semibold">A</button> <button data-size="large" class="toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg hover-bg-gray-100 text-lg font-bold">A</button>
       </div>
       <div class="text-center">
-       <div id="timer" class="text-2xl font-bold text-gray-800">06:00 Stunden</div>
-      </div>
-      <button id="endExamBtn" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg shadow-lg transition-all">Prüfung beenden</button>
+       <div id="timer" class="text-2xl font-bold text-gray-800">
+        06:00 Stunden
+       </div>
+      </div><button id="endExamBtn" class="px-6 py-3 bg-gray-300 hover-bg-gray-400 text-gray-800 font-bold rounded-lg shadow-lg transition-all"> Prüfung beenden </button>
      </div>
+    </div><!-- Toolbar -->
+    <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Ausschneiden">✂</button> <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Kopieren">📋</button> <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Einfügen">📄</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Seitenumbruch">⎯⎯</button>
+     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="p">Absatz</option> <option value="h2">Kopfzeile</option> </select>
+     <div class="w-px bg-gray-300 mx-1"></div><select id="highlightSelect" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Farbauswahl aufheben</option> <option value="#d3d3d3">Grau</option> </select>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 font-bold">B</button> <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 italic">I</button> <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 line-through">S</button> <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x²</button> <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x₂</button> <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 text-red-600 underline">U</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="justifyLeft" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Linksbündig">
+      <svg width="16" height="16" viewbox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5" /> <rect x="2" y="6" width="8" height="2" rx="0.5" /> <rect x="2" y="10" width="10" height="2" rx="0.5" />
+      </svg></button> <button data-cmd="justifyCenter" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Zentriert">
+      <svg width="16" height="16" viewbox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5" /> <rect x="4" y="6" width="8" height="2" rx="0.5" /> <rect x="3" y="10" width="10" height="2" rx="0.5" />
+      </svg></button> <button data-cmd="justifyRight" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rechtsbündig">
+      <svg width="16" height="16" viewbox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5" /> <rect x="6" y="6" width="8" height="2" rx="0.5" /> <rect x="4" y="10" width="10" height="2" rx="0.5" />
+      </svg></button> <button data-cmd="justifyFull" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Blocksatz">
+      <svg width="16" height="16" viewbox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5" /> <rect x="2" y="6" width="12" height="2" rx="0.5" /> <rect x="2" y="10" width="12" height="2" rx="0.5" />
+      </svg></button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="insertUnorderedList" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">•</button> <button data-cmd="insertOrderedList" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">1.</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="nbsp" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">␣</button> <button data-cmd="outdent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">◁</button> <button data-cmd="indent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">▷</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="table" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">⊞</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="specialChar" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">Ω</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="find" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">🔍</button>
     </div>
-
-    <!-- Toolbar -->
-    <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;">
-     <button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Rückgängig">↶</button>
-     <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Wiederholen">↷</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Ausschneiden">✂</button>
-     <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Kopieren">📋</button>
-     <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Einfügen">📄</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Seitenumbruch">⎯⎯</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <select id="formatType" class="px-3 py-2 rounded bg-gray-100 border-none cursor-pointer">
-      <option value="p">Absatz</option>
-      <option value="h2">Kopfzeile</option>
-     </select>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <select id="highlightSelect" class="px-3 py-2 rounded bg-gray-100 border-none cursor-pointer">
-      <option value="">Farbauswahl aufheben</option>
-      <option value="#d3d3d3">Grau</option>
-     </select>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 font-bold">B</button>
-     <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 italic">I</button>
-     <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 line-through">S</button>
-     <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">x²</button>
-     <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">x₂</button>
-     <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 text-red-600 underline">U</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="justifyLeft" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Linksbündig">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5"/><rect x="2" y="6" width="8" height="2" rx="0.5"/><rect x="2" y="10" width="10" height="2" rx="0.5"/></svg>
-     </button>
-     <button data-cmd="justifyCenter" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Zentriert">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5"/><rect x="4" y="6" width="8" height="2" rx="0.5"/><rect x="3" y="10" width="10" height="2" rx="0.5"/></svg>
-     </button>
-     <button data-cmd="justifyRight" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Rechtsbündig">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5"/><rect x="6" y="6" width="8" height="2" rx="0.5"/><rect x="4" y="10" width="10" height="2" rx="0.5"/></svg>
-     </button>
-     <button data-cmd="justifyFull" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" title="Blocksatz">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5"/><rect x="2" y="6" width="12" height="2" rx="0.5"/><rect x="2" y="10" width="12" height="2" rx="0.5"/></svg>
-     </button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="insertUnorderedList" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">•</button>
-     <button data-cmd="insertOrderedList" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">1.</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="nbsp" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">␣</button>
-     <button data-cmd="outdent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">◁</button>
-     <button data-cmd="indent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">▷</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="table" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">⊞</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="specialChar" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Ω</button>
-     <div class="w-px bg-gray-300 mx-1"></div>
-     <button data-cmd="find" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">🔍</button>
-    </div>
-
-    <div style="height: 210px;"></div>
-
-    <!-- Editor Content -->
+    <div style="height: 210px;"></div><!-- Editor Content -->
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg mb-8 flex" style="min-height: 600px;">
      <div class="w-1/3 bg-white p-4"></div>
      <div class="w-2/3 p-8">
       <div id="editor" class="editor-content" contenteditable="true"></div>
      </div>
     </div>
-   </div>
-
-   <!-- Table Dialog -->
+   </div><!-- Table Dialog -->
    <div id="tableDialog" class="hidden dialog-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full mx-4">
      <h3 class="font-bold mb-4 text-xl text-gray-800">Tabelle einfügen</h3>
@@ -560,39 +463,25 @@
       <div id="tableSelection" class="mt-3 text-sm font-semibold text-gray-700"></div>
      </div>
     </div>
-   </div>
-
-   <!-- Special Char Dialog -->
+   </div><!-- Special Char Dialog -->
    <div id="specialCharDialog" class="hidden dialog-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-80 overflow-y-auto">
      <h3 class="font-bold mb-4 text-xl text-gray-800">Sonderzeichen einfügen</h3>
      <div id="specialCharGrid" class="grid grid-cols-8 gap-2"></div>
     </div>
-   </div>
-
-   <!-- Find Replace Dialog -->
+   </div><!-- Find Replace Dialog -->
    <div id="findReplaceDialog" class="hidden fixed top-4 right-4 z-50">
-    <div class="bg-white rounded-lg shadow-2xl p-6 w-96 border-2 border-gray-300 relative">
-     <button id="closeFindBtn" class="absolute w-8 h-8 flex items-center justify-center text-gray-500 rounded-full font-bold transition-all" style="top: 1rem; right: 1rem; font-size: 1.5rem;" title="Schließen">×</button>
+    <div class="bg-white rounded-lg shadow-2xl p-6 w-96 border-2 border-gray-300 relative"><button id="closeFindBtn" class="absolute w-8 h-8 flex items-center justify-center text-gray-500 hover-text-gray-800 hover-bg-gray-100 rounded-full font-bold transition-all" style="top: 1rem; right: 1rem; font-size: 1.5rem;" title="Schließen"> × </button>
      <h3 class="font-bold mb-4 text-xl text-gray-800 pr-8">Suchen und Ersetzen</h3>
-     <div class="mb-4 flex gap-2">
-      <input type="text" id="findText" class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg" placeholder="Suchen nach..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
-      <button id="findNextBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">Suchen</button>
-      <button id="findPrevBtn" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Vorheriges">↑</button>
-      <button id="findNextBtn2" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Nächstes">↓</button>
+     <div class="mb-4 flex gap-2"><input type="text" id="findText" class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Suchen nach..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button id="findNextBtn" class="px-4 py-2 bg-blue-600 hover-bg-blue-700 text-white font-semibold rounded-lg transition-all"> Suchen </button> <button id="findPrevBtn" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Vorheriges"> ↑ </button> <button id="findNextBtn2" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Nächstes"> ↓ </button>
      </div>
-     <div class="mb-4">
-      <input type="text" id="replaceText" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg" placeholder="Ersetzen durch..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
+     <div class="mb-4"><input type="text" id="replaceText" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Ersetzen durch..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
      </div>
      <div id="findReplaceResult" class="mb-4 text-sm hidden"></div>
-     <div class="flex gap-2">
-      <button id="replaceOneBtn" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all">Ersetzen</button>
-      <button id="replaceAllBtn" class="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-all">Alle ersetzen</button>
+     <div class="flex gap-2"><button id="replaceOneBtn" class="flex-1 px-4 py-2 bg-green-600 hover-bg-green-700 text-white font-semibold rounded-lg transition-all"> Ersetzen </button> <button id="replaceAllBtn" class="flex-1 px-4 py-2 bg-orange-600 hover-bg-orange-700 text-white font-semibold rounded-lg transition-all"> Alle ersetzen </button>
      </div>
     </div>
-   </div>
-
-   <!-- Autosave Restore Dialog -->
+   </div><!-- Autosave Restore Dialog -->
    <div id="autosaveDialog" class="hidden dialog-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-xl w-full mx-4">
      <h2 class="text-2xl font-bold text-gray-800 mb-4">Autosave gefunden</h2>
@@ -600,14 +489,10 @@
      <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
       <p class="text-gray-800 text-sm leading-relaxed"><strong>Name:</strong> <span id="autosave-kennummer"></span><br><strong>Prüfung:</strong> <span id="autosave-pruefungsname"></span><br><strong>Gespeichert:</strong> <span id="autosave-timestamp"></span></p>
      </div>
-     <div class="flex gap-4 justify-end">
-      <button id="autosaveNewBtn" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">Neu anfangen</button>
-      <button id="autosaveRestoreBtn" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all">Wiederherstellen</button>
+     <div class="flex gap-4 justify-end"><button id="autosaveNewBtn" class="px-6 py-3 bg-gray-300 hover-bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">Neu anfangen</button> <button id="autosaveRestoreBtn" class="px-6 py-3 bg-green-600 hover-bg-green-700 text-white font-bold rounded-lg transition-all">Wiederherstellen</button>
      </div>
     </div>
-   </div>
-
-   <!-- End Exam Dialog -->
+   </div><!-- End Exam Dialog -->
    <div id="endExamDialog" class="hidden dialog-overlay">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-xl w-full mx-4">
      <h2 class="text-2xl font-bold text-gray-800 mb-4">Prüfung beenden?</h2>
@@ -615,14 +500,11 @@
      <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
       <p class="text-gray-800 text-sm leading-relaxed">Wenn Sie die Prüfung beenden, öffnet sich automatisch die Downloadmöglichkeit. Wählen Sie als Ziel bzw. Drucker <strong>"Als PDF speichern"</strong> aus. Diese PDF können Sie in Ihrem Benutzerkonto zur Korrektur hochladen.</p>
      </div>
-     <div class="flex gap-4 justify-end">
-      <button id="cancelEndBtn" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">Nein</button>
-      <button id="confirmEndBtn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all">Ja, Prüfung beenden</button>
+     <div class="flex gap-4 justify-end"><button id="cancelEndBtn" class="px-6 py-3 bg-gray-300 hover-bg-gray-400 text-gray-800 font-bold rounded-lg transition-all">Nein</button> <button id="confirmEndBtn" class="px-6 py-3 bg-red-600 hover-bg-red-700 text-white font-bold rounded-lg transition-all">Ja, Prüfung beenden</button>
      </div>
     </div>
    </div>
   </div>
-
   <script>
     (function() {
       'use strict';
@@ -640,7 +522,7 @@
         searchMatches: [],
         contextMenu: null,
         AUTOSAVE_KEY: 'probeklausur_autosave',
-        AUTOSAVE_INTERVAL: 120000
+        AUTOSAVE_INTERVAL: 120000 // 120 seconds
       };
       
       // ============================================
@@ -673,10 +555,12 @@
           const data = JSON.parse(saved);
           const age = Date.now() - data.timestamp;
           
+          // Only restore if less than 24 hours old
           if (age < 24 * 60 * 60 * 1000) {
             return data;
           }
           
+          // Clear old data
           localStorage.removeItem(AppState.AUTOSAVE_KEY);
           return null;
         } catch (e) {
@@ -694,6 +578,7 @@
       }
       
       function startAutosave() {
+        // Save every 30 seconds
         return setInterval(saveToLocalStorage, AppState.AUTOSAVE_INTERVAL);
       }
       
@@ -701,12 +586,14 @@
       // TIMER MANAGEMENT
       // ============================================
       function startTimer() {
+        // Clear any existing timer
         if (AppState.timerInterval) {
           clearInterval(AppState.timerInterval);
         }
         
         updateTimerDisplay();
         
+        // Single interval for countdown
         AppState.timerInterval = setInterval(function() {
           AppState.remainingMinutes--;
           updateTimerDisplay();
@@ -715,7 +602,7 @@
             stopTimer();
             showTimeUpDialog();
           }
-        }, 60000);
+        }, 60000); // Every minute
       }
       
       function stopTimer() {
@@ -730,7 +617,9 @@
         const minutes = AppState.remainingMinutes % 60;
         const timerEl = document.getElementById('timer');
         if (timerEl) {
-          timerEl.textContent = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ' Stunden';
+          timerEl.textContent = 
+            hours.toString().padStart(2, '0') + ':' + 
+            minutes.toString().padStart(2, '0') + ' Stunden';
         }
       }
       
@@ -741,7 +630,7 @@
           '<div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">' +
           '<h2 class="text-2xl font-bold text-red-600 mb-4">Zeit abgelaufen!</h2>' +
           '<p class="text-gray-700 mb-6">Die Prüfungszeit ist abgelaufen. Bitte laden Sie Ihr Dokument herunter.</p>' +
-          '<button id="timeUpDownloadBtn" class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg">Dokument herunterladen</button>' +
+          '<button id="timeUpDownloadBtn" class="w-full px-6 py-3 bg-green-600 hover-bg-green-700 text-white font-bold rounded-lg">Dokument herunterladen</button>' +
           '</div>';
         document.body.appendChild(dialog);
         
@@ -798,6 +687,7 @@
         document.getElementById('header-kennummer').textContent = AppState.userKennummer;
         document.getElementById('header-pruefungsname').textContent = AppState.pruefungsname;
         
+        // Check for autosaved content
         const saved = loadFromLocalStorage();
         if (saved && saved.kennummer === AppState.userKennummer && saved.pruefungsname === AppState.pruefungsname) {
           showAutosaveDialog(saved);
@@ -838,8 +728,6 @@
         if (saved) {
           document.getElementById('editor').innerHTML = saved.content;
           AppState.remainingMinutes = saved.remainingMinutes;
-          // Re-attach context menu listeners to restored tables
-          reattachTableListeners();
         }
         hideAutosaveDialog();
         startTimer();
@@ -923,69 +811,50 @@
         }
       }
       
-      // ============================================
-      // FIX 1: Seitenumbruch — verwendet jetzt <hr> statt <div>
-      // Der alte Code fügte ein <div style="page-break-after: always"> ein.
-      // contenteditable klont beim Enter-Drücken das umgebende Block-Element
-      // inklusive aller Inline-Styles — daher wurde der page-break vererbt.
-      // 
-      // Lösung: Wir fügen ein <hr> mit der Klasse "page-break-marker" ein,
-      // gefolgt von einem leeren <p> für den Cursor. <hr> ist ein void-Element
-      // und wird von contenteditable nicht geklont.
-      // ============================================
       function insertPageBreak() {
         const editor = document.getElementById('editor');
         editor.focus();
-        
-        // Create the page break as an HR element (void element, won't be cloned by Enter)
-        const hr = document.createElement('hr');
-        hr.className = 'page-break-marker';
-        hr.setAttribute('contenteditable', 'false');
-        
-        // Create a new empty paragraph after the break for the cursor
-        const newParagraph = document.createElement('p');
-        newParagraph.innerHTML = '<br>';
-        
+
         const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          
-          // Find the current block-level parent to insert after
-          let currentBlock = range.startContainer;
-          if (currentBlock.nodeType === Node.TEXT_NODE) {
-            currentBlock = currentBlock.parentElement;
-          }
-          while (currentBlock && currentBlock !== editor && 
-                 !['P', 'DIV', 'H2', 'UL', 'OL', 'TABLE', 'HR'].includes(currentBlock.tagName)) {
-            currentBlock = currentBlock.parentElement;
-          }
-          
-          if (currentBlock && currentBlock !== editor) {
-            // Insert HR and new paragraph after the current block
-            currentBlock.after(hr);
-            hr.after(newParagraph);
-          } else {
-            // Fallback: append to editor
-            editor.appendChild(hr);
-            editor.appendChild(newParagraph);
-          }
-          
-          // Place cursor in the new paragraph
-          const newRange = document.createRange();
-          newRange.setStart(newParagraph, 0);
-          newRange.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(newRange);
+        let range;
+        if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).startContainer)) {
+          range = selection.getRangeAt(0);
+        } else if (AppState.lastRange && editor.contains(AppState.lastRange.startContainer)) {
+          range = AppState.lastRange.cloneRange();
         } else {
-          editor.appendChild(hr);
-          editor.appendChild(newParagraph);
+          range = document.createRange();
+          range.selectNodeContents(editor);
+          range.collapse(false);
         }
-        
-        // Update lastRange
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-          AppState.lastRange = sel.getRangeAt(0).cloneRange();
-        }
+        range.deleteContents();
+
+        // Seitenumbruch als NICHT editierbares Element, damit der Cursor
+        // nicht darin hängen bleibt und Enter es nicht aufteilen kann.
+        const pageBreak = document.createElement('div');
+        pageBreak.setAttribute('contenteditable', 'false');
+        pageBreak.style.pageBreakAfter = 'always';
+        pageBreak.style.borderTop = '2px dashed #999';
+        pageBreak.style.margin = '20px 0';
+        pageBreak.style.paddingTop = '20px';
+
+        // Direkt nach dem Umbruch ein normaler, leerer Absatz, in den der
+        // Cursor gesetzt wird -> Enter erzeugt wieder einen normalen Absatz.
+        const para = document.createElement('p');
+        para.appendChild(document.createElement('br'));
+
+        const fragment = document.createDocumentFragment();
+        fragment.appendChild(pageBreak);
+        fragment.appendChild(para);
+        range.insertNode(fragment);
+
+        const newRange = document.createRange();
+        newRange.setStart(para, 0);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        AppState.lastRange = newRange.cloneRange();
+
+        editor.focus();
       }
       
       function changeFormatType(tag) {
@@ -1044,14 +913,14 @@
         const toolbar = document.getElementById('mainToolbar');
         const buttons = document.querySelectorAll('.toolbar-size-btn');
         
-        buttons.forEach(function(btn) {
-          btn.className = 'toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg';
+        buttons.forEach(btn => {
+          btn.className = 'toolbar-size-btn px-3 py-2 border-2 border-gray-300 rounded-lg hover-bg-gray-100';
           if (btn.dataset.size === 'small') btn.className += ' text-sm';
           if (btn.dataset.size === 'medium') btn.className += ' text-base font-semibold';
           if (btn.dataset.size === 'large') btn.className += ' text-lg font-bold';
         });
         
-        const activeBtn = document.querySelector('[data-size="' + size + '"]');
+        const activeBtn = document.querySelector(`[data-size="${size}"]`);
         if (activeBtn) {
           activeBtn.className = activeBtn.className.replace('border-gray-300', 'border-blue-500 bg-blue-50');
         }
@@ -1069,10 +938,7 @@
       }
       
       // ============================================
-      // FIX 2 & 3: TABLE FUNCTIONALITY
-      // - Kontextmenü per Rechtsklick (contextmenu) statt Linksklick
-      // - Kein editor.focus() vor dem Einfügen (verhindert Scroll-nach-oben)
-      // - Event-Delegation statt direkter Listener auf Zellen
+      // TABLE FUNCTIONALITY
       // ============================================
       function showTableDialog() {
         document.getElementById('tableDialog').classList.remove('hidden');
@@ -1087,12 +953,12 @@
         const grid = document.getElementById('tableGrid');
         grid.innerHTML = '';
         
-        for (var row = 0; row < 10; row++) {
-          var rowDiv = document.createElement('div');
+        for (let row = 0; row < 10; row++) {
+          const rowDiv = document.createElement('div');
           rowDiv.style.display = 'flex';
           
-          for (var col = 0; col < 10; col++) {
-            var cell = document.createElement('div');
+          for (let col = 0; col < 10; col++) {
+            const cell = document.createElement('div');
             cell.style.width = '20px';
             cell.style.height = '20px';
             cell.style.border = '1px solid #ccc';
@@ -1119,33 +985,30 @@
       }
       
       function highlightTableCells(rows, cols) {
-        var grid = document.getElementById('tableGrid');
-        var allCells = grid.querySelectorAll('div[data-row]');
+        const grid = document.getElementById('tableGrid');
+        const allCells = grid.querySelectorAll('div[data-row]');
         
         allCells.forEach(function(cell) {
-          var cellRow = parseInt(cell.dataset.row);
-          var cellCol = parseInt(cell.dataset.col);
+          const cellRow = parseInt(cell.dataset.row);
+          const cellCol = parseInt(cell.dataset.col);
           cell.style.backgroundColor = (cellRow <= rows && cellCol <= cols) ? '#3b82f6' : 'transparent';
         });
         
         document.getElementById('tableSelection').textContent = rows + ' x ' + cols + ' Tabelle';
       }
       
-      // FIX 3: insertTable — kein editor.focus() am Anfang mehr, das hat den
-      // Scroll-nach-oben-Bug verursacht. Stattdessen wird der Fokus erst nach
-      // dem Einfügen gesetzt, mit preventScroll.
       function insertTable(rows, cols) {
-        var editor = document.getElementById('editor');
-        var table = document.createElement('table');
+        const editor = document.getElementById('editor');
+        const table = document.createElement('table');
         table.style.borderCollapse = 'collapse';
         table.style.width = '100%';
         table.style.margin = '10px 0';
         table.style.tableLayout = 'fixed';
         
-        for (var i = 0; i < rows; i++) {
-          var row = document.createElement('tr');
-          for (var j = 0; j < cols; j++) {
-            var cell = document.createElement('td');
+        for (let i = 0; i < rows; i++) {
+          const row = document.createElement('tr');
+          for (let j = 0; j < cols; j++) {
+            const cell = document.createElement('td');
             cell.style.border = '1px solid #333';
             cell.style.padding = '8px';
             cell.style.wordWrap = 'break-word';
@@ -1153,114 +1016,79 @@
             cell.style.whiteSpace = 'normal';
             cell.contentEditable = 'true';
             cell.innerHTML = '&nbsp;';
-            // No individual click listener — we use event delegation on editor
+            cell.addEventListener('click', function(e) {
+              showTableContextMenu(e, this);
+            });
             row.appendChild(cell);
           }
           table.appendChild(row);
         }
         
-        // Save current scroll position
-        var scrollContainer = editor.closest('.app-container') || document.documentElement;
-        var savedScrollTop = scrollContainer.scrollTop;
+        editor.focus();
+        const selection = window.getSelection();
         
-        var selection = window.getSelection();
-        
-        // Try to restore the saved range without calling editor.focus() first
         if (AppState.lastRange) {
           try {
             selection.removeAllRanges();
             selection.addRange(AppState.lastRange);
           } catch (e) {
-            // If restoring fails, create range at end of editor
-            var range = document.createRange();
+            const range = document.createRange();
             range.selectNodeContents(editor);
             range.collapse(false);
             selection.removeAllRanges();
             selection.addRange(range);
           }
-        } else {
-          // No saved range — place at end
-          var range = document.createRange();
-          range.selectNodeContents(editor);
-          range.collapse(false);
-          selection.removeAllRanges();
-          selection.addRange(range);
         }
         
         if (selection.rangeCount > 0) {
-          var range = selection.getRangeAt(0);
+          const range = selection.getRangeAt(0);
           range.deleteContents();
           range.insertNode(table);
           
-          // Add paragraph after table for continued typing
-          var afterP = document.createElement('p');
-          afterP.innerHTML = '<br>';
-          if (table.nextSibling) {
-            table.parentNode.insertBefore(afterP, table.nextSibling);
-          } else {
-            table.parentNode.appendChild(afterP);
-          }
-          
-          // Place cursor after the table
-          var newRange = document.createRange();
-          newRange.setStart(afterP, 0);
-          newRange.collapse(true);
+          const br = document.createElement('br');
+          range.setStartAfter(table);
+          range.insertNode(br);
+          range.setStartAfter(br);
+          range.collapse(true);
           selection.removeAllRanges();
-          selection.addRange(newRange);
-          AppState.lastRange = newRange.cloneRange();
+          selection.addRange(range);
+          AppState.lastRange = range.cloneRange();
         } else {
           editor.appendChild(table);
-          var afterP = document.createElement('p');
-          afterP.innerHTML = '<br>';
-          editor.appendChild(afterP);
+          const br = document.createElement('br');
+          editor.appendChild(br);
         }
         
         hideTableDialog();
-        
-        // Focus without scrolling, then restore scroll position
-        editor.focus({ preventScroll: true });
-        scrollContainer.scrollTop = savedScrollTop;
-      }
-      
-      // FIX 2: Tabellen-Kontextmenü — Event-Delegation auf dem Editor statt
-      // einzelner click-Listener auf jeder Zelle.
-      // Probleme im Original:
-      // a) click-Event auf Zellen kollidiert mit normalem Textcursor-Setzen
-      // b) Neue Zellen (per addRow/addColumn) bekamen keinen Listener
-      // c) Wenn Text in die Zelle getippt wurde, war das click-Target oft ein
-      //    Textknoten statt der Zelle, und der Listener feuerte nicht
-      //
-      // Lösung: Ein einziger contextmenu-Listener auf dem Editor, der per
-      // event.target.closest('td') die Zelle findet. Funktioniert auch für
-      // dynamisch hinzugefügte Zellen und über allen Browsern gleich.
-      function setupTableContextMenu() {
-        var editor = document.getElementById('editor');
-        
-        editor.addEventListener('contextmenu', function(e) {
-          var td = e.target.closest('td');
-          if (!td) return;
-          
-          // Check that the td is inside a table in our editor
-          var table = td.closest('table');
-          if (!table || !editor.contains(table)) return;
-          
-          e.preventDefault();
-          e.stopPropagation();
-          showTableContextMenu(e, td);
-        });
+        editor.focus();
       }
       
       function showTableContextMenu(event, cell) {
-        hideContextMenu();
+        event.preventDefault();
+        event.stopPropagation();
         
-        var menu = document.createElement('div');
-        menu.className = 'table-context-menu';
-        menu.style.left = event.clientX + 'px';
-        menu.style.top = event.clientY + 'px';
+        if (AppState.contextMenu) {
+          AppState.contextMenu.remove();
+        }
         
-        AppState.contextMenu = menu;
+        AppState.contextMenu = document.createElement('div');
+        AppState.contextMenu.style.position = 'absolute';
+        AppState.contextMenu.style.backgroundColor = 'white';
+        AppState.contextMenu.style.border = '2px solid #ccc';
+        AppState.contextMenu.style.borderRadius = '8px';
+        AppState.contextMenu.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        AppState.contextMenu.style.zIndex = '1000';
+        AppState.contextMenu.style.minWidth = '220px';
+        AppState.contextMenu.style.padding = '8px 0';
         
-        var menuItems = [
+        const table = cell.closest('table');
+        const tableRect = table.getBoundingClientRect();
+        const editorRect = document.getElementById('editor').getBoundingClientRect();
+        
+        AppState.contextMenu.style.left = (tableRect.left - editorRect.left + (tableRect.width / 2) - 110) + 'px';
+        AppState.contextMenu.style.top = (tableRect.bottom - editorRect.top + 10) + 'px';
+        
+        const menuItems = [
           { text: 'Zeile davor einfügen', action: function() { insertRowBefore(cell); } },
           { text: 'Zeile danach einfügen', action: function() { insertRowAfter(cell); } },
           { text: 'Spalte davor einfügen', action: function() { insertColumnBefore(cell); } },
@@ -1271,46 +1099,41 @@
         
         menuItems.forEach(function(item) {
           if (item.text === '---') {
-            var divider = document.createElement('div');
-            divider.className = 'table-context-menu-divider';
-            menu.appendChild(divider);
+            const divider = document.createElement('div');
+            divider.style.height = '1px';
+            divider.style.backgroundColor = '#e0e0e0';
+            divider.style.margin = '4px 0';
+            AppState.contextMenu.appendChild(divider);
           } else {
-            var menuItem = document.createElement('div');
+            const menuItem = document.createElement('div');
             menuItem.textContent = item.text;
-            menuItem.className = 'table-context-menu-item' + (item.danger ? ' danger' : '');
+            menuItem.style.padding = '10px 16px';
+            menuItem.style.cursor = 'pointer';
+            menuItem.style.fontSize = '14px';
+            menuItem.style.color = item.danger ? '#dc2626' : '#333';
+            menuItem.style.fontWeight = item.danger ? 'bold' : 'normal';
             
-            menuItem.addEventListener('click', function(e) {
-              e.stopPropagation();
+            menuItem.addEventListener('mouseenter', function() {
+              this.style.backgroundColor = item.danger ? '#fee2e2' : '#f3f4f6';
+            });
+            
+            menuItem.addEventListener('mouseleave', function() {
+              this.style.backgroundColor = 'transparent';
+            });
+            
+            menuItem.addEventListener('click', function() {
               item.action();
               hideContextMenu();
             });
             
-            menu.appendChild(menuItem);
+            AppState.contextMenu.appendChild(menuItem);
           }
         });
         
-        document.body.appendChild(menu);
-        
-        // Adjust position if menu goes off-screen
-        var menuRect = menu.getBoundingClientRect();
-        if (menuRect.right > window.innerWidth) {
-          menu.style.left = (window.innerWidth - menuRect.width - 10) + 'px';
-        }
-        if (menuRect.bottom > window.innerHeight) {
-          menu.style.top = (window.innerHeight - menuRect.height - 10) + 'px';
-        }
-        
-        // Close on next click anywhere
+        document.body.appendChild(AppState.contextMenu);
         setTimeout(function() {
           document.addEventListener('click', hideContextMenu);
-          document.addEventListener('contextmenu', hideContextMenuOnOutsideRightClick);
-        }, 50);
-      }
-      
-      function hideContextMenuOnOutsideRightClick(e) {
-        if (AppState.contextMenu && !AppState.contextMenu.contains(e.target)) {
-          hideContextMenu();
-        }
+        }, 100);
       }
       
       function hideContextMenu() {
@@ -1319,28 +1142,29 @@
           AppState.contextMenu = null;
         }
         document.removeEventListener('click', hideContextMenu);
-        document.removeEventListener('contextmenu', hideContextMenuOnOutsideRightClick);
       }
       
       function insertRowBefore(cell) {
-        var row = cell.closest('tr');
-        var colCount = row.cells.length;
-        var newRow = document.createElement('tr');
+        const row = cell.closest('tr');
+        const colCount = row.cells.length;
+        const newRow = document.createElement('tr');
         
-        for (var i = 0; i < colCount; i++) {
-          newRow.appendChild(createTableCell());
+        for (let i = 0; i < colCount; i++) {
+          const newCell = createTableCell();
+          newRow.appendChild(newCell);
         }
         
         row.parentNode.insertBefore(newRow, row);
       }
       
       function insertRowAfter(cell) {
-        var row = cell.closest('tr');
-        var colCount = row.cells.length;
-        var newRow = document.createElement('tr');
+        const row = cell.closest('tr');
+        const colCount = row.cells.length;
+        const newRow = document.createElement('tr');
         
-        for (var i = 0; i < colCount; i++) {
-          newRow.appendChild(createTableCell());
+        for (let i = 0; i < colCount; i++) {
+          const newCell = createTableCell();
+          newRow.appendChild(newCell);
         }
         
         if (row.nextSibling) {
@@ -1351,23 +1175,23 @@
       }
       
       function insertColumnBefore(cell) {
-        var table = cell.closest('table');
-        var cellIndex = cell.cellIndex;
-        var rows = table.querySelectorAll('tr');
+        const table = cell.closest('table');
+        const cellIndex = cell.cellIndex;
+        const rows = table.querySelectorAll('tr');
         
         rows.forEach(function(row) {
-          var newCell = createTableCell();
+          const newCell = createTableCell();
           row.insertBefore(newCell, row.cells[cellIndex]);
         });
       }
       
       function insertColumnAfter(cell) {
-        var table = cell.closest('table');
-        var cellIndex = cell.cellIndex;
-        var rows = table.querySelectorAll('tr');
+        const table = cell.closest('table');
+        const cellIndex = cell.cellIndex;
+        const rows = table.querySelectorAll('tr');
         
         rows.forEach(function(row) {
-          var newCell = createTableCell();
+          const newCell = createTableCell();
           if (cellIndex + 1 < row.cells.length) {
             row.insertBefore(newCell, row.cells[cellIndex + 1]);
           } else {
@@ -1377,7 +1201,7 @@
       }
       
       function createTableCell() {
-        var cell = document.createElement('td');
+        const cell = document.createElement('td');
         cell.style.border = '1px solid #333';
         cell.style.padding = '8px';
         cell.style.wordWrap = 'break-word';
@@ -1385,22 +1209,17 @@
         cell.style.whiteSpace = 'normal';
         cell.contentEditable = 'true';
         cell.innerHTML = '&nbsp;';
-        // No individual listener needed — event delegation handles it
+        cell.addEventListener('click', function(e) {
+          showTableContextMenu(e, this);
+        });
         return cell;
       }
       
       function deleteTable(cell) {
-        var table = cell.closest('table');
+        const table = cell.closest('table');
         if (table) {
           table.remove();
         }
-      }
-      
-      // Re-attach table listeners after restoring from autosave
-      // (not needed anymore with event delegation, but kept for safety)
-      function reattachTableListeners() {
-        // With event delegation, no per-cell listeners needed.
-        // This function is a no-op now but kept for API compatibility.
       }
       
       // ============================================
@@ -1416,10 +1235,10 @@
       }
       
       function createSpecialCharGrid() {
-        var grid = document.getElementById('specialCharGrid');
+        const grid = document.getElementById('specialCharGrid');
         grid.innerHTML = '';
         
-        var specialChars = [
+        const specialChars = [
           '\u00B1', '\u00D7', '\u00F7', '\u2260', '\u2248', '\u2264', '\u2265', '\u221E',
           '\u2211', '\u220F', '\u221A', '\u221B', '\u221C', '\u222B', '\u2202', '\u2207',
           '\u00B0', '\u2032', '\u2033', '\u2030', '\u2031', '\u03C0', '\u03B8', '\u03A9',
@@ -1452,9 +1271,9 @@
         ];
         
         specialChars.forEach(function(char) {
-          var charButton = document.createElement('button');
+          const charButton = document.createElement('button');
           charButton.textContent = char;
-          charButton.className = 'px-4 py-3 text-2xl border-2 border-gray-300 rounded-lg transition-all cursor-pointer';
+          charButton.className = 'px-4 py-3 text-2xl border-2 border-gray-300 rounded-lg hover-bg-blue-100 hover-border-blue-500 transition-all cursor-pointer';
           charButton.title = char + ' einfügen';
           charButton.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1465,7 +1284,7 @@
       }
       
       function insertSpecialChar(char) {
-        var editor = document.getElementById('editor');
+        const editor = document.getElementById('editor');
         editor.focus();
         execCommand('insertText', char);
         hideSpecialCharDialog();
@@ -1488,42 +1307,47 @@
       }
       
       function clearSearchHighlights() {
-        var selection = window.getSelection();
+        const selection = window.getSelection();
         selection.removeAllRanges();
       }
       
       function findNext() {
-        var findTextVal = document.getElementById('findText').value;
-        if (!findTextVal) {
+        const findText = document.getElementById('findText').value;
+        if (!findText) {
           showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
           return;
         }
         
-        var editor = document.getElementById('editor');
+        const editor = document.getElementById('editor');
         clearSearchHighlights();
         AppState.searchMatches = [];
         
-        var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+        const walker = document.createTreeWalker(
+          editor,
+          NodeFilter.SHOW_TEXT,
+          null,
+          false
+        );
         
-        var nodes = [];
-        var node;
+        const nodes = [];
+        let node;
         while (node = walker.nextNode()) {
           nodes.push(node);
         }
         
-        var searchLower = findTextVal.toLowerCase();
+        const searchLower = findText.toLowerCase();
         nodes.forEach(function(textNode) {
-          var text = textNode.textContent;
-          var textLower = text.toLowerCase();
-          var index = 0;
+          const text = textNode.textContent;
+          const textLower = text.toLowerCase();
+          let index = 0;
           
           while ((index = textLower.indexOf(searchLower, index)) !== -1) {
             AppState.searchMatches.push({
               node: textNode,
               start: index,
-              end: index + findTextVal.length
+              end: index + findText.length
             });
-            index += findTextVal.length;
+            index += findText.length;
           }
         });
         
@@ -1545,8 +1369,8 @@
       }
       
       function findPrevious() {
-        var findTextVal = document.getElementById('findText').value;
-        if (!findTextVal) {
+        const findText = document.getElementById('findText').value;
+        if (!findText) {
           showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
           return;
         }
@@ -1566,22 +1390,22 @@
       function highlightCurrentMatch() {
         if (AppState.currentSearchIndex === -1 || AppState.searchMatches.length === 0) return;
         
-        var match = AppState.searchMatches[AppState.currentSearchIndex];
-        var range = document.createRange();
+        const match = AppState.searchMatches[AppState.currentSearchIndex];
+        const range = document.createRange();
         range.setStart(match.node, match.start);
         range.setEnd(match.node, match.end);
         
-        var selection = window.getSelection();
+        const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
       }
       
       function scrollToCurrentMatch() {
-        var selection = window.getSelection();
+        const selection = window.getSelection();
         if (selection.rangeCount > 0) {
-          var range = selection.getRangeAt(0);
-          var tempSpan = document.createElement('span');
-          var rangeClone = range.cloneRange();
+          const range = selection.getRangeAt(0);
+          const tempSpan = document.createElement('span');
+          const rangeClone = range.cloneRange();
           rangeClone.insertNode(tempSpan);
           
           tempSpan.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
@@ -1593,10 +1417,10 @@
       }
       
       function replaceOne() {
-        var findTextVal = document.getElementById('findText').value;
-        var replaceTextVal = document.getElementById('replaceText').value;
+        const findText = document.getElementById('findText').value;
+        const replaceText = document.getElementById('replaceText').value;
         
-        if (!findTextVal) {
+        if (!findText) {
           showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
           return;
         }
@@ -1606,11 +1430,11 @@
           return;
         }
         
-        var selection = window.getSelection();
+        const selection = window.getSelection();
         if (selection.rangeCount > 0) {
-          var range = selection.getRangeAt(0);
+          const range = selection.getRangeAt(0);
           range.deleteContents();
-          var textNode = document.createTextNode(replaceTextVal);
+          const textNode = document.createTextNode(replaceText);
           range.insertNode(textNode);
           range.setStartAfter(textNode);
           range.collapse(true);
@@ -1625,33 +1449,38 @@
       }
       
       function replaceAll() {
-        var findTextVal = document.getElementById('findText').value;
-        var replaceTextVal = document.getElementById('replaceText').value;
+        const findText = document.getElementById('findText').value;
+        const replaceText = document.getElementById('replaceText').value;
         
-        if (!findTextVal) {
+        if (!findText) {
           showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
           return;
         }
         
-        var editor = document.getElementById('editor');
-        var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+        const editor = document.getElementById('editor');
+        const walker = document.createTreeWalker(
+          editor,
+          NodeFilter.SHOW_TEXT,
+          null,
+          false
+        );
         
-        var nodes = [];
-        var node;
+        const nodes = [];
+        let node;
         while (node = walker.nextNode()) {
           nodes.push(node);
         }
         
-        var totalCount = 0;
-        var regex = new RegExp(escapeRegex(findTextVal), 'gi');
+        let totalCount = 0;
+        const regex = new RegExp(escapeRegex(findText), 'gi');
         
         nodes.forEach(function(textNode) {
-          var text = textNode.textContent;
-          var matches = text.match(regex);
+          const text = textNode.textContent;
+          const matches = text.match(regex);
           
           if (matches) {
             totalCount += matches.length;
-            textNode.textContent = text.replace(regex, replaceTextVal);
+            textNode.textContent = text.replace(regex, replaceText);
           }
         });
         
@@ -1671,7 +1500,7 @@
       }
       
       function showFindResult(message, type) {
-        var resultDiv = document.getElementById('findReplaceResult');
+        const resultDiv = document.getElementById('findReplaceResult');
         resultDiv.textContent = message;
         resultDiv.className = 'mb-4 text-sm font-semibold ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
         resultDiv.classList.remove('hidden');
@@ -1681,7 +1510,7 @@
       // DOWNLOAD / PRINT
       // ============================================
       function downloadDocument() {
-        var printDiv = document.getElementById('printContent');
+        let printDiv = document.getElementById('printContent');
         if (!printDiv) {
           printDiv = document.createElement('div');
           printDiv.id = 'printContent';
@@ -1689,8 +1518,8 @@
           document.body.appendChild(printDiv);
         }
         
-        var editor = document.getElementById('editor');
-        var header = 
+        const editor = document.getElementById('editor');
+        const header = 
           '<div class="print-header">' +
           '<div style="display: flex; justify-content: space-between; align-items: center;">' +
           '<div><strong>Name:</strong> ' + AppState.userKennummer + '</div>' +
@@ -1698,10 +1527,10 @@
           '</div>' +
           '</div>';
         
-        var content = editor.cloneNode(true);
+        const content = editor.cloneNode(true);
         content.classList.add('print-content');
         
-        var layoutWrapper = 
+        const layoutWrapper = 
           '<div style="display: flex; width: 100%;">' +
           '<div style="width: 33.33%; border-right: 1px solid #ccc;"></div>' +
           '<div style="width: 66.67%; padding-left: 20px;">' + content.outerHTML + '</div>' +
@@ -1710,7 +1539,7 @@
         printDiv.innerHTML = header + layoutWrapper;
         printDiv.style.display = 'block';
         
-        var originalTitle = document.title;
+        const originalTitle = document.title;
         document.title = AppState.pruefungsname + '_' + AppState.userKennummer;
         
         window.print();
@@ -1736,7 +1565,7 @@
         stopTimer();
         hideEndExamDialog();
         
-        var message = document.createElement('div');
+        const message = document.createElement('div');
         message.className = 'fixed bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50';
         message.style.top = '1rem';
         message.style.right = '1rem';
@@ -1776,16 +1605,16 @@
         document.getElementById('confirmEndBtn').addEventListener('click', endExam);
         
         // Toolbar size buttons
-        document.querySelectorAll('.toolbar-size-btn').forEach(function(btn) {
+        document.querySelectorAll('.toolbar-size-btn').forEach(btn => {
           btn.addEventListener('click', function() {
             changeToolbarSize(this.dataset.size);
           });
         });
         
         // Toolbar commands
-        document.querySelectorAll('[data-cmd]').forEach(function(btn) {
+        document.querySelectorAll('[data-cmd]').forEach(btn => {
           btn.addEventListener('click', function() {
-            var cmd = this.dataset.cmd;
+            const cmd = this.dataset.cmd;
             
             switch(cmd) {
               case 'undo': execCommand('undo'); break;
@@ -1848,24 +1677,24 @@
         });
         
         // Editor range tracking
-        var editor = document.getElementById('editor');
+        const editor = document.getElementById('editor');
         
         editor.addEventListener('blur', function() {
-          var selection = window.getSelection();
+          const selection = window.getSelection();
           if (selection.rangeCount > 0) {
             AppState.lastRange = selection.getRangeAt(0).cloneRange();
           }
         });
         
         editor.addEventListener('keyup', function() {
-          var selection = window.getSelection();
+          const selection = window.getSelection();
           if (selection.rangeCount > 0) {
             AppState.lastRange = selection.getRangeAt(0).cloneRange();
           }
         });
         
         editor.addEventListener('mouseup', function() {
-          var selection = window.getSelection();
+          const selection = window.getSelection();
           if (selection.rangeCount > 0) {
             AppState.lastRange = selection.getRangeAt(0).cloneRange();
           }
@@ -1888,9 +1717,37 @@
             }
           }
         });
-        
-        // FIX 2: Setup table context menu via event delegation
-        setupTableContextMenu();
+      }
+      
+      // ============================================
+      // ELEMENT SDK
+      // ============================================
+      const defaultConfig = { document_title: "Mein Dokument" };
+      
+      function onConfigChange(config) {}
+      
+      function mapToCapabilities(config) {
+        return {
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        };
+      }
+      
+      function mapToEditPanelValues(config) {
+        return new Map([
+          ["document_title", config.document_title || defaultConfig.document_title]
+        ]);
+      }
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig: defaultConfig,
+          onConfigChange: onConfigChange,
+          mapToCapabilities: mapToCapabilities,
+          mapToEditPanelValues: mapToEditPanelValues
+        });
       }
       
       // ============================================
