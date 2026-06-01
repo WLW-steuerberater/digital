@@ -1099,16 +1099,12 @@
       // ---- Menü-Modell (entspricht den Screenshots) ----
       function getMenuModel(ctx) {
         const inTable = !!ctx.table;
-        const hasRowClip = !!tableState.rowClipboard;
-        const hasColClip = !!tableState.colClipboard;
         const selCells = inTable ? getSelectedCells() : [];
         const canMerge = selCells.length > 1;
         const canSplit = !!(ctx.cell && ((ctx.cell.colSpan || 1) > 1 || (ctx.cell.rowSpan || 1) > 1));
         return [
           { label: 'Tabelle', submenu: 'grid' },
           { label: 'Zelle', disabled: !inTable, submenu: [
-            { label: 'Zelleneigenschaften', disabled: !inTable, action: function() { openCellProps(ctx); } },
-            { sep: true },
             { label: 'Zellen verbinden', disabled: !canMerge, action: function() { doMergeCells(ctx, selCells); } },
             { label: 'Zelle aufteilen', disabled: !canSplit, action: function() { doSplitCell(ctx); } }
           ]},
@@ -1116,12 +1112,9 @@
             { label: 'Neue Zeile davor einfügen', disabled: !inTable, action: function() { doRowInsert(ctx, 'before'); } },
             { label: 'Neue Zeile danach einfügen', disabled: !inTable, action: function() { doRowInsert(ctx, 'after'); } },
             { label: 'Zeile löschen', disabled: !inTable, action: function() { doRowDelete(ctx); } },
-            { label: 'Zeileneigenschaften', disabled: !inTable, action: function() { openRowProps(ctx); } },
             { sep: true },
             { label: 'Zeile ausschneiden', disabled: !inTable, action: function() { doRowCut(ctx); } },
-            { label: 'Zeile kopieren', disabled: !inTable, action: function() { doRowCopy(ctx); } },
-            { label: 'Zeile davor einfügen', disabled: !inTable || !hasRowClip, action: function() { doRowPaste(ctx, 'before'); } },
-            { label: 'Zeile danach einfügen', disabled: !inTable || !hasRowClip, action: function() { doRowPaste(ctx, 'after'); } }
+            { label: 'Zeile kopieren', disabled: !inTable, action: function() { doRowCopy(ctx); } }
           ]},
           { label: 'Spalte', disabled: !inTable, submenu: [
             { label: 'Neue Spalte davor einfügen', disabled: !inTable, action: function() { doColInsert(ctx, 'before'); } },
@@ -1129,12 +1122,9 @@
             { label: 'Spalte löschen', disabled: !inTable, action: function() { doColDelete(ctx); } },
             { sep: true },
             { label: 'Spalte ausschneiden', disabled: !inTable, action: function() { doColCut(ctx); } },
-            { label: 'Spalte kopieren', disabled: !inTable, action: function() { doColCopy(ctx); } },
-            { label: 'Spalte davor einfügen', disabled: !inTable || !hasColClip, action: function() { doColPaste(ctx, 'before'); } },
-            { label: 'Spalte danach einfügen', disabled: !inTable || !hasColClip, action: function() { doColPaste(ctx, 'after'); } }
+            { label: 'Spalte kopieren', disabled: !inTable, action: function() { doColCopy(ctx); } }
           ]},
           { sep: true },
-          { label: 'Tabelleneigenschaften', disabled: !inTable, action: function() { openTableProps(ctx); } },
           { label: 'Tabelle löschen', disabled: !inTable, action: function() { doTableDelete(ctx); } }
         ];
       }
@@ -1325,21 +1315,6 @@
           if (tbl.rows.length === 0) tbl.remove();
         });
       }
-      function doRowPaste(ctx, where) {
-        const clip = tableState.rowClipboard;
-        if (!clip) { closeTableMenu(); return; }
-        runTableAction(ctx, function() {
-          const tr = document.createElement('tr');
-          clip.forEach(function(html) {
-            const c = createTableCell();
-            c.innerHTML = html || '&nbsp;';
-            tr.appendChild(c);
-          });
-          if (where === 'before') ctx.row.parentNode.insertBefore(tr, ctx.row);
-          else ctx.row.parentNode.insertBefore(tr, ctx.row.nextSibling);
-        });
-      }
-
       // ---- Spalten-Aktionen ----
       function doColInsert(ctx, where) {
         runTableAction(ctx, function() {
@@ -1378,20 +1353,6 @@
             if (r.cells[idx]) r.deleteCell(idx);
           });
           if (!ctx.table.rows[0] || ctx.table.rows[0].cells.length === 0) ctx.table.remove();
-        });
-      }
-      function doColPaste(ctx, where) {
-        const clip = tableState.colClipboard;
-        if (!clip) { closeTableMenu(); return; }
-        runTableAction(ctx, function() {
-          const idx = ctx.cell.cellIndex;
-          Array.prototype.forEach.call(ctx.table.rows, function(r, i) {
-            const c = createTableCell();
-            c.innerHTML = clip[i] || '&nbsp;';
-            const ref = where === 'before' ? r.cells[idx] : (r.cells[idx] ? r.cells[idx].nextSibling : null);
-            if (ref) r.insertBefore(c, ref);
-            else r.appendChild(c);
-          });
         });
       }
 
@@ -1549,216 +1510,6 @@
         runTableAction(ctx, function() { splitCell(ctx.cell); });
       }
 
-      // ---- Eigenschaften-Dialoge ----
-      function renderPropField(f, inputs) {
-        const wrap = document.createElement('div');
-        const lab = document.createElement('label');
-        lab.style.display = 'block';
-        lab.style.fontSize = '13px';
-        lab.style.color = '#374151';
-        lab.style.marginBottom = '4px';
-        lab.textContent = f.label;
-        wrap.appendChild(lab);
-        let inp;
-        if (f.type === 'select') {
-          inp = document.createElement('select');
-          f.options.forEach(function(o) {
-            const op = document.createElement('option');
-            op.value = o.value;
-            op.textContent = o.label;
-            if (o.value === f.value) op.selected = true;
-            inp.appendChild(op);
-          });
-        } else {
-          inp = document.createElement('input');
-          inp.type = (f.type === 'color') ? 'color' : 'text';
-          if (f.type !== 'color') inp.placeholder = f.placeholder || '';
-          inp.value = f.value || (f.type === 'color' ? '#ffffff' : '');
-        }
-        inp.style.width = '100%';
-        inp.style.padding = '8px 10px';
-        inp.style.border = '1px solid #cbd5e1';
-        inp.style.borderRadius = '4px';
-        inp.style.fontSize = '14px';
-        inp.style.boxSizing = 'border-box';
-        if (f.type === 'color') inp.style.height = '38px';
-        inputs[f.key] = inp;
-        wrap.appendChild(inp);
-        return wrap;
-      }
-
-      function openPropsDialog(title, fields, onApply) {
-        closeTableMenu();
-        const TEAL = '#0e7490';
-        const overlay = document.createElement('div');
-        overlay.className = 'dialog-overlay';
-        overlay.style.zIndex = '100001';
-
-        const box = document.createElement('div');
-        box.style.background = '#fff';
-        box.style.borderRadius = '8px';
-        box.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,.35)';
-        box.style.width = '440px';
-        box.style.maxWidth = '92vw';
-        box.style.overflow = 'hidden';
-
-        // Header (Teal)
-        const header = document.createElement('div');
-        header.style.background = TEAL;
-        header.style.color = '#fff';
-        header.style.padding = '14px 18px';
-        header.style.display = 'flex';
-        header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
-        const hTitle = document.createElement('div');
-        hTitle.style.fontSize = '18px';
-        hTitle.style.fontWeight = '600';
-        hTitle.textContent = title;
-        const hClose = document.createElement('button');
-        hClose.textContent = '\u00D7';
-        hClose.style.background = 'transparent';
-        hClose.style.border = 'none';
-        hClose.style.color = '#fff';
-        hClose.style.fontSize = '22px';
-        hClose.style.lineHeight = '1';
-        hClose.style.cursor = 'pointer';
-        header.appendChild(hTitle);
-        header.appendChild(hClose);
-        box.appendChild(header);
-
-        // Body
-        const body = document.createElement('div');
-        body.style.padding = '18px';
-        const inputs = {};
-        let k = 0;
-        while (k < fields.length) {
-          const f = fields[k];
-          if (f.half && fields[k + 1] && fields[k + 1].half) {
-            const rowWrap = document.createElement('div');
-            rowWrap.style.display = 'flex';
-            rowWrap.style.gap = '14px';
-            rowWrap.style.marginBottom = '14px';
-            const c1 = renderPropField(f, inputs); c1.style.flex = '1';
-            const c2 = renderPropField(fields[k + 1], inputs); c2.style.flex = '1';
-            rowWrap.appendChild(c1);
-            rowWrap.appendChild(c2);
-            body.appendChild(rowWrap);
-            k += 2;
-          } else {
-            const w = renderPropField(f, inputs);
-            w.style.marginBottom = '14px';
-            body.appendChild(w);
-            k += 1;
-          }
-        }
-        box.appendChild(body);
-
-        // Footer
-        const footer = document.createElement('div');
-        footer.style.padding = '0 18px 18px 18px';
-        footer.style.display = 'flex';
-        footer.style.justifyContent = 'space-between';
-        const cancel = document.createElement('button');
-        cancel.textContent = 'Abbrechen';
-        cancel.style.padding = '8px 16px';
-        cancel.style.background = '#fff';
-        cancel.style.color = TEAL;
-        cancel.style.border = '1px solid ' + TEAL;
-        cancel.style.borderRadius = '4px';
-        cancel.style.fontWeight = '600';
-        cancel.style.cursor = 'pointer';
-        const ok = document.createElement('button');
-        ok.textContent = 'Speichern';
-        ok.style.padding = '8px 18px';
-        ok.style.background = TEAL;
-        ok.style.color = '#fff';
-        ok.style.border = '1px solid ' + TEAL;
-        ok.style.borderRadius = '4px';
-        ok.style.fontWeight = '600';
-        ok.style.cursor = 'pointer';
-        footer.appendChild(cancel);
-        footer.appendChild(ok);
-        box.appendChild(footer);
-
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
-
-        function close() { overlay.remove(); }
-        hClose.addEventListener('click', close);
-        cancel.addEventListener('click', close);
-        overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
-        ok.addEventListener('click', function() {
-          const vals = {};
-          Object.keys(inputs).forEach(function(key) { vals[key] = inputs[key].value; });
-          const scroll = saveScroll();
-          onApply(vals);
-          restoreScroll(scroll);
-          close();
-        });
-      }
-
-      function openTableProps(ctx) {
-        if (!ctx.table) return;
-        const t = ctx.table;
-        let align = '';
-        if (t.style.marginLeft === 'auto' && t.style.marginRight === 'auto') align = 'center';
-        else if (t.style.marginLeft === 'auto') align = 'right';
-        else if (t.style.marginLeft === '0px' || t.style.marginLeft === '0') align = 'left';
-        openPropsDialog('Tabelleneigenschaften', [
-          { key: 'width', label: 'Breite', type: 'text', value: t.style.width || '', half: true, placeholder: 'z. B. 100%' },
-          { key: 'height', label: 'Höhe', type: 'text', value: t.style.height || '', half: true, placeholder: 'z. B. 200px' },
-          { key: 'align', label: 'Ausrichtung', type: 'select', value: align, options: [
-            { value: '', label: 'Keine' }, { value: 'left', label: 'Links' },
-            { value: 'center', label: 'Zentriert' }, { value: 'right', label: 'Rechts' }
-          ]}
-        ], function(vals) {
-          t.style.width = vals.width || '';
-          t.style.height = vals.height || '';
-          if (vals.align === 'center') { t.style.marginLeft = 'auto'; t.style.marginRight = 'auto'; }
-          else if (vals.align === 'right') { t.style.marginLeft = 'auto'; t.style.marginRight = '0'; }
-          else if (vals.align === 'left') { t.style.marginLeft = '0'; t.style.marginRight = 'auto'; }
-          else { t.style.marginLeft = ''; t.style.marginRight = ''; }
-        });
-      }
-
-      function openRowProps(ctx) {
-        if (!ctx.row) return;
-        const row = ctx.row;
-        openPropsDialog('Zeileneigenschaften', [
-          { key: 'height', label: 'Höhe (z. B. 30px)', type: 'text', value: row.style.height || '', placeholder: '30px' },
-          { key: 'bg', label: 'Hintergrundfarbe', type: 'color', value: rgbToHex(row.style.backgroundColor) }
-        ], function(vals) {
-          row.style.height = vals.height || '';
-          row.style.backgroundColor = vals.bg || '';
-        });
-      }
-
-      function openCellProps(ctx) {
-        if (!ctx.cell) return;
-        const cell = ctx.cell;
-        openPropsDialog('Zelleneigenschaften', [
-          { key: 'bg', label: 'Hintergrundfarbe', type: 'color', value: rgbToHex(cell.style.backgroundColor) },
-          { key: 'halign', label: 'Textausrichtung', type: 'select', value: cell.style.textAlign || 'left', options: [
-            { value: 'left', label: 'Links' }, { value: 'center', label: 'Zentriert' }, { value: 'right', label: 'Rechts' }
-          ]},
-          { key: 'valign', label: 'Vertikale Ausrichtung', type: 'select', value: cell.style.verticalAlign || 'top', options: [
-            { value: 'top', label: 'Oben' }, { value: 'middle', label: 'Mitte' }, { value: 'bottom', label: 'Unten' }
-          ]}
-        ], function(vals) {
-          cell.style.backgroundColor = vals.bg || '';
-          cell.style.textAlign = vals.halign;
-          cell.style.verticalAlign = vals.valign;
-        });
-      }
-
-      function rgbToHex(color) {
-        if (!color) return '#ffffff';
-        const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-        if (!m) return (color.charAt(0) === '#') ? color : '#ffffff';
-        function h(n) { const s = parseInt(n).toString(16); return s.length === 1 ? '0' + s : s; }
-        return '#' + h(m[1]) + h(m[2]) + h(m[3]);
-      }
-      
       // ============================================
       // SPECIAL CHARACTERS
       // ============================================
