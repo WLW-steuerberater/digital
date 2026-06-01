@@ -372,6 +372,9 @@
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full card-overlay">
      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugangskontrolle</h1>
      <p class="text-gray-600 mb-6 text-center">Bitte geben Sie das Passwort ein, um fortzufahren.</p>
+     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6 text-center">
+      <p class="text-sm text-gray-700 leading-relaxed">ℹ Bitte nutzen Sie dieses Programm mit <strong>Google Chrome</strong>, damit alle Funktionen ordnungsgemäß funktionieren.</p>
+     </div>
      <form id="passwordForm"><label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Passwort:</label>
       <div class="relative mb-4"><input type="password" id="password" required class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Passwort eingeben..." style="padding-right: 3rem; border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button type="button" id="togglePasswordBtn" class="absolute right-3 text-gray-500 hover-text-gray-700 focus-outline-none" style="top: 50%; transform: translateY(-50%);" title="Passwort anzeigen/verbergen">
         <svg id="eyeIcon" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>
@@ -972,11 +975,9 @@
         document.head.appendChild(style);
       }
 
-      // Interner Tabellen-Zustand (Menü + Zwischenablage für Zeilen/Spalten)
+      // Interner Tabellen-Zustand (Menü)
       const tableState = {
-        menuEl: null,
-        rowClipboard: null,
-        colClipboard: null
+        menuEl: null
       };
 
       // ---- Scroll-Erhaltung (verhindert Sprung nach oben, Punkt 4.2) ----
@@ -1111,18 +1112,12 @@
           { label: 'Zeile', disabled: !inTable, submenu: [
             { label: 'Neue Zeile davor einfügen', disabled: !inTable, action: function() { doRowInsert(ctx, 'before'); } },
             { label: 'Neue Zeile danach einfügen', disabled: !inTable, action: function() { doRowInsert(ctx, 'after'); } },
-            { label: 'Zeile löschen', disabled: !inTable, action: function() { doRowDelete(ctx); } },
-            { sep: true },
-            { label: 'Zeile ausschneiden', disabled: !inTable, action: function() { doRowCut(ctx); } },
-            { label: 'Zeile kopieren', disabled: !inTable, action: function() { doRowCopy(ctx); } }
+            { label: 'Zeile löschen', disabled: !inTable, action: function() { doRowDelete(ctx); } }
           ]},
           { label: 'Spalte', disabled: !inTable, submenu: [
             { label: 'Neue Spalte davor einfügen', disabled: !inTable, action: function() { doColInsert(ctx, 'before'); } },
             { label: 'Neue Spalte danach einfügen', disabled: !inTable, action: function() { doColInsert(ctx, 'after'); } },
-            { label: 'Spalte löschen', disabled: !inTable, action: function() { doColDelete(ctx); } },
-            { sep: true },
-            { label: 'Spalte ausschneiden', disabled: !inTable, action: function() { doColCut(ctx); } },
-            { label: 'Spalte kopieren', disabled: !inTable, action: function() { doColCopy(ctx); } }
+            { label: 'Spalte löschen', disabled: !inTable, action: function() { doColDelete(ctx); } }
           ]},
           { sep: true },
           { label: 'Tabelle löschen', disabled: !inTable, action: function() { doTableDelete(ctx); } }
@@ -1303,18 +1298,6 @@
           if (tbl.rows.length === 0) tbl.remove();
         });
       }
-      function doRowCopy(ctx) {
-        tableState.rowClipboard = Array.prototype.map.call(ctx.row.cells, function(c) { return c.innerHTML; });
-        closeTableMenu();
-      }
-      function doRowCut(ctx) {
-        tableState.rowClipboard = Array.prototype.map.call(ctx.row.cells, function(c) { return c.innerHTML; });
-        runTableAction(ctx, function() {
-          const tbl = ctx.table;
-          ctx.row.remove();
-          if (tbl.rows.length === 0) tbl.remove();
-        });
-      }
       // ---- Spalten-Aktionen ----
       function doColInsert(ctx, where) {
         runTableAction(ctx, function() {
@@ -1330,25 +1313,6 @@
       function doColDelete(ctx) {
         runTableAction(ctx, function() {
           const idx = ctx.cell.cellIndex;
-          Array.prototype.forEach.call(ctx.table.rows, function(r) {
-            if (r.cells[idx]) r.deleteCell(idx);
-          });
-          if (!ctx.table.rows[0] || ctx.table.rows[0].cells.length === 0) ctx.table.remove();
-        });
-      }
-      function doColCopy(ctx) {
-        const idx = ctx.cell.cellIndex;
-        tableState.colClipboard = Array.prototype.map.call(ctx.table.rows, function(r) {
-          return r.cells[idx] ? r.cells[idx].innerHTML : '';
-        });
-        closeTableMenu();
-      }
-      function doColCut(ctx) {
-        const idx = ctx.cell.cellIndex;
-        tableState.colClipboard = Array.prototype.map.call(ctx.table.rows, function(r) {
-          return r.cells[idx] ? r.cells[idx].innerHTML : '';
-        });
-        runTableAction(ctx, function() {
           Array.prototype.forEach.call(ctx.table.rows, function(r) {
             if (r.cells[idx]) r.deleteCell(idx);
           });
