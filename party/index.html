@@ -1166,6 +1166,12 @@
         cell.style.wordWrap = 'break-word';
         cell.style.overflowWrap = 'break-word';
         cell.style.whiteSpace = 'normal';
+        cell.style.verticalAlign = 'top';
+        // Höhe einer Textzeile als Mindesthöhe: leere Zelle ist sofort eine
+        // Zeile hoch (gut anklickbar), wächst beim Schreiben der ersten Zeile
+        // nicht und erst ab der zweiten Zeile adaptiv mit (height wirkt bei
+        // Tabellenzellen als Mindesthöhe).
+        cell.style.height = '50px';
         cell.contentEditable = 'true';
         cell.innerHTML = '';
         return cell;
