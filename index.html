@@ -209,7 +209,7 @@
       outline: none;
       font-family: 'Arial', sans-serif;
       font-size: 16px;
-      line-height: 1.6;
+      line-height: 2.0;
       color: #333;
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -247,6 +247,11 @@
       font-weight: bold;
       margin: 15px 0 10px 0;
       line-height: 1.3;
+    }
+    
+    #editor u {
+      text-decoration-color: #000;
+      text-decoration-thickness: 2px;
     }
     
     .toolbar-button {
@@ -333,7 +338,7 @@
         padding-top: 0;
         font-family: 'Arial', sans-serif;
         font-size: 12pt;
-        line-height: 1.6;
+        line-height: 2.0;
         color: #000;
       }
       
@@ -344,12 +349,15 @@
       .print-content table {
         border-collapse: collapse;
         width: 100%;
+        max-width: 100% !important;
         page-break-inside: avoid;
       }
       
       .print-content table td {
         border: 1px solid #000;
         padding: 5px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
       
       .print-content h1, .print-content h2, .print-content h3 {
@@ -432,9 +440,9 @@
     <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Ausschneiden">✂</button> <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Kopieren">📋</button> <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Einfügen">📄</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Seitenumbruch">⎯⎯</button>
-     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="p">Absatz</option> <option value="h2">Kopfzeile</option> </select>
+     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Formate</option> <option value="p">Absatz</option> <option value="h2">Überschrift</option> </select>
      <div class="w-px bg-gray-300 mx-1"></div><select id="highlightSelect" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Farbauswahl aufheben</option> <option value="#d3d3d3">Grau</option> </select>
-     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 font-bold">B</button> <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 italic">I</button> <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 line-through">S</button> <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x²</button> <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x₂</button> <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 text-red-600 underline">U</button>
+     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 font-bold">B</button> <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 italic">I</button> <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 line-through">S</button> <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x²</button> <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x₂</button> <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 underline">U</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="justifyLeft" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Linksbündig">
       <svg width="16" height="16" viewbox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="2" rx="0.5" /> <rect x="2" y="6" width="8" height="2" rx="0.5" /> <rect x="2" y="10" width="10" height="2" rx="0.5" />
       </svg></button> <button data-cmd="justifyCenter" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Zentriert">
@@ -448,14 +456,13 @@
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="nbsp" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">␣</button> <button data-cmd="outdent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">◁</button> <button data-cmd="indent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">▷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="table" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">⊞</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="specialChar" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">Ω</button>
-     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="find" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">🔍</button>
     </div>
     <div style="height: 210px;"></div><!-- Editor Content -->
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg mb-8 flex" style="min-height: 600px;">
-     <div class="w-1/3 bg-white p-4"></div>
-     <div class="w-2/3 p-8">
+     <div class="w-2/3 p-8" style="padding-left: 3rem; padding-top: 3rem;">
       <div id="editor" class="editor-content" contenteditable="true"></div>
      </div>
+     <div class="w-1/3 bg-white p-4"></div>
     </div>
    </div><!-- Table Dialog -->
    <div id="tableDialog" class="hidden dialog-overlay">
@@ -471,18 +478,6 @@
     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-80 overflow-y-auto">
      <h3 class="font-bold mb-4 text-xl text-gray-800">Sonderzeichen einfügen</h3>
      <div id="specialCharGrid" class="grid grid-cols-8 gap-2"></div>
-    </div>
-   </div><!-- Find Replace Dialog -->
-   <div id="findReplaceDialog" class="hidden fixed top-4 right-4 z-50">
-    <div class="bg-white rounded-lg shadow-2xl p-6 w-96 border-2 border-gray-300 relative"><button id="closeFindBtn" class="absolute w-8 h-8 flex items-center justify-center text-gray-500 hover-text-gray-800 hover-bg-gray-100 rounded-full font-bold transition-all" style="top: 1rem; right: 1rem; font-size: 1.5rem;" title="Schließen"> × </button>
-     <h3 class="font-bold mb-4 text-xl text-gray-800 pr-8">Suchen und Ersetzen</h3>
-     <div class="mb-4 flex gap-2"><input type="text" id="findText" class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Suchen nach..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button id="findNextBtn" class="px-4 py-2 bg-blue-600 hover-bg-blue-700 text-white font-semibold rounded-lg transition-all"> Suchen </button> <button id="findPrevBtn" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Vorheriges"> ↑ </button> <button id="findNextBtn2" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Nächstes"> ↓ </button>
-     </div>
-     <div class="mb-4"><input type="text" id="replaceText" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Ersetzen durch..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
-     </div>
-     <div id="findReplaceResult" class="mb-4 text-sm hidden"></div>
-     <div class="flex gap-2"><button id="replaceOneBtn" class="flex-1 px-4 py-2 bg-green-600 hover-bg-green-700 text-white font-semibold rounded-lg transition-all"> Ersetzen </button> <button id="replaceAllBtn" class="flex-1 px-4 py-2 bg-orange-600 hover-bg-orange-700 text-white font-semibold rounded-lg transition-all"> Alle ersetzen </button>
-     </div>
     </div>
    </div><!-- Autosave Restore Dialog -->
    <div id="autosaveDialog" class="hidden dialog-overlay">
@@ -521,8 +516,6 @@
         remainingMinutes: 360,
         timerInterval: null,
         lastRange: null,
-        currentSearchIndex: -1,
-        searchMatches: [],
         contextMenu: null,
         AUTOSAVE_KEY: 'probeklausur_autosave',
         AUTOSAVE_INTERVAL: 120000 // 120 seconds
@@ -861,7 +854,11 @@
       }
       
       function changeFormatType(tag) {
+        if (!tag) return;
         execCommand('formatBlock', tag);
+        // Auswahl zurücksetzen, sodass der Knopf wieder "Formate" anzeigt.
+        const sel = document.getElementById('formatType');
+        if (sel) sel.value = '';
       }
       
       function highlightText(color) {
@@ -872,24 +869,138 @@
         }
       }
       
-      function redUnderline() {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          const span = document.createElement('span');
-          span.style.textDecoration = 'underline';
-          span.style.textDecorationColor = 'red';
-          span.style.textDecorationThickness = '2px';
-          
-          try {
-            range.surroundContents(span);
-          } catch (e) {
-            const contents = range.extractContents();
-            span.appendChild(contents);
-            range.insertNode(span);
+      // Inline-Formatbefehl (underline/bold/superscript/subscript) als
+      // nativer Umschalter. Stellt vorher die gespeicherte Cursorposition
+      // wieder her, damit der Befehl an der richtigen Stelle greift – auch
+      // bei leerer Auswahl, sodass anschließend geschriebener Text das
+      // Format übernimmt. Undo-fähig über Strg+Z / Zurück-Pfeil.
+      function applyInlineCommand(command) {
+        const editor = document.getElementById('editor');
+        editor.focus();
+        const sel = window.getSelection();
+        if (AppState.lastRange && editor.contains(AppState.lastRange.startContainer)) {
+          sel.removeAllRanges();
+          sel.addRange(AppState.lastRange);
+        }
+
+        if (command === 'superscript' || command === 'subscript') {
+          toggleSupSub(command);
+        } else {
+          document.execCommand(command, false, null);
+        }
+
+        updateFormatButtonStates();
+        const cur = window.getSelection();
+        if (cur.rangeCount && editor.contains(cur.getRangeAt(0).startContainer)) {
+          AppState.lastRange = cur.getRangeAt(0).cloneRange();
+        }
+      }
+
+      // Hoch-/Tiefstellen vollständig über das DOM umschalten (zuverlässig in
+      // Chrome und Firefox). Einschalten legt sofort ein <sup>/<sub> an und
+      // setzt den Cursor hinein, damit der Button sofort aktiv ist und der
+      // Folgetext darin landet.
+      function toggleSupSub(command) {
+        const editor = document.getElementById('editor');
+        const t = (command === 'superscript') ? 'sup' : 'sub';
+        const TAG = t.toUpperCase();
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+
+        let el = range.startContainer;
+        if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
+        let wrap = null;
+        while (el && el !== editor) { if (el.tagName === TAG) { wrap = el; break; } el = el.parentElement; }
+
+        if (wrap) {
+          if (sel.isCollapsed) {
+            // AUS (Cursor im sup/sub): hinter dem Element einen unsichtbaren
+            // Anker (Zero-Width-Space) setzen und den Cursor dorthin – dann
+            // ist der Folgetext normal (Chrome behält sonst den Tipp-Stil).
+            let anchor = wrap.nextSibling;
+            if (!(anchor && anchor.nodeType === Node.TEXT_NODE && anchor.textContent.charAt(0) === '\u200B')) {
+              anchor = document.createTextNode('\u200B');
+              wrap.parentNode.insertBefore(anchor, wrap.nextSibling);
+            }
+            const r = document.createRange();
+            r.setStart(anchor, anchor.textContent.length);
+            r.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(r);
+            // Falls das sup/sub nun praktisch leer ist (nur ZWSP), entfernen.
+            if (wrap.textContent.replace(/\u200B/g, '') === '') wrap.parentNode.removeChild(wrap);
+          } else {
+            // AUS (Auswahl im sup/sub): gesamtes Element durch seinen Inhalt
+            // ersetzen -> Hoch-/Tiefstellung entfernt (undo-fähig).
+            const r = document.createRange();
+            r.selectNode(wrap);
+            sel.removeAllRanges();
+            sel.addRange(r);
+            document.execCommand('insertHTML', false, wrap.innerHTML);
+          }
+        } else {
+          if (sel.isCollapsed) {
+            // EIN (leere Auswahl): leeres sup/sub einfügen und Cursor hinein
+            // setzen -> Button sofort aktiv, Folgetext wird hoch-/tiefgestellt.
+            document.execCommand('insertHTML', false, '<' + t + ' id="__tmpfmt__">\u200B</' + t + '>');
+            let supEl = editor.querySelector('#__tmpfmt__');
+            if (supEl) supEl.removeAttribute('id');
+            if (!supEl) {
+              const list = editor.getElementsByTagName(t);
+              for (let i = list.length - 1; i >= 0; i--) {
+                if (list[i].textContent === '\u200B') { supEl = list[i]; break; }
+              }
+            }
+            if (supEl && supEl.firstChild) {
+              const r = document.createRange();
+              r.setStart(supEl.firstChild, supEl.firstChild.length);
+              r.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(r);
+            }
+          } else {
+            // EIN (Auswahl): markierten Inhalt in sup/sub einpacken.
+            const tmp = document.createElement('div');
+            tmp.appendChild(range.cloneContents());
+            document.execCommand('insertHTML', false, '<' + t + '>' + tmp.innerHTML + '</' + t + '>');
           }
         }
-        document.getElementById('editor').focus();
+      }
+
+      function redUnderline() {
+        applyInlineCommand('underline');
+      }
+
+      // Markiert die Format-Buttons als aktiv, wenn die aktuelle Auswahl /
+      // der Cursor im jeweiligen Format steht (folgt der Cursorbewegung).
+      // Hoch-/Tiefstellen wird über das DOM erkannt, weil Chrome bei
+      // queryCommandState('superscript') hier unzuverlässig ist.
+      function updateFormatButtonStates() {
+        const editor = document.getElementById('editor');
+        const sel = window.getSelection();
+        const inEditor = !!(sel.rangeCount && sel.anchorNode && editor.contains(sel.anchorNode));
+
+        function setBtn(cmd, active) {
+          const btn = document.querySelector('[data-cmd="' + cmd + '"]');
+          if (btn) btn.classList.toggle('active', active);
+        }
+        function cmdState(name) {
+          if (!inEditor) return false;
+          try { return document.queryCommandState(name); } catch (e) { return false; }
+        }
+        function inTag(tag) {
+          if (!inEditor) return false;
+          let el = sel.anchorNode;
+          if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
+          while (el && el !== editor) { if (el.tagName === tag) return true; el = el.parentElement; }
+          return false;
+        }
+
+        setBtn('redUnderline', cmdState('underline'));
+        setBtn('bold', cmdState('bold'));
+        setBtn('superscript', inTag('SUP'));
+        setBtn('subscript', inTag('SUB'));
       }
       
       function insertNonBreakingSpace() {
@@ -975,9 +1086,12 @@
         document.head.appendChild(style);
       }
 
-      // Interner Tabellen-Zustand (Menü)
+      // Interner Tabellen-Zustand (Menü + Größenänderung)
       const tableState = {
-        menuEl: null
+        menuEl: null,
+        resizer: null,
+        activeTable: null,
+        resizeData: null
       };
 
       // ---- Scroll-Erhaltung (verhindert Sprung nach oben, Punkt 4.2) ----
@@ -1039,7 +1153,7 @@
         cell.style.overflowWrap = 'break-word';
         cell.style.whiteSpace = 'normal';
         cell.contentEditable = 'true';
-        cell.innerHTML = '&nbsp;';
+        cell.innerHTML = '';
         return cell;
       }
 
@@ -1246,6 +1360,8 @@
         }
         restoreScroll(scroll);
         closeTableMenu();
+        tableState.activeTable = table;
+        positionTableResizer();
       }
 
       // ---- Gemeinsamer Ausführungs-Wrapper für Tabellenaktionen ----
@@ -1474,6 +1590,212 @@
         runTableAction(ctx, function() { splitCell(ctx.cell); });
       }
 
+      // ---- Tabellengröße per Ziehen anpassen ----
+      function ensureResizerStyles() {
+        if (document.getElementById('tblResizerStyles')) return;
+        const css =
+          '.tbl-resizer{position:fixed;z-index:99990;pointer-events:none;' +
+          'border:1px solid #3b82f6;box-sizing:border-box;display:none;}' +
+          '.tbl-resizer .h{position:absolute;width:10px;height:10px;background:#2563eb;' +
+          'border:1px solid #fff;box-sizing:border-box;pointer-events:auto;}' +
+          '.tbl-resizer .h.nw{left:-5px;top:-5px;cursor:nwse-resize;}' +
+          '.tbl-resizer .h.ne{right:-5px;top:-5px;cursor:nesw-resize;}' +
+          '.tbl-resizer .h.sw{left:-5px;bottom:-5px;cursor:nesw-resize;}' +
+          '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}' +
+          '.tbl-resizer .rowh-container{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;}' +
+          '.tbl-resizer .rowh{position:absolute;left:12px;right:12px;height:7px;cursor:row-resize;pointer-events:auto;}';
+        const style = document.createElement('style');
+        style.id = 'tblResizerStyles';
+        style.textContent = css;
+        document.head.appendChild(style);
+      }
+
+      function getResizerEl() {
+        if (!tableState.resizer) {
+          ensureResizerStyles();
+          const el = document.createElement('div');
+          el.className = 'tbl-resizer';
+          ['nw', 'ne', 'sw', 'se'].forEach(function(pos) {
+            const h = document.createElement('div');
+            h.className = 'h ' + pos;
+            h.dataset.pos = pos;
+            h.addEventListener('mousedown', startTableResize);
+            el.appendChild(h);
+          });
+          document.body.appendChild(el);
+          tableState.resizer = el;
+        }
+        return tableState.resizer;
+      }
+
+      function positionTableResizer() {
+        const table = tableState.activeTable;
+        if (!table || !document.body.contains(table)) { hideTableResizer(); return; }
+        const el = getResizerEl();
+        const r = table.getBoundingClientRect();
+        el.style.left = r.left + 'px';
+        el.style.top = r.top + 'px';
+        el.style.width = r.width + 'px';
+        el.style.height = r.height + 'px';
+        el.style.display = 'block';
+        buildRowHandles(table, r);
+      }
+
+      // Pro Zeile ein schmaler Anfasser auf der unteren Zeilenkante, um die
+      // Höhe einzelner Zeilen per Ziehen zu ändern.
+      function buildRowHandles(table, tableRect) {
+        const el = tableState.resizer;
+        let container = el.querySelector('.rowh-container');
+        if (!container) {
+          container = document.createElement('div');
+          container.className = 'rowh-container';
+          el.appendChild(container);
+        }
+        container.innerHTML = '';
+        const rows = table.rows;
+        for (let i = 0; i < rows.length; i++) {
+          const rr = rows[i].getBoundingClientRect();
+          const strip = document.createElement('div');
+          strip.className = 'rowh';
+          strip.style.top = (rr.bottom - tableRect.top - 3) + 'px';
+          strip._row = rows[i];
+          strip.addEventListener('mousedown', startRowResize);
+          container.appendChild(strip);
+        }
+      }
+
+      function hideTableResizer() {
+        tableState.activeTable = null;
+        if (tableState.resizer) tableState.resizer.style.display = 'none';
+      }
+
+      function updateTableResizer() {
+        if (tableState.resizeData) return;
+        const ctx = getTableContext();
+        if (ctx.table && document.body.contains(ctx.table)) {
+          tableState.activeTable = ctx.table;
+          positionTableResizer();
+        } else {
+          hideTableResizer();
+        }
+      }
+
+      function startTableResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const table = tableState.activeTable;
+        if (!table) return;
+        const rect = table.getBoundingClientRect();
+        tableState.resizeData = {
+          type: 'table',
+          pos: e.currentTarget.dataset.pos,
+          startX: e.clientX,
+          startY: e.clientY,
+          startW: rect.width,
+          startH: rect.height,
+          table: table
+        };
+        beginResizeDrag();
+      }
+
+      function startRowResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const row = e.currentTarget._row;
+        if (!row) return;
+        const rect = row.getBoundingClientRect();
+        tableState.resizeData = {
+          type: 'row',
+          row: row,
+          startY: e.clientY,
+          startH: rect.height
+        };
+        beginResizeDrag();
+      }
+
+      function beginResizeDrag() {
+        document.addEventListener('mousemove', onTableResizeMove, true);
+        document.addEventListener('mouseup', onTableResizeEnd, true);
+        document.body.style.userSelect = 'none';
+      }
+
+      function onTableResizeMove(e) {
+        const d = tableState.resizeData;
+        if (!d) return;
+        if (d.type === 'row') {
+          const dy = e.clientY - d.startY;
+          d.row.style.height = Math.max(16, d.startH + dy) + 'px';
+          positionTableResizer();
+          return;
+        }
+        const dx = e.clientX - d.startX;
+        const dy = e.clientY - d.startY;
+        // Maximale Breite = Innenbreite des Schreibbereichs, damit die Tabelle
+        // nicht in den Korrekturrand hineinragt.
+        const editor = document.getElementById('editor');
+        const maxW = editor ? editor.clientWidth : Infinity;
+        let w = d.startW + dx;
+        w = Math.max(50, Math.min(maxW, w));
+        let h = Math.max(24, d.startH + dy);
+        d.table.style.width = w + 'px';
+        d.table.style.height = h + 'px';
+        positionTableResizer();
+      }
+
+      function onTableResizeEnd() {
+        tableState.resizeData = null;
+        document.removeEventListener('mousemove', onTableResizeMove, true);
+        document.removeEventListener('mouseup', onTableResizeEnd, true);
+        document.body.style.userSelect = '';
+      }
+
+      function initTableResizer() {
+        const editor = document.getElementById('editor');
+        if (!editor) return;
+        editor.addEventListener('click', updateTableResizer);
+        editor.addEventListener('keyup', updateTableResizer);
+        document.addEventListener('selectionchange', updateTableResizer);
+        const app = document.querySelector('.app-container');
+        if (app) app.addEventListener('scroll', positionTableResizer, true);
+        window.addEventListener('scroll', positionTableResizer, true);
+        window.addEventListener('resize', positionTableResizer);
+        // Klick außerhalb von Editor und Anfassern blendet den Rahmen aus.
+        document.addEventListener('mousedown', function(e) {
+          if (tableState.resizeData) return;
+          if (editor.contains(e.target)) return;
+          if (tableState.resizer && tableState.resizer.contains(e.target)) return;
+          hideTableResizer();
+        }, true);
+      }
+
+      // Pfeiltasten-Navigation in Tabellen: Pfeil hoch/runter wechselt direkt
+      // in die Zelle der darüber-/darunterliegenden Zeile (gleiche Spalte).
+      function initTableNavigation() {
+        const editor = document.getElementById('editor');
+        if (!editor) return;
+        editor.addEventListener('keydown', function(e) {
+          if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          let node = sel.getRangeAt(0).startContainer;
+          let cell = (node && node.nodeType === Node.TEXT_NODE) ? node.parentElement : node;
+          cell = (cell && cell.closest) ? cell.closest('td,th') : null;
+          if (!cell) return;
+          const row = cell.parentElement;
+          const table = cell.closest('table');
+          if (!row || !table) return;
+          const rows = Array.prototype.slice.call(table.rows);
+          const rowIndex = rows.indexOf(row);
+          const colIndex = cell.cellIndex;
+          const targetRow = (e.key === 'ArrowDown') ? rows[rowIndex + 1] : rows[rowIndex - 1];
+          if (!targetRow) return; // erste/letzte Zeile: Standardverhalten zulassen
+          const targetCell = targetRow.cells[Math.min(colIndex, targetRow.cells.length - 1)];
+          if (!targetCell) return;
+          e.preventDefault();
+          placeCaretInCell(targetCell);
+        });
+      }
+
       // ============================================
       // SPECIAL CHARACTERS
       // ============================================
@@ -1543,222 +1865,6 @@
       }
       
       // ============================================
-      // FIND & REPLACE
-      // ============================================
-      function showFindReplaceDialog() {
-        document.getElementById('findReplaceDialog').classList.remove('hidden');
-        document.getElementById('findText').focus();
-      }
-      
-      function hideFindReplaceDialog() {
-        document.getElementById('findReplaceDialog').classList.add('hidden');
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        document.getElementById('findReplaceResult').classList.add('hidden');
-      }
-      
-      function clearSearchHighlights() {
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-      }
-      
-      function findNext() {
-        const findText = document.getElementById('findText').value;
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        const editor = document.getElementById('editor');
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        
-        const walker = document.createTreeWalker(
-          editor,
-          NodeFilter.SHOW_TEXT,
-          null,
-          false
-        );
-        
-        const nodes = [];
-        let node;
-        while (node = walker.nextNode()) {
-          nodes.push(node);
-        }
-        
-        const searchLower = findText.toLowerCase();
-        nodes.forEach(function(textNode) {
-          const text = textNode.textContent;
-          const textLower = text.toLowerCase();
-          let index = 0;
-          
-          while ((index = textLower.indexOf(searchLower, index)) !== -1) {
-            AppState.searchMatches.push({
-              node: textNode,
-              start: index,
-              end: index + findText.length
-            });
-            index += findText.length;
-          }
-        });
-        
-        if (AppState.searchMatches.length === 0) {
-          showFindResult('Keine Übereinstimmungen gefunden.', 'error');
-          AppState.currentSearchIndex = -1;
-          return;
-        }
-        
-        if (AppState.currentSearchIndex === -1) {
-          AppState.currentSearchIndex = 0;
-        } else {
-          AppState.currentSearchIndex = (AppState.currentSearchIndex + 1) % AppState.searchMatches.length;
-        }
-        
-        highlightCurrentMatch();
-        scrollToCurrentMatch();
-        showFindResult('Treffer ' + (AppState.currentSearchIndex + 1) + ' von ' + AppState.searchMatches.length, 'success');
-      }
-      
-      function findPrevious() {
-        const findText = document.getElementById('findText').value;
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        if (AppState.searchMatches.length === 0) {
-          findNext();
-          return;
-        }
-        
-        AppState.currentSearchIndex = (AppState.currentSearchIndex - 1 + AppState.searchMatches.length) % AppState.searchMatches.length;
-        
-        highlightCurrentMatch();
-        scrollToCurrentMatch();
-        showFindResult('Treffer ' + (AppState.currentSearchIndex + 1) + ' von ' + AppState.searchMatches.length, 'success');
-      }
-      
-      function highlightCurrentMatch() {
-        if (AppState.currentSearchIndex === -1 || AppState.searchMatches.length === 0) return;
-        
-        const match = AppState.searchMatches[AppState.currentSearchIndex];
-        const range = document.createRange();
-        range.setStart(match.node, match.start);
-        range.setEnd(match.node, match.end);
-        
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-      
-      function scrollToCurrentMatch() {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          const tempSpan = document.createElement('span');
-          const rangeClone = range.cloneRange();
-          rangeClone.insertNode(tempSpan);
-          
-          tempSpan.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-          tempSpan.remove();
-          
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-      }
-      
-      function replaceOne() {
-        const findText = document.getElementById('findText').value;
-        const replaceText = document.getElementById('replaceText').value;
-        
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        if (AppState.searchMatches.length === 0 || AppState.currentSearchIndex === -1) {
-          showFindResult('Keine Übereinstimmung ausgewählt. Bitte zuerst suchen.', 'error');
-          return;
-        }
-        
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          range.deleteContents();
-          const textNode = document.createTextNode(replaceText);
-          range.insertNode(textNode);
-          range.setStartAfter(textNode);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-        
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        
-        showFindResult('Ersetzt! Klicken Sie "Suchen" für die nächste Übereinstimmung.', 'success');
-      }
-      
-      function replaceAll() {
-        const findText = document.getElementById('findText').value;
-        const replaceText = document.getElementById('replaceText').value;
-        
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        const editor = document.getElementById('editor');
-        const walker = document.createTreeWalker(
-          editor,
-          NodeFilter.SHOW_TEXT,
-          null,
-          false
-        );
-        
-        const nodes = [];
-        let node;
-        while (node = walker.nextNode()) {
-          nodes.push(node);
-        }
-        
-        let totalCount = 0;
-        const regex = new RegExp(escapeRegex(findText), 'gi');
-        
-        nodes.forEach(function(textNode) {
-          const text = textNode.textContent;
-          const matches = text.match(regex);
-          
-          if (matches) {
-            totalCount += matches.length;
-            textNode.textContent = text.replace(regex, replaceText);
-          }
-        });
-        
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        
-        if (totalCount > 0) {
-          showFindResult(totalCount + ' Übereinstimmung(en) ersetzt.', 'success');
-        } else {
-          showFindResult('Keine Übereinstimmungen gefunden.', 'error');
-        }
-      }
-      
-      function escapeRegex(str) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-      
-      function showFindResult(message, type) {
-        const resultDiv = document.getElementById('findReplaceResult');
-        resultDiv.textContent = message;
-        resultDiv.className = 'mb-4 text-sm font-semibold ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
-        resultDiv.classList.remove('hidden');
-      }
-      
-      // ============================================
       // DOWNLOAD / PRINT
       // ============================================
       function downloadDocument() {
@@ -1784,8 +1890,8 @@
         
         const layoutWrapper = 
           '<div style="display: flex; width: 100%;">' +
-          '<div style="width: 33.33%; border-right: 1px solid #ccc;"></div>' +
-          '<div style="width: 66.67%; padding-left: 20px;">' + content.outerHTML + '</div>' +
+          '<div style="width: 66.67%; padding-right: 20px; border-right: 1px solid #ccc;">' + content.outerHTML + '</div>' +
+          '<div style="width: 33.33%;"></div>' +
           '</div>';
         
         printDiv.innerHTML = header + layoutWrapper;
@@ -1875,11 +1981,11 @@
               case 'copy': copyText(); break;
               case 'paste': pasteText(); break;
               case 'pageBreak': insertPageBreak(); break;
-              case 'bold': execCommand('bold'); break;
+              case 'bold': applyInlineCommand('bold'); break;
               case 'italic': execCommand('italic'); break;
               case 'strikeThrough': execCommand('strikeThrough'); break;
-              case 'superscript': execCommand('superscript'); break;
-              case 'subscript': execCommand('subscript'); break;
+              case 'superscript': applyInlineCommand('superscript'); break;
+              case 'subscript': applyInlineCommand('subscript'); break;
               case 'redUnderline': redUnderline(); break;
               case 'justifyLeft': execCommand('justifyLeft'); break;
               case 'justifyCenter': execCommand('justifyCenter'); break;
@@ -1892,7 +1998,6 @@
               case 'outdent': handleIndentOutdent('outdent'); break;
               case 'table': showTableDialog(); break;
               case 'specialChar': showSpecialCharDialog(); break;
-              case 'find': showFindReplaceDialog(); break;
             }
           });
         });
@@ -1905,18 +2010,6 @@
         // Highlight select
         document.getElementById('highlightSelect').addEventListener('change', function() {
           highlightText(this.value);
-        });
-        
-        // Find/Replace
-        document.getElementById('closeFindBtn').addEventListener('click', hideFindReplaceDialog);
-        document.getElementById('findNextBtn').addEventListener('click', findNext);
-        document.getElementById('findNextBtn2').addEventListener('click', findNext);
-        document.getElementById('findPrevBtn').addEventListener('click', findPrevious);
-        document.getElementById('replaceOneBtn').addEventListener('click', replaceOne);
-        document.getElementById('replaceAllBtn').addEventListener('click', replaceAll);
-        
-        document.getElementById('findText').addEventListener('keyup', function(e) {
-          if (e.key === 'Enter') findNext();
         });
         
         // Dialog click handlers
@@ -1951,6 +2044,15 @@
             AppState.lastRange = selection.getRangeAt(0).cloneRange();
           }
         });
+
+        // Unterstreichungs-Button als aktiv markieren, wenn der Cursor in
+        // unterstrichenem Text steht (folgt der Cursor-/Auswahlbewegung).
+        document.addEventListener('selectionchange', updateFormatButtonStates);
+
+        // Tabellen per Ziehen in Breite/Höhe veränderbar machen.
+        initTableResizer();
+        // Pfeiltasten-Navigation in Tabellenzellen.
+        initTableNavigation();
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
