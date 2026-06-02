@@ -877,34 +877,48 @@
         }
       }
       
-      function redUnderline() {
+      // Inline-Formatbefehl (underline/bold/superscript/subscript) als
+      // nativer Umschalter. Stellt vorher die gespeicherte Cursorposition
+      // wieder her, damit der Befehl an der richtigen Stelle greift – auch
+      // bei leerer Auswahl, sodass anschließend geschriebener Text das
+      // Format übernimmt. Undo-fähig über Strg+Z / Zurück-Pfeil.
+      function applyInlineCommand(command) {
         const editor = document.getElementById('editor');
         editor.focus();
-        // Gespeicherte Auswahl/Cursorposition wiederherstellen, damit der
-        // Befehl an der richtigen Stelle greift – auch bei leerer Auswahl,
-        // sodass anschließend geschriebener Text unterstrichen wird.
         const sel = window.getSelection();
         if (AppState.lastRange && editor.contains(AppState.lastRange.startContainer)) {
           sel.removeAllRanges();
           sel.addRange(AppState.lastRange);
         }
-        // Nativer Umschalter: markierten Text unterstreichen bzw. die
-        // Unterstreichung wieder entfernen. Undo-fähig und per
-        // queryCommandState abfragbar für die Button-Hervorhebung.
-        document.execCommand('underline', false, null);
-        updateUnderlineButtonState();
+        document.execCommand(command, false, null);
+        updateFormatButtonStates();
       }
 
-      function updateUnderlineButtonState() {
-        const btn = document.querySelector('[data-cmd="redUnderline"]');
-        if (!btn) return;
+      function redUnderline() {
+        applyInlineCommand('underline');
+      }
+
+      // Markiert die Format-Buttons als aktiv, wenn die aktuelle Auswahl /
+      // der Cursor im jeweiligen Format steht (folgt der Cursorbewegung).
+      function updateFormatButtonStates() {
         const editor = document.getElementById('editor');
         const sel = window.getSelection();
-        let active = false;
-        if (sel.rangeCount && sel.anchorNode && editor.contains(sel.anchorNode)) {
-          try { active = document.queryCommandState('underline'); } catch (e) { active = false; }
-        }
-        btn.classList.toggle('active', active);
+        const inEditor = !!(sel.rangeCount && sel.anchorNode && editor.contains(sel.anchorNode));
+        const map = {
+          'redUnderline': 'underline',
+          'bold': 'bold',
+          'superscript': 'superscript',
+          'subscript': 'subscript'
+        };
+        Object.keys(map).forEach(function(cmd) {
+          const btn = document.querySelector('[data-cmd="' + cmd + '"]');
+          if (!btn) return;
+          let active = false;
+          if (inEditor) {
+            try { active = document.queryCommandState(map[cmd]); } catch (e) { active = false; }
+          }
+          btn.classList.toggle('active', active);
+        });
       }
       
       function insertNonBreakingSpace() {
@@ -1890,11 +1904,11 @@
               case 'copy': copyText(); break;
               case 'paste': pasteText(); break;
               case 'pageBreak': insertPageBreak(); break;
-              case 'bold': execCommand('bold'); break;
+              case 'bold': applyInlineCommand('bold'); break;
               case 'italic': execCommand('italic'); break;
               case 'strikeThrough': execCommand('strikeThrough'); break;
-              case 'superscript': execCommand('superscript'); break;
-              case 'subscript': execCommand('subscript'); break;
+              case 'superscript': applyInlineCommand('superscript'); break;
+              case 'subscript': applyInlineCommand('subscript'); break;
               case 'redUnderline': redUnderline(); break;
               case 'justifyLeft': execCommand('justifyLeft'); break;
               case 'justifyCenter': execCommand('justifyCenter'); break;
@@ -1969,7 +1983,7 @@
 
         // Unterstreichungs-Button als aktiv markieren, wenn der Cursor in
         // unterstrichenem Text steht (folgt der Cursor-/Auswahlbewegung).
-        document.addEventListener('selectionchange', updateUnderlineButtonState);
+        document.addEventListener('selectionchange', updateFormatButtonStates);
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
