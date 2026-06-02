@@ -453,7 +453,6 @@
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="nbsp" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">␣</button> <button data-cmd="outdent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">◁</button> <button data-cmd="indent" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">▷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="table" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">⊞</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="specialChar" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">Ω</button>
-     <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="find" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">🔍</button>
     </div>
     <div style="height: 210px;"></div><!-- Editor Content -->
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg mb-8 flex" style="min-height: 600px;">
@@ -476,18 +475,6 @@
     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-80 overflow-y-auto">
      <h3 class="font-bold mb-4 text-xl text-gray-800">Sonderzeichen einfügen</h3>
      <div id="specialCharGrid" class="grid grid-cols-8 gap-2"></div>
-    </div>
-   </div><!-- Find Replace Dialog -->
-   <div id="findReplaceDialog" class="hidden fixed top-4 right-4 z-50">
-    <div class="bg-white rounded-lg shadow-2xl p-6 w-96 border-2 border-gray-300 relative"><button id="closeFindBtn" class="absolute w-8 h-8 flex items-center justify-center text-gray-500 hover-text-gray-800 hover-bg-gray-100 rounded-full font-bold transition-all" style="top: 1rem; right: 1rem; font-size: 1.5rem;" title="Schließen"> × </button>
-     <h3 class="font-bold mb-4 text-xl text-gray-800 pr-8">Suchen und Ersetzen</h3>
-     <div class="mb-4 flex gap-2"><input type="text" id="findText" class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Suchen nach..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;"> <button id="findNextBtn" class="px-4 py-2 bg-blue-600 hover-bg-blue-700 text-white font-semibold rounded-lg transition-all"> Suchen </button> <button id="findPrevBtn" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Vorheriges"> ↑ </button> <button id="findNextBtn2" class="px-3 py-2 bg-gray-200 hover-bg-gray-300 rounded-lg font-bold text-gray-700 transition-all" title="Nächstes"> ↓ </button>
-     </div>
-     <div class="mb-4"><input type="text" id="replaceText" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus-border-blue-500 focus-outline-none" placeholder="Ersetzen durch..." style="border: 2px solid #d1d5db; border-radius: 0.5rem;">
-     </div>
-     <div id="findReplaceResult" class="mb-4 text-sm hidden"></div>
-     <div class="flex gap-2"><button id="replaceOneBtn" class="flex-1 px-4 py-2 bg-green-600 hover-bg-green-700 text-white font-semibold rounded-lg transition-all"> Ersetzen </button> <button id="replaceAllBtn" class="flex-1 px-4 py-2 bg-orange-600 hover-bg-orange-700 text-white font-semibold rounded-lg transition-all"> Alle ersetzen </button>
-     </div>
     </div>
    </div><!-- Autosave Restore Dialog -->
    <div id="autosaveDialog" class="hidden dialog-overlay">
@@ -526,8 +513,6 @@
         remainingMinutes: 360,
         timerInterval: null,
         lastRange: null,
-        currentSearchIndex: -1,
-        searchMatches: [],
         contextMenu: null,
         AUTOSAVE_KEY: 'probeklausur_autosave',
         AUTOSAVE_INTERVAL: 120000 // 120 seconds
@@ -1662,222 +1647,6 @@
       }
       
       // ============================================
-      // FIND & REPLACE
-      // ============================================
-      function showFindReplaceDialog() {
-        document.getElementById('findReplaceDialog').classList.remove('hidden');
-        document.getElementById('findText').focus();
-      }
-      
-      function hideFindReplaceDialog() {
-        document.getElementById('findReplaceDialog').classList.add('hidden');
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        document.getElementById('findReplaceResult').classList.add('hidden');
-      }
-      
-      function clearSearchHighlights() {
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-      }
-      
-      function findNext() {
-        const findText = document.getElementById('findText').value;
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        const editor = document.getElementById('editor');
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        
-        const walker = document.createTreeWalker(
-          editor,
-          NodeFilter.SHOW_TEXT,
-          null,
-          false
-        );
-        
-        const nodes = [];
-        let node;
-        while (node = walker.nextNode()) {
-          nodes.push(node);
-        }
-        
-        const searchLower = findText.toLowerCase();
-        nodes.forEach(function(textNode) {
-          const text = textNode.textContent;
-          const textLower = text.toLowerCase();
-          let index = 0;
-          
-          while ((index = textLower.indexOf(searchLower, index)) !== -1) {
-            AppState.searchMatches.push({
-              node: textNode,
-              start: index,
-              end: index + findText.length
-            });
-            index += findText.length;
-          }
-        });
-        
-        if (AppState.searchMatches.length === 0) {
-          showFindResult('Keine Übereinstimmungen gefunden.', 'error');
-          AppState.currentSearchIndex = -1;
-          return;
-        }
-        
-        if (AppState.currentSearchIndex === -1) {
-          AppState.currentSearchIndex = 0;
-        } else {
-          AppState.currentSearchIndex = (AppState.currentSearchIndex + 1) % AppState.searchMatches.length;
-        }
-        
-        highlightCurrentMatch();
-        scrollToCurrentMatch();
-        showFindResult('Treffer ' + (AppState.currentSearchIndex + 1) + ' von ' + AppState.searchMatches.length, 'success');
-      }
-      
-      function findPrevious() {
-        const findText = document.getElementById('findText').value;
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        if (AppState.searchMatches.length === 0) {
-          findNext();
-          return;
-        }
-        
-        AppState.currentSearchIndex = (AppState.currentSearchIndex - 1 + AppState.searchMatches.length) % AppState.searchMatches.length;
-        
-        highlightCurrentMatch();
-        scrollToCurrentMatch();
-        showFindResult('Treffer ' + (AppState.currentSearchIndex + 1) + ' von ' + AppState.searchMatches.length, 'success');
-      }
-      
-      function highlightCurrentMatch() {
-        if (AppState.currentSearchIndex === -1 || AppState.searchMatches.length === 0) return;
-        
-        const match = AppState.searchMatches[AppState.currentSearchIndex];
-        const range = document.createRange();
-        range.setStart(match.node, match.start);
-        range.setEnd(match.node, match.end);
-        
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-      
-      function scrollToCurrentMatch() {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          const tempSpan = document.createElement('span');
-          const rangeClone = range.cloneRange();
-          rangeClone.insertNode(tempSpan);
-          
-          tempSpan.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-          tempSpan.remove();
-          
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-      }
-      
-      function replaceOne() {
-        const findText = document.getElementById('findText').value;
-        const replaceText = document.getElementById('replaceText').value;
-        
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        if (AppState.searchMatches.length === 0 || AppState.currentSearchIndex === -1) {
-          showFindResult('Keine Übereinstimmung ausgewählt. Bitte zuerst suchen.', 'error');
-          return;
-        }
-        
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          range.deleteContents();
-          const textNode = document.createTextNode(replaceText);
-          range.insertNode(textNode);
-          range.setStartAfter(textNode);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-        
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        
-        showFindResult('Ersetzt! Klicken Sie "Suchen" für die nächste Übereinstimmung.', 'success');
-      }
-      
-      function replaceAll() {
-        const findText = document.getElementById('findText').value;
-        const replaceText = document.getElementById('replaceText').value;
-        
-        if (!findText) {
-          showFindResult('Bitte geben Sie einen Suchtext ein.', 'error');
-          return;
-        }
-        
-        const editor = document.getElementById('editor');
-        const walker = document.createTreeWalker(
-          editor,
-          NodeFilter.SHOW_TEXT,
-          null,
-          false
-        );
-        
-        const nodes = [];
-        let node;
-        while (node = walker.nextNode()) {
-          nodes.push(node);
-        }
-        
-        let totalCount = 0;
-        const regex = new RegExp(escapeRegex(findText), 'gi');
-        
-        nodes.forEach(function(textNode) {
-          const text = textNode.textContent;
-          const matches = text.match(regex);
-          
-          if (matches) {
-            totalCount += matches.length;
-            textNode.textContent = text.replace(regex, replaceText);
-          }
-        });
-        
-        clearSearchHighlights();
-        AppState.searchMatches = [];
-        AppState.currentSearchIndex = -1;
-        
-        if (totalCount > 0) {
-          showFindResult(totalCount + ' Übereinstimmung(en) ersetzt.', 'success');
-        } else {
-          showFindResult('Keine Übereinstimmungen gefunden.', 'error');
-        }
-      }
-      
-      function escapeRegex(str) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-      
-      function showFindResult(message, type) {
-        const resultDiv = document.getElementById('findReplaceResult');
-        resultDiv.textContent = message;
-        resultDiv.className = 'mb-4 text-sm font-semibold ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
-        resultDiv.classList.remove('hidden');
-      }
-      
-      // ============================================
       // DOWNLOAD / PRINT
       // ============================================
       function downloadDocument() {
@@ -2011,7 +1780,6 @@
               case 'outdent': handleIndentOutdent('outdent'); break;
               case 'table': showTableDialog(); break;
               case 'specialChar': showSpecialCharDialog(); break;
-              case 'find': showFindReplaceDialog(); break;
             }
           });
         });
@@ -2024,18 +1792,6 @@
         // Highlight select
         document.getElementById('highlightSelect').addEventListener('change', function() {
           highlightText(this.value);
-        });
-        
-        // Find/Replace
-        document.getElementById('closeFindBtn').addEventListener('click', hideFindReplaceDialog);
-        document.getElementById('findNextBtn').addEventListener('click', findNext);
-        document.getElementById('findNextBtn2').addEventListener('click', findNext);
-        document.getElementById('findPrevBtn').addEventListener('click', findPrevious);
-        document.getElementById('replaceOneBtn').addEventListener('click', replaceOne);
-        document.getElementById('replaceAllBtn').addEventListener('click', replaceAll);
-        
-        document.getElementById('findText').addEventListener('keyup', function(e) {
-          if (e.key === 'Enter') findNext();
         });
         
         // Dialog click handlers
