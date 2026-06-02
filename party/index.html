@@ -920,11 +920,17 @@
         while (el && el !== editor) { if (el.tagName === tag) { wrap = el; break; } el = el.parentElement; }
 
         if (sel.isCollapsed && wrap) {
-          // Format ausschalten: Cursor hinter das <sup>/<sub> setzen, damit
-          // anschließend wieder normal (weder hoch- noch tiefgestellt)
-          // geschrieben wird.
+          // Format ausschalten: hinter dem <sup>/<sub> einen unsichtbaren
+          // normalen Textanker (Zero-Width-Space) platzieren und den Cursor
+          // dorthin setzen. Das ist nötig, weil Chrome sich den Tipp-Stil
+          // sonst merkt und weiter hoch-/tiefgestellt schreibt.
+          let anchor = wrap.nextSibling;
+          if (!(anchor && anchor.nodeType === Node.TEXT_NODE && anchor.textContent.charAt(0) === '\u200B')) {
+            anchor = document.createTextNode('\u200B');
+            wrap.parentNode.insertBefore(anchor, wrap.nextSibling);
+          }
           const r = document.createRange();
-          r.setStartAfter(wrap);
+          r.setStart(anchor, anchor.textContent.length);
           r.collapse(true);
           sel.removeAllRanges();
           sel.addRange(r);
@@ -940,25 +946,33 @@
 
       // Markiert die Format-Buttons als aktiv, wenn die aktuelle Auswahl /
       // der Cursor im jeweiligen Format steht (folgt der Cursorbewegung).
+      // Hoch-/Tiefstellen wird über das DOM erkannt, weil Chrome bei
+      // queryCommandState('superscript') hier unzuverlässig ist.
       function updateFormatButtonStates() {
         const editor = document.getElementById('editor');
         const sel = window.getSelection();
         const inEditor = !!(sel.rangeCount && sel.anchorNode && editor.contains(sel.anchorNode));
-        const map = {
-          'redUnderline': 'underline',
-          'bold': 'bold',
-          'superscript': 'superscript',
-          'subscript': 'subscript'
-        };
-        Object.keys(map).forEach(function(cmd) {
+
+        function setBtn(cmd, active) {
           const btn = document.querySelector('[data-cmd="' + cmd + '"]');
-          if (!btn) return;
-          let active = false;
-          if (inEditor) {
-            try { active = document.queryCommandState(map[cmd]); } catch (e) { active = false; }
-          }
-          btn.classList.toggle('active', active);
-        });
+          if (btn) btn.classList.toggle('active', active);
+        }
+        function cmdState(name) {
+          if (!inEditor) return false;
+          try { return document.queryCommandState(name); } catch (e) { return false; }
+        }
+        function inTag(tag) {
+          if (!inEditor) return false;
+          let el = sel.anchorNode;
+          if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
+          while (el && el !== editor) { if (el.tagName === tag) return true; el = el.parentElement; }
+          return false;
+        }
+
+        setBtn('redUnderline', cmdState('underline'));
+        setBtn('bold', cmdState('bold'));
+        setBtn('superscript', inTag('SUP'));
+        setBtn('subscript', inTag('SUB'));
       }
       
       function insertNonBreakingSpace() {
