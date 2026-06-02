@@ -873,23 +873,18 @@
       }
       
       function redUnderline() {
+        const editor = document.getElementById('editor');
+        editor.focus();
         const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          const span = document.createElement('span');
-          span.style.textDecoration = 'underline';
-          span.style.textDecorationColor = 'black';
-          span.style.textDecorationThickness = '2px';
-          
-          try {
-            range.surroundContents(span);
-          } catch (e) {
-            const contents = range.extractContents();
-            span.appendChild(contents);
-            range.insertNode(span);
-          }
-        }
-        document.getElementById('editor').focus();
+        if (!selection.rangeCount || selection.isCollapsed) return;
+        const range = selection.getRangeAt(0);
+        const tmp = document.createElement('div');
+        tmp.appendChild(range.cloneContents());
+        const html = '<span style="text-decoration: underline; text-decoration-color: black; text-decoration-thickness: 2px;">' +
+                     tmp.innerHTML + '</span>';
+        // Über execCommand einfügen, damit die Aktion im Undo-Verlauf landet
+        // und sich per Strg+Z bzw. Zurück-Pfeil rückgängig machen lässt.
+        execCommand('insertHTML', html);
       }
       
       function insertNonBreakingSpace() {
