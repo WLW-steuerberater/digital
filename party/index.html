@@ -440,7 +440,7 @@
     <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Ausschneiden">✂</button> <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Kopieren">📋</button> <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Einfügen">📄</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Seitenumbruch">⎯⎯</button>
-     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="p">Absatz</option> <option value="h2">Kopfzeile</option> </select>
+     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Formate</option> <option value="p">Absatz</option> <option value="h2">Überschrift</option> </select>
      <div class="w-px bg-gray-300 mx-1"></div><select id="highlightSelect" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Farbauswahl aufheben</option> <option value="#d3d3d3">Grau</option> </select>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 font-bold">B</button> <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 italic">I</button> <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 line-through">S</button> <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x²</button> <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x₂</button> <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 underline">U</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="justifyLeft" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Linksbündig">
@@ -854,7 +854,11 @@
       }
       
       function changeFormatType(tag) {
+        if (!tag) return;
         execCommand('formatBlock', tag);
+        // Auswahl zurücksetzen, sodass der Knopf wieder "Formate" anzeigt.
+        const sel = document.getElementById('formatType');
+        if (sel) sel.value = '';
       }
       
       function highlightText(color) {
@@ -1597,7 +1601,9 @@
           '.tbl-resizer .h.nw{left:-5px;top:-5px;cursor:nwse-resize;}' +
           '.tbl-resizer .h.ne{right:-5px;top:-5px;cursor:nesw-resize;}' +
           '.tbl-resizer .h.sw{left:-5px;bottom:-5px;cursor:nesw-resize;}' +
-          '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}';
+          '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}' +
+          '.tbl-resizer .rowh-container{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;}' +
+          '.tbl-resizer .rowh{position:absolute;left:12px;right:12px;height:7px;cursor:row-resize;pointer-events:auto;}';
         const style = document.createElement('style');
         style.id = 'tblResizerStyles';
         style.textContent = css;
@@ -1632,6 +1638,30 @@
         el.style.width = r.width + 'px';
         el.style.height = r.height + 'px';
         el.style.display = 'block';
+        buildRowHandles(table, r);
+      }
+
+      // Pro Zeile ein schmaler Anfasser auf der unteren Zeilenkante, um die
+      // Höhe einzelner Zeilen per Ziehen zu ändern.
+      function buildRowHandles(table, tableRect) {
+        const el = tableState.resizer;
+        let container = el.querySelector('.rowh-container');
+        if (!container) {
+          container = document.createElement('div');
+          container.className = 'rowh-container';
+          el.appendChild(container);
+        }
+        container.innerHTML = '';
+        const rows = table.rows;
+        for (let i = 0; i < rows.length; i++) {
+          const rr = rows[i].getBoundingClientRect();
+          const strip = document.createElement('div');
+          strip.className = 'rowh';
+          strip.style.top = (rr.bottom - tableRect.top - 3) + 'px';
+          strip._row = rows[i];
+          strip.addEventListener('mousedown', startRowResize);
+          container.appendChild(strip);
+        }
       }
 
       function hideTableResizer() {
@@ -1657,6 +1687,7 @@
         if (!table) return;
         const rect = table.getBoundingClientRect();
         tableState.resizeData = {
+          type: 'table',
           pos: e.currentTarget.dataset.pos,
           startX: e.clientX,
           startY: e.clientY,
@@ -1664,6 +1695,25 @@
           startH: rect.height,
           table: table
         };
+        beginResizeDrag();
+      }
+
+      function startRowResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const row = e.currentTarget._row;
+        if (!row) return;
+        const rect = row.getBoundingClientRect();
+        tableState.resizeData = {
+          type: 'row',
+          row: row,
+          startY: e.clientY,
+          startH: rect.height
+        };
+        beginResizeDrag();
+      }
+
+      function beginResizeDrag() {
         document.addEventListener('mousemove', onTableResizeMove, true);
         document.addEventListener('mouseup', onTableResizeEnd, true);
         document.body.style.userSelect = 'none';
@@ -1672,6 +1722,12 @@
       function onTableResizeMove(e) {
         const d = tableState.resizeData;
         if (!d) return;
+        if (d.type === 'row') {
+          const dy = e.clientY - d.startY;
+          d.row.style.height = Math.max(16, d.startH + dy) + 'px';
+          positionTableResizer();
+          return;
+        }
         const dx = e.clientX - d.startX;
         const dy = e.clientY - d.startY;
         // Maximale Breite = Innenbreite des Schreibbereichs, damit die Tabelle
