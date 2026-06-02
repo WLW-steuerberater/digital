@@ -880,11 +880,18 @@
       function redUnderline() {
         const editor = document.getElementById('editor');
         editor.focus();
+        // Gespeicherte Auswahl/Cursorposition wiederherstellen, damit der
+        // Befehl an der richtigen Stelle greift – auch bei leerer Auswahl,
+        // sodass anschließend geschriebener Text unterstrichen wird.
+        const sel = window.getSelection();
+        if (AppState.lastRange && editor.contains(AppState.lastRange.startContainer)) {
+          sel.removeAllRanges();
+          sel.addRange(AppState.lastRange);
+        }
         // Nativer Umschalter: markierten Text unterstreichen bzw. die
         // Unterstreichung wieder entfernen. Undo-fähig und per
         // queryCommandState abfragbar für die Button-Hervorhebung.
         document.execCommand('underline', false, null);
-        editor.focus();
         updateUnderlineButtonState();
       }
 
