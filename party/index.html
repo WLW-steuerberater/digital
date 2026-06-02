@@ -249,6 +249,11 @@
       line-height: 1.3;
     }
     
+    #editor u {
+      text-decoration-color: #000;
+      text-decoration-thickness: 2px;
+    }
+    
     .toolbar-button {
       transition: all 0.2s;
     }
@@ -875,16 +880,24 @@
       function redUnderline() {
         const editor = document.getElementById('editor');
         editor.focus();
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.isCollapsed) return;
-        const range = selection.getRangeAt(0);
-        const tmp = document.createElement('div');
-        tmp.appendChild(range.cloneContents());
-        const html = '<span style="text-decoration: underline; text-decoration-color: black; text-decoration-thickness: 2px;">' +
-                     tmp.innerHTML + '</span>';
-        // Über execCommand einfügen, damit die Aktion im Undo-Verlauf landet
-        // und sich per Strg+Z bzw. Zurück-Pfeil rückgängig machen lässt.
-        execCommand('insertHTML', html);
+        // Nativer Umschalter: markierten Text unterstreichen bzw. die
+        // Unterstreichung wieder entfernen. Undo-fähig und per
+        // queryCommandState abfragbar für die Button-Hervorhebung.
+        document.execCommand('underline', false, null);
+        editor.focus();
+        updateUnderlineButtonState();
+      }
+
+      function updateUnderlineButtonState() {
+        const btn = document.querySelector('[data-cmd="redUnderline"]');
+        if (!btn) return;
+        const editor = document.getElementById('editor');
+        const sel = window.getSelection();
+        let active = false;
+        if (sel.rangeCount && sel.anchorNode && editor.contains(sel.anchorNode)) {
+          try { active = document.queryCommandState('underline'); } catch (e) { active = false; }
+        }
+        btn.classList.toggle('active', active);
       }
       
       function insertNonBreakingSpace() {
@@ -1946,6 +1959,10 @@
             AppState.lastRange = selection.getRangeAt(0).cloneRange();
           }
         });
+
+        // Unterstreichungs-Button als aktiv markieren, wenn der Cursor in
+        // unterstrichenem Text steht (folgt der Cursor-/Auswahlbewegung).
+        document.addEventListener('selectionchange', updateUnderlineButtonState);
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
