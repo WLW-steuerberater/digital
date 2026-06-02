@@ -1149,7 +1149,7 @@
         cell.style.overflowWrap = 'break-word';
         cell.style.whiteSpace = 'normal';
         cell.contentEditable = 'true';
-        cell.innerHTML = '&nbsp;';
+        cell.innerHTML = '';
         return cell;
       }
 
@@ -1712,6 +1712,34 @@
         }, true);
       }
 
+      // Pfeiltasten-Navigation in Tabellen: Pfeil hoch/runter wechselt direkt
+      // in die Zelle der darüber-/darunterliegenden Zeile (gleiche Spalte).
+      function initTableNavigation() {
+        const editor = document.getElementById('editor');
+        if (!editor) return;
+        editor.addEventListener('keydown', function(e) {
+          if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          let node = sel.getRangeAt(0).startContainer;
+          let cell = (node && node.nodeType === Node.TEXT_NODE) ? node.parentElement : node;
+          cell = (cell && cell.closest) ? cell.closest('td,th') : null;
+          if (!cell) return;
+          const row = cell.parentElement;
+          const table = cell.closest('table');
+          if (!row || !table) return;
+          const rows = Array.prototype.slice.call(table.rows);
+          const rowIndex = rows.indexOf(row);
+          const colIndex = cell.cellIndex;
+          const targetRow = (e.key === 'ArrowDown') ? rows[rowIndex + 1] : rows[rowIndex - 1];
+          if (!targetRow) return; // erste/letzte Zeile: Standardverhalten zulassen
+          const targetCell = targetRow.cells[Math.min(colIndex, targetRow.cells.length - 1)];
+          if (!targetCell) return;
+          e.preventDefault();
+          placeCaretInCell(targetCell);
+        });
+      }
+
       // ============================================
       // SPECIAL CHARACTERS
       // ============================================
@@ -1967,6 +1995,8 @@
 
         // Tabellen per Ziehen in Breite/Höhe veränderbar machen.
         initTableResizer();
+        // Pfeiltasten-Navigation in Tabellenzellen.
+        initTableNavigation();
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
