@@ -1591,8 +1591,9 @@
           'border:1px solid #3b82f6;box-sizing:border-box;display:none;}' +
           '.tbl-resizer .h{position:absolute;width:10px;height:10px;background:#2563eb;' +
           'border:1px solid #fff;box-sizing:border-box;pointer-events:auto;}' +
-          '.tbl-resizer .h.e{right:-5px;top:50%;margin-top:-5px;cursor:ew-resize;}' +
-          '.tbl-resizer .h.s{bottom:-5px;left:50%;margin-left:-5px;cursor:ns-resize;}' +
+          '.tbl-resizer .h.nw{left:-5px;top:-5px;cursor:nwse-resize;}' +
+          '.tbl-resizer .h.ne{right:-5px;top:-5px;cursor:nesw-resize;}' +
+          '.tbl-resizer .h.sw{left:-5px;bottom:-5px;cursor:nesw-resize;}' +
           '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}';
         const style = document.createElement('style');
         style.id = 'tblResizerStyles';
@@ -1605,7 +1606,7 @@
           ensureResizerStyles();
           const el = document.createElement('div');
           el.className = 'tbl-resizer';
-          ['e', 's', 'se'].forEach(function(pos) {
+          ['nw', 'ne', 'sw', 'se'].forEach(function(pos) {
             const h = document.createElement('div');
             h.className = 'h ' + pos;
             h.dataset.pos = pos;
@@ -1670,12 +1671,15 @@
         if (!d) return;
         const dx = e.clientX - d.startX;
         const dy = e.clientY - d.startY;
-        if (d.pos === 'e' || d.pos === 'se') {
-          d.table.style.width = Math.max(50, d.startW + dx) + 'px';
-        }
-        if (d.pos === 's' || d.pos === 'se') {
-          d.table.style.height = Math.max(24, d.startH + dy) + 'px';
-        }
+        // Maximale Breite = Innenbreite des Schreibbereichs, damit die Tabelle
+        // nicht in den Korrekturrand hineinragt.
+        const editor = document.getElementById('editor');
+        const maxW = editor ? editor.clientWidth : Infinity;
+        let w = d.startW + dx;
+        w = Math.max(50, Math.min(maxW, w));
+        let h = Math.max(24, d.startH + dy);
+        d.table.style.width = w + 'px';
+        d.table.style.height = h + 'px';
         positionTableResizer();
       }
 
