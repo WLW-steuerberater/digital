@@ -1617,7 +1617,9 @@
           '.tbl-resizer .h.sw{left:-5px;bottom:-5px;cursor:nesw-resize;}' +
           '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}' +
           '.tbl-resizer .rowh-container{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;}' +
-          '.tbl-resizer .rowh{position:absolute;left:12px;right:12px;height:7px;cursor:row-resize;pointer-events:auto;}';
+          '.tbl-resizer .rowh{position:absolute;left:12px;right:12px;height:7px;cursor:row-resize;pointer-events:auto;}' +
+          '.tbl-resizer .colh-container{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;}' +
+          '.tbl-resizer .colh{position:absolute;top:12px;bottom:12px;width:7px;cursor:col-resize;pointer-events:auto;}';
         const style = document.createElement('style');
         style.id = 'tblResizerStyles';
         style.textContent = css;
@@ -1653,6 +1655,7 @@
         el.style.height = r.height + 'px';
         el.style.display = 'block';
         buildRowHandles(table, r);
+        buildColHandles(table, r);
       }
 
       // Pro Zeile ein schmaler Anfasser auf der unteren Zeilenkante, um die
@@ -1674,6 +1677,32 @@
           strip.style.top = (rr.bottom - tableRect.top - 3) + 'px';
           strip._row = rows[i];
           strip.addEventListener('mousedown', startRowResize);
+          container.appendChild(strip);
+        }
+      }
+
+      // Pro Spaltengrenze ein schmaler senkrechter Anfasser, um die Breite
+      // einzelner Spalten per Ziehen zu ändern (linke Spalte breiter, rechte
+      // schmaler und umgekehrt; Gesamtbreite bleibt gleich).
+      function buildColHandles(table, tableRect) {
+        const el = tableState.resizer;
+        let container = el.querySelector('.colh-container');
+        if (!container) {
+          container = document.createElement('div');
+          container.className = 'colh-container';
+          el.appendChild(container);
+        }
+        container.innerHTML = '';
+        const firstRow = table.rows[0];
+        if (!firstRow) return;
+        const cells = firstRow.cells;
+        for (let i = 0; i < cells.length - 1; i++) {
+          const cr = cells[i].getBoundingClientRect();
+          const strip = document.createElement('div');
+          strip.className = 'colh';
+          strip.style.left = (cr.right - tableRect.left - 3) + 'px';
+          strip._col = i;
+          strip.addEventListener('mousedown', startColResize);
           container.appendChild(strip);
         }
       }
@@ -1733,12 +1762,49 @@
         document.body.style.userSelect = 'none';
       }
 
+      function startColResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const table = tableState.activeTable;
+        if (!table) return;
+        const firstRow = table.rows[0];
+        if (!firstRow) return;
+        const idx = parseInt(e.currentTarget._col, 10);
+        const cells = firstRow.cells;
+        // Aktuelle Breiten aller Spalten erfassen und als feste px-Breiten
+        // setzen, damit beim Ziehen nur die beiden betroffenen Spalten
+        // verändert werden und die übrigen stabil bleiben.
+        const widths = [];
+        for (let k = 0; k < cells.length; k++) widths.push(cells[k].getBoundingClientRect().width);
+        for (let k = 0; k < cells.length; k++) cells[k].style.width = widths[k] + 'px';
+        tableState.resizeData = {
+          type: 'col',
+          leftCell: cells[idx],
+          rightCell: cells[idx + 1],
+          startX: e.clientX,
+          startLeftW: widths[idx],
+          startRightW: widths[idx + 1]
+        };
+        beginResizeDrag();
+      }
+
       function onTableResizeMove(e) {
         const d = tableState.resizeData;
         if (!d) return;
         if (d.type === 'row') {
           const dy = e.clientY - d.startY;
           d.row.style.height = Math.max(16, d.startH + dy) + 'px';
+          positionTableResizer();
+          return;
+        }
+        if (d.type === 'col') {
+          const dx = e.clientX - d.startX;
+          const total = d.startLeftW + d.startRightW;
+          const MIN = 20;
+          let lw = Math.max(MIN, Math.min(total - MIN, d.startLeftW + dx));
+          const rw = total - lw;
+          d.leftCell.style.width = lw + 'px';
+          d.rightCell.style.width = rw + 'px';
           positionTableResizer();
           return;
         }
