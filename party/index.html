@@ -891,39 +891,46 @@
           sel.addRange(AppState.lastRange);
         }
 
-        const isSupSub = (command === 'superscript' || command === 'subscript');
-        let wasActive = false;
-        if (isSupSub) {
-          try { wasActive = document.queryCommandState(command); } catch (e) { wasActive = false; }
-        }
-
-        document.execCommand(command, false, null);
-
-        // Beim Ausschalten von Hoch-/Tiefstellung mit leerer Auswahl den
-        // Cursor aus dem <sup>/<sub> herausführen, damit anschließend wieder
-        // normal (weder hoch- noch tiefgestellt) geschrieben wird.
-        if (isSupSub && wasActive) {
-          const s = window.getSelection();
-          if (s.rangeCount && s.isCollapsed) {
-            const tag = (command === 'superscript') ? 'SUP' : 'SUB';
-            let el = s.anchorNode;
-            if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
-            let wrap = null;
-            while (el && el !== editor) { if (el.tagName === tag) { wrap = el; break; } el = el.parentElement; }
-            if (wrap) {
-              const r = document.createRange();
-              r.setStartAfter(wrap);
-              r.collapse(true);
-              s.removeAllRanges();
-              s.addRange(r);
-            }
-          }
+        if (command === 'superscript' || command === 'subscript') {
+          toggleSupSub(command);
+        } else {
+          document.execCommand(command, false, null);
         }
 
         updateFormatButtonStates();
         const cur = window.getSelection();
         if (cur.rangeCount && editor.contains(cur.getRangeAt(0).startContainer)) {
           AppState.lastRange = cur.getRangeAt(0).cloneRange();
+        }
+      }
+
+      // Hoch-/Tiefstellen zuverlässig umschalten. In Chrome ist
+      // queryCommandState('superscript') unzuverlässig, daher wird anhand
+      // des DOM geprüft, ob der Cursor in einem <sup>/<sub> steht.
+      function toggleSupSub(command) {
+        const editor = document.getElementById('editor');
+        const tag = (command === 'superscript') ? 'SUP' : 'SUB';
+        const sel = window.getSelection();
+        if (!sel.rangeCount) { document.execCommand(command, false, null); return; }
+        const range = sel.getRangeAt(0);
+
+        let el = range.startContainer;
+        if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
+        let wrap = null;
+        while (el && el !== editor) { if (el.tagName === tag) { wrap = el; break; } el = el.parentElement; }
+
+        if (sel.isCollapsed && wrap) {
+          // Format ausschalten: Cursor hinter das <sup>/<sub> setzen, damit
+          // anschließend wieder normal (weder hoch- noch tiefgestellt)
+          // geschrieben wird.
+          const r = document.createRange();
+          r.setStartAfter(wrap);
+          r.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(r);
+        } else {
+          // Format einschalten bzw. für eine Auswahl umschalten.
+          document.execCommand(command, false, null);
         }
       }
 
