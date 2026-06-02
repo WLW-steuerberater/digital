@@ -440,7 +440,7 @@
     <div id="mainToolbar" class="w-full bg-white shadow-lg p-3 flex flex-wrap gap-2 border-b-2 border-gray-200 mb-2 fixed z-30" style="top: 80px;"><button data-cmd="undo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Rückgängig">↶</button> <button data-cmd="redo" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Wiederholen">↷</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="cut" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Ausschneiden">✂</button> <button data-cmd="copy" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Kopieren">📋</button> <button data-cmd="paste" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Einfügen">📄</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="pageBreak" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Seitenumbruch">⎯⎯</button>
-     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Formate</option> <option value="p">Absatz</option> <option value="h2">Überschrift</option> </select>
+     <div class="w-px bg-gray-300 mx-1"></div><select id="formatType" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="" selected disabled hidden>Formate</option> <option value="p">Absatz</option> <option value="h2">Überschrift</option> </select>
      <div class="w-px bg-gray-300 mx-1"></div><select id="highlightSelect" class="px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 border-none cursor-pointer"> <option value="">Farbauswahl aufheben</option> <option value="#d3d3d3">Grau</option> </select>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="bold" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 font-bold">B</button> <button data-cmd="italic" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 italic">I</button> <button data-cmd="strikeThrough" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 line-through">S</button> <button data-cmd="superscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x²</button> <button data-cmd="subscript" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200">x₂</button> <button data-cmd="redUnderline" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200 underline">U</button>
      <div class="w-px bg-gray-300 mx-1"></div><button data-cmd="justifyLeft" class="toolbar-button px-3 py-2 rounded bg-gray-100 hover-bg-gray-200" title="Linksbündig">
@@ -858,7 +858,7 @@
         execCommand('formatBlock', tag);
         // Auswahl zurücksetzen, sodass der Knopf wieder "Formate" anzeigt.
         const sel = document.getElementById('formatType');
-        if (sel) sel.value = '';
+        if (sel) sel.selectedIndex = 0;
       }
       
       function highlightText(color) {
