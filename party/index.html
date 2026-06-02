@@ -1079,9 +1079,12 @@
         document.head.appendChild(style);
       }
 
-      // Interner Tabellen-Zustand (Menü)
+      // Interner Tabellen-Zustand (Menü + Größenänderung)
       const tableState = {
-        menuEl: null
+        menuEl: null,
+        resizer: null,
+        activeTable: null,
+        resizeData: null
       };
 
       // ---- Scroll-Erhaltung (verhindert Sprung nach oben, Punkt 4.2) ----
@@ -1350,6 +1353,8 @@
         }
         restoreScroll(scroll);
         closeTableMenu();
+        tableState.activeTable = table;
+        positionTableResizer();
       }
 
       // ---- Gemeinsamer Ausführungs-Wrapper für Tabellenaktionen ----
@@ -1576,6 +1581,128 @@
       function doSplitCell(ctx) {
         if (!ctx.cell) { closeTableMenu(); return; }
         runTableAction(ctx, function() { splitCell(ctx.cell); });
+      }
+
+      // ---- Tabellengröße per Ziehen anpassen ----
+      function ensureResizerStyles() {
+        if (document.getElementById('tblResizerStyles')) return;
+        const css =
+          '.tbl-resizer{position:fixed;z-index:99990;pointer-events:none;' +
+          'border:1px solid #3b82f6;box-sizing:border-box;display:none;}' +
+          '.tbl-resizer .h{position:absolute;width:10px;height:10px;background:#2563eb;' +
+          'border:1px solid #fff;box-sizing:border-box;pointer-events:auto;}' +
+          '.tbl-resizer .h.e{right:-5px;top:50%;margin-top:-5px;cursor:ew-resize;}' +
+          '.tbl-resizer .h.s{bottom:-5px;left:50%;margin-left:-5px;cursor:ns-resize;}' +
+          '.tbl-resizer .h.se{right:-5px;bottom:-5px;cursor:nwse-resize;}';
+        const style = document.createElement('style');
+        style.id = 'tblResizerStyles';
+        style.textContent = css;
+        document.head.appendChild(style);
+      }
+
+      function getResizerEl() {
+        if (!tableState.resizer) {
+          ensureResizerStyles();
+          const el = document.createElement('div');
+          el.className = 'tbl-resizer';
+          ['e', 's', 'se'].forEach(function(pos) {
+            const h = document.createElement('div');
+            h.className = 'h ' + pos;
+            h.dataset.pos = pos;
+            h.addEventListener('mousedown', startTableResize);
+            el.appendChild(h);
+          });
+          document.body.appendChild(el);
+          tableState.resizer = el;
+        }
+        return tableState.resizer;
+      }
+
+      function positionTableResizer() {
+        const table = tableState.activeTable;
+        if (!table || !document.body.contains(table)) { hideTableResizer(); return; }
+        const el = getResizerEl();
+        const r = table.getBoundingClientRect();
+        el.style.left = r.left + 'px';
+        el.style.top = r.top + 'px';
+        el.style.width = r.width + 'px';
+        el.style.height = r.height + 'px';
+        el.style.display = 'block';
+      }
+
+      function hideTableResizer() {
+        tableState.activeTable = null;
+        if (tableState.resizer) tableState.resizer.style.display = 'none';
+      }
+
+      function updateTableResizer() {
+        if (tableState.resizeData) return;
+        const ctx = getTableContext();
+        if (ctx.table && document.body.contains(ctx.table)) {
+          tableState.activeTable = ctx.table;
+          positionTableResizer();
+        } else {
+          hideTableResizer();
+        }
+      }
+
+      function startTableResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const table = tableState.activeTable;
+        if (!table) return;
+        const rect = table.getBoundingClientRect();
+        tableState.resizeData = {
+          pos: e.currentTarget.dataset.pos,
+          startX: e.clientX,
+          startY: e.clientY,
+          startW: rect.width,
+          startH: rect.height,
+          table: table
+        };
+        document.addEventListener('mousemove', onTableResizeMove, true);
+        document.addEventListener('mouseup', onTableResizeEnd, true);
+        document.body.style.userSelect = 'none';
+      }
+
+      function onTableResizeMove(e) {
+        const d = tableState.resizeData;
+        if (!d) return;
+        const dx = e.clientX - d.startX;
+        const dy = e.clientY - d.startY;
+        if (d.pos === 'e' || d.pos === 'se') {
+          d.table.style.width = Math.max(50, d.startW + dx) + 'px';
+        }
+        if (d.pos === 's' || d.pos === 'se') {
+          d.table.style.height = Math.max(24, d.startH + dy) + 'px';
+        }
+        positionTableResizer();
+      }
+
+      function onTableResizeEnd() {
+        tableState.resizeData = null;
+        document.removeEventListener('mousemove', onTableResizeMove, true);
+        document.removeEventListener('mouseup', onTableResizeEnd, true);
+        document.body.style.userSelect = '';
+      }
+
+      function initTableResizer() {
+        const editor = document.getElementById('editor');
+        if (!editor) return;
+        editor.addEventListener('click', updateTableResizer);
+        editor.addEventListener('keyup', updateTableResizer);
+        document.addEventListener('selectionchange', updateTableResizer);
+        const app = document.querySelector('.app-container');
+        if (app) app.addEventListener('scroll', positionTableResizer, true);
+        window.addEventListener('scroll', positionTableResizer, true);
+        window.addEventListener('resize', positionTableResizer);
+        // Klick außerhalb von Editor und Anfassern blendet den Rahmen aus.
+        document.addEventListener('mousedown', function(e) {
+          if (tableState.resizeData) return;
+          if (editor.contains(e.target)) return;
+          if (tableState.resizer && tableState.resizer.contains(e.target)) return;
+          hideTableResizer();
+        }, true);
       }
 
       // ============================================
@@ -1830,6 +1957,9 @@
         // Unterstreichungs-Button als aktiv markieren, wenn der Cursor in
         // unterstrichenem Text steht (folgt der Cursor-/Auswahlbewegung).
         document.addEventListener('selectionchange', updateFormatButtonStates);
+
+        // Tabellen per Ziehen in Breite/Höhe veränderbar machen.
+        initTableResizer();
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
