@@ -904,39 +904,75 @@
         }
       }
 
-      // Hoch-/Tiefstellen zuverlässig umschalten. In Chrome ist
-      // queryCommandState('superscript') unzuverlässig, daher wird anhand
-      // des DOM geprüft, ob der Cursor in einem <sup>/<sub> steht.
+      // Hoch-/Tiefstellen vollständig über das DOM umschalten (zuverlässig in
+      // Chrome und Firefox). Einschalten legt sofort ein <sup>/<sub> an und
+      // setzt den Cursor hinein, damit der Button sofort aktiv ist und der
+      // Folgetext darin landet.
       function toggleSupSub(command) {
         const editor = document.getElementById('editor');
-        const tag = (command === 'superscript') ? 'SUP' : 'SUB';
+        const t = (command === 'superscript') ? 'sup' : 'sub';
+        const TAG = t.toUpperCase();
         const sel = window.getSelection();
-        if (!sel.rangeCount) { document.execCommand(command, false, null); return; }
+        if (!sel.rangeCount) return;
         const range = sel.getRangeAt(0);
 
         let el = range.startContainer;
         if (el && el.nodeType === Node.TEXT_NODE) el = el.parentElement;
         let wrap = null;
-        while (el && el !== editor) { if (el.tagName === tag) { wrap = el; break; } el = el.parentElement; }
+        while (el && el !== editor) { if (el.tagName === TAG) { wrap = el; break; } el = el.parentElement; }
 
-        if (sel.isCollapsed && wrap) {
-          // Format ausschalten: hinter dem <sup>/<sub> einen unsichtbaren
-          // normalen Textanker (Zero-Width-Space) platzieren und den Cursor
-          // dorthin setzen. Das ist nötig, weil Chrome sich den Tipp-Stil
-          // sonst merkt und weiter hoch-/tiefgestellt schreibt.
-          let anchor = wrap.nextSibling;
-          if (!(anchor && anchor.nodeType === Node.TEXT_NODE && anchor.textContent.charAt(0) === '\u200B')) {
-            anchor = document.createTextNode('\u200B');
-            wrap.parentNode.insertBefore(anchor, wrap.nextSibling);
+        if (wrap) {
+          if (sel.isCollapsed) {
+            // AUS (Cursor im sup/sub): hinter dem Element einen unsichtbaren
+            // Anker (Zero-Width-Space) setzen und den Cursor dorthin – dann
+            // ist der Folgetext normal (Chrome behält sonst den Tipp-Stil).
+            let anchor = wrap.nextSibling;
+            if (!(anchor && anchor.nodeType === Node.TEXT_NODE && anchor.textContent.charAt(0) === '\u200B')) {
+              anchor = document.createTextNode('\u200B');
+              wrap.parentNode.insertBefore(anchor, wrap.nextSibling);
+            }
+            const r = document.createRange();
+            r.setStart(anchor, anchor.textContent.length);
+            r.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(r);
+            // Falls das sup/sub nun praktisch leer ist (nur ZWSP), entfernen.
+            if (wrap.textContent.replace(/\u200B/g, '') === '') wrap.parentNode.removeChild(wrap);
+          } else {
+            // AUS (Auswahl im sup/sub): gesamtes Element durch seinen Inhalt
+            // ersetzen -> Hoch-/Tiefstellung entfernt (undo-fähig).
+            const r = document.createRange();
+            r.selectNode(wrap);
+            sel.removeAllRanges();
+            sel.addRange(r);
+            document.execCommand('insertHTML', false, wrap.innerHTML);
           }
-          const r = document.createRange();
-          r.setStart(anchor, anchor.textContent.length);
-          r.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(r);
         } else {
-          // Format einschalten bzw. für eine Auswahl umschalten.
-          document.execCommand(command, false, null);
+          if (sel.isCollapsed) {
+            // EIN (leere Auswahl): leeres sup/sub einfügen und Cursor hinein
+            // setzen -> Button sofort aktiv, Folgetext wird hoch-/tiefgestellt.
+            document.execCommand('insertHTML', false, '<' + t + ' id="__tmpfmt__">\u200B</' + t + '>');
+            let supEl = editor.querySelector('#__tmpfmt__');
+            if (supEl) supEl.removeAttribute('id');
+            if (!supEl) {
+              const list = editor.getElementsByTagName(t);
+              for (let i = list.length - 1; i >= 0; i--) {
+                if (list[i].textContent === '\u200B') { supEl = list[i]; break; }
+              }
+            }
+            if (supEl && supEl.firstChild) {
+              const r = document.createRange();
+              r.setStart(supEl.firstChild, supEl.firstChild.length);
+              r.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(r);
+            }
+          } else {
+            // EIN (Auswahl): markierten Inhalt in sup/sub einpacken.
+            const tmp = document.createElement('div');
+            tmp.appendChild(range.cloneContents());
+            document.execCommand('insertHTML', false, '<' + t + '>' + tmp.innerHTML + '</' + t + '>');
+          }
         }
       }
 
