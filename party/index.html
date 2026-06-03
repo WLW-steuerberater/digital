@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Klausurprogramm</title> 
+  <link rel="icon" type="image/png" href="https://wlw-steuern.de/storage/files/shares/Bilder/Videos%20Website/Logo%20transparent%203.png">
   <script src="/_sdk/element_sdk.js"></script>
   <style>
     /* Reset & Base */
@@ -209,11 +210,16 @@
       outline: none;
       font-family: 'Arial', sans-serif;
       font-size: 16px;
-      line-height: 2.0;
+      line-height: 1.5;
       color: #333;
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: pre-wrap;
+    }
+
+    /* Absatzabstand: Standardabstand zwischen Absätzen für bessere Übersicht. */
+    #editor p, #editor div {
+      margin: 0 0 0.85em 0;
     }
     
     .editor-content:focus {
@@ -338,8 +344,12 @@
         padding-top: 0;
         font-family: 'Arial', sans-serif;
         font-size: 12pt;
-        line-height: 2.0;
+        line-height: 1.5;
         color: #000;
+      }
+
+      .print-content p, .print-content div {
+        margin: 0 0 0.85em 0;
       }
       
       .print-content div[style*="page-break-after: always"] {
