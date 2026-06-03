@@ -1787,14 +1787,17 @@
         if (!firstRow) return;
         const idx = parseInt(e.currentTarget._col, 10);
         const cells = firstRow.cells;
-        // Aktuelle Breiten aller Spalten erfassen und als feste px-Breiten
-        // setzen, damit beim Ziehen nur die beiden betroffenen Spalten
-        // verändert werden und die übrigen stabil bleiben.
+        const tableW = table.getBoundingClientRect().width || 1;
+        // Aktuelle Breiten aller Spalten erfassen und als PROZENT-Breiten
+        // setzen. So bleiben die Spaltenverhältnisse beim Ziehen einzelner
+        // Spalten stabil und skalieren zugleich mit der Tabellenbreite mit,
+        // sodass die Eckpunkte die Gesamtbreite weiterhin verändern können.
         const widths = [];
         for (let k = 0; k < cells.length; k++) widths.push(cells[k].getBoundingClientRect().width);
-        for (let k = 0; k < cells.length; k++) cells[k].style.width = widths[k] + 'px';
+        for (let k = 0; k < cells.length; k++) cells[k].style.width = (widths[k] / tableW * 100) + '%';
         tableState.resizeData = {
           type: 'col',
+          tableW: tableW,
           leftCell: cells[idx],
           rightCell: cells[idx + 1],
           startX: e.clientX,
@@ -1819,8 +1822,8 @@
           const MIN = 20;
           let lw = Math.max(MIN, Math.min(total - MIN, d.startLeftW + dx));
           const rw = total - lw;
-          d.leftCell.style.width = lw + 'px';
-          d.rightCell.style.width = rw + 'px';
+          d.leftCell.style.width = (lw / d.tableW * 100) + '%';
+          d.rightCell.style.width = (rw / d.tableW * 100) + '%';
           positionTableResizer();
           return;
         }
