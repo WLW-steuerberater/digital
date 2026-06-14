@@ -1,197 +1,453 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Treaded – Interaktiver Pfad</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Karteikarten — apkg zu PDF</title>
+<style>
+  :root {
+    --paper: #f6f2e9;
+    --paper-deep: #ece5d6;
+    --ink: #1f2a38;
+    --ink-soft: #5a6573;
+    --rule: #d8cfbc;
+    --marker: #e0654a;
+    --marker-soft: #f3d9d1;
+    --thread: #c9b896;
+    --ok: #3f7d58;
+  }
 
-    :root {
-      --bg: #0f1117;
-      --surface: #181c27;
-      --border: #252a38;
-      --accent: #5b7fff;
-      --accent-glow: rgba(91, 127, 255, 0.18);
-      --text: #e8eaf0;
-      --muted: #6b7280;
-      --font: 'Inter', system-ui, sans-serif;
-    }
+- { box-sizing: border-box; margin: 0; padding: 0; }
 
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+body {
+font-family: “Iowan Old Style”, “Palatino Linotype”, Palatino, Georgia, serif;
+background: var(–paper);
+color: var(–ink);
+line-height: 1.5;
+min-height: 100vh;
+padding: env(safe-area-inset-top) 1.1rem 2rem;
+-webkit-text-size-adjust: 100%;
+}
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      -webkit-font-smoothing: antialiased;
-    }
+.wrap { max-width: 540px; margin: 0 auto; }
 
-    /* ── Layout ── */
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+/* Header as an index-card tab */
+header {
+padding: 2.4rem 0 1.6rem;
+text-align: center;
+}
+.tab {
+display: inline-block;
+font-family: ui-monospace, “SF Mono”, Menlo, monospace;
+font-size: 0.7rem;
+letter-spacing: 0.22em;
+text-transform: uppercase;
+color: var(–ink-soft);
+border: 1px solid var(–rule);
+border-radius: 999px;
+padding: 0.3rem 0.85rem;
+margin-bottom: 1.1rem;
+}
+h1 {
+font-size: 2.1rem;
+font-weight: 600;
+letter-spacing: -0.01em;
+line-height: 1.1;
+}
+h1 .accent {
+background: linear-gradient(transparent 62%, var(–marker-soft) 62%);
+padding: 0 0.1em;
+}
+.sub {
+color: var(–ink-soft);
+font-size: 0.98rem;
+margin-top: 0.7rem;
+}
 
-    /* ── Header ── */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 28px;
-      height: 60px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      flex-shrink: 0;
-    }
+/* The card itself — the signature element */
+.card {
+position: relative;
+background: #fffdf8;
+border: 1px solid var(–rule);
+border-radius: 10px;
+padding: 1.6rem 1.4rem 1.8rem;
+box-shadow: 0 1px 0 var(–paper-deep), 0 14px 30px -18px rgba(31,42,56,0.35);
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
+.drop {
+border: 2px dashed var(–thread);
+border-radius: 8px;
+padding: 2.2rem 1.2rem;
+text-align: center;
+cursor: pointer;
+transition: border-color .2s, background .2s;
+position: relative;
+z-index: 1;
+}
+.drop.over { border-color: var(–marker); background: rgba(224,101,74,0.05); }
+.drop .glyph {
+font-size: 2.4rem;
+line-height: 1;
+margin-bottom: 0.6rem;
+filter: grayscale(0.2);
+}
+.drop strong { display: block; font-size: 1.05rem; }
+.drop span { display: block; color: var(–ink-soft); font-size: 0.88rem; margin-top: 0.3rem; }
+input[type=file] { display: none; }
 
-    .logo-icon {
-      width: 30px;
-      height: 30px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 0 14px var(--accent-glow);
-    }
+.filename {
+margin-top: 1rem;
+font-family: ui-monospace, Menlo, monospace;
+font-size: 0.82rem;
+color: var(–ink-soft);
+text-align: center;
+word-break: break-all;
+}
 
-    .logo-icon svg {
-      width: 16px; height: 16px; fill: #fff;
-    }
+/* options */
+.opts {
+margin-top: 1.4rem;
+display: flex;
+flex-direction: column;
+gap: 0.75rem;
+}
+.opt {
+display: flex;
+align-items: center;
+gap: 0.65rem;
+font-size: 0.95rem;
+color: var(–ink);
+}
+.opt input { width: 1.05rem; height: 1.05rem; accent-color: var(–marker); }
 
-    .logo-text {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: .3px;
-      color: var(--text);
-    }
+button.go {
+margin-top: 1.5rem;
+width: 100%;
+background: var(–ink);
+color: var(–paper);
+border: none;
+border-radius: 8px;
+padding: 0.95rem;
+font-size: 1.02rem;
+font-family: inherit;
+letter-spacing: 0.01em;
+cursor: pointer;
+transition: transform .08s, opacity .2s;
+}
+button.go:active { transform: translateY(1px); }
+button.go:disabled { opacity: 0.4; cursor: default; }
 
-    .badge {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--accent);
-      background: var(--accent-glow);
-      border: 1px solid rgba(91,127,255,.3);
-      padding: 3px 9px;
-      border-radius: 20px;
-      letter-spacing: .4px;
-      text-transform: uppercase;
-    }
+.status {
+margin-top: 1.1rem;
+min-height: 1.3rem;
+text-align: center;
+font-size: 0.9rem;
+color: var(–ink-soft);
+}
+.status.err { color: var(–marker); }
+.status.ok { color: var(–ok); }
 
-    /* ── Main content ── */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 28px;
-      gap: 20px;
-    }
+.count {
+display: inline-block;
+margin-top: 0.2rem;
+font-family: ui-monospace, Menlo, monospace;
+}
 
-    .info-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* preview list */
+.preview { margin-top: 1.8rem; }
+.preview h2 {
+font-size: 0.74rem;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–ink-soft);
+font-weight: 600;
+margin-bottom: 0.8rem;
+font-family: ui-monospace, Menlo, monospace;
+}
+.pcard {
+background: #fffdf8;
+border: 1px solid var(–rule);
+border-left: 3px solid var(–thread);
+border-radius: 6px;
+padding: 0.8rem 0.95rem;
+margin-bottom: 0.6rem;
+}
+.pcard .q { font-weight: 600; }
+.pcard .a { color: var(–ink-soft); font-size: 0.92rem; margin-top: 0.25rem; }
+.pcard .a::before { content: “→ “; color: var(–marker); }
 
-    .info-bar h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-    }
+footer {
+margin-top: 2.2rem;
+text-align: center;
+font-size: 0.78rem;
+color: var(–ink-soft);
+}
+footer code {
+font-family: ui-monospace, Menlo, monospace;
+background: var(–paper-deep);
+padding: 0.1rem 0.35rem;
+border-radius: 4px;
+}
 
-    .dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 6px #22c55e88;
-      animation: pulse 2s ease-in-out infinite;
-      flex-shrink: 0;
-    }
+.spin {
+display: inline-block;
+width: 0.9rem; height: 0.9rem;
+border: 2px solid var(–thread);
+border-top-color: var(–marker);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+vertical-align: -0.1rem;
+margin-right: 0.4rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .55; transform: scale(1.3); }
-    }
-
-    /* ── iframe card ── */
-    .frame-card {
-      flex: 1;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 40px rgba(0,0,0,.5);
-      background: var(--surface);
-      min-height: 500px;
-      position: relative;
-    }
-
-    .frame-card iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 660px;
-      border: 0;
-    }
-
-    /* ── Footer ── */
-    footer {
-      padding: 14px 28px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      main { padding: 14px; }
-      header { padding: 0 16px; }
-      .info-bar h1 { font-size: 15px; }
-    }
-  </style>
 </head>
 <body>
-<div class="page">
-
+<div class="wrap">
   <header>
-    <a class="logo" href="#">
-      <div class="logo-icon">
-        <!-- simple path/route icon -->
-        <svg viewBox="0 0 16 16"><path d="M2 13c0-.55.45-1 1-1h2.5V8H4a1 1 0 0 1 0-2h2.5V4a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2H8.5v2H11a1 1 0 1 1 0 2H8.5v4H13a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1Z"/></svg>
-      </div>
-      <span class="logo-text">Treaded</span>
-    </a>
-    <span class="badge">Live</span>
+    <div class="tab">Anki · Deck → PDF</div>
+    <h1>Karten zum <span class="accent">Mitnehmen</span></h1>
+    <p class="sub">Lade einen <code>.apkg</code>-Stapel hoch. Alles läuft direkt auf deinem Gerät — nichts wird hochgeladen.</p>
   </header>
 
-  <main>
-    <div class="info-bar">
-      <div class="dot"></div>
-      <h1>Interaktiver Lernpfad</h1>
-    </div>
+  <div class="card">
+    <label class="drop" id="drop">
+      <span class="glyph">🗂️</span>
+      <strong>Datei auswählen</strong>
+      <span>oder hierher ziehen — .apkg</span>
+      <input type="file" id="file" accept=".apkg,.colpkg,.zip">
+    </label>
+    <div class="filename" id="filename"></div>
 
-    <div class="frame-card">
-      <iframe
-        src="https://app.treaded.de/shared/paths/c9b88901-03bf-4adb-9c49-f1a130afc190/run?launchToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3ODEyMTE4NTQsImV4cCI6MTc4MzgwMzg1NCwianRpIjoiNmY4NTQ0NDEtNjhjYS00NzdmLWE0NGMtMmJkY2U1N2YyODU1IiwidG9rZW5fdHlwZSI6IndvcmtiZW5jaF9sYXVuY2giLCJsZWFybmluZ19wYXRoX2lkIjoiYzliODg5MDEtMDNiZi00YWRiLTljNDktZjFhMTMwYWZjMTkwIiwibGVhcm5pbmdfcGF0aF9ub2RlX2lkIjoiMTE2OTIwOTgtZTU4MS00NTFlLThjOGMtMWY5YjUwYmIwNWE2Iiwid29ya2JlbmNoX25vZGVfaWQiOiJhZTBhM2VkZC02NTQ1LTRlMjQtYjA0MC1hMmRlMzI4MTM2NjQifQ.tv_RP-rzD4nsGv1V_X862f9Ha35DCc0uzojQD_r7iqI&embed=1&iframe=1"
-        allow="microphone; camera; autoplay"
-        loading="lazy"
-        title="Treaded Lernpfad"
-      ></iframe>
-    </div>
-  </main>
-
-  <footer>Bereitgestellt via Treaded · Eingebettete Ansicht</footer>
-
+```
+<div class="opts">
+  <label class="opt">
+    <input type="checkbox" id="optClean" checked>
+    HTML-Formatierung entfernen (sauberer Text)
+  </label>
+  <label class="opt">
+    <input type="checkbox" id="optPreview" checked>
+    Vorschau der ersten Karten anzeigen
+  </label>
 </div>
+
+<button class="go" id="go" disabled>PDF erstellen</button>
+<div class="status" id="status"></div>
+```
+
+  </div>
+
+  <div class="preview" id="preview"></div>
+
+  <footer>
+    Funktioniert offline. Tipp: Über „Teilen → Zum Home-Bildschirm“ als App installierbar.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+const SQL_WASM = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/";
+let SQL = null;
+let cards = [];
+let deckName = "anki-deck";
+
+const $ = id => document.getElementById(id);
+const drop = $("drop"), fileInput = $("file"), go = $("go");
+const statusEl = $("status"), preview = $("preview"), filenameEl = $("filename");
+
+function setStatus(msg, kind = "") {
+  statusEl.className = "status " + kind;
+  statusEl.innerHTML = msg;
+}
+
+// --- load sql.js lazily ---
+async function loadSQL() {
+  if (SQL) return SQL;
+  const s = document.createElement("script");
+  s.src = SQL_WASM + "sql-wasm.min.js";
+  await new Promise((res, rej) => { s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+  SQL = await initSqlJs({ locateFile: f => SQL_WASM + f });
+  return SQL;
+}
+
+// --- clean anki/html content ---
+function cleanHtml(raw, strip) {
+  if (!raw) return "";
+  raw = raw.replace(/\[sound:[^\]]*\]/g, "[Audio]");
+  raw = raw.replace(/<img[^>]*>/gi, "[Bild]");
+  if (!strip) return raw.trim();
+  raw = raw.replace(/<\s*br\s*\/?\s*>/gi, "\n");
+  raw = raw.replace(/<\/\s*(div|p|li|tr)\s*>/gi, "\n");
+  raw = raw.replace(/<[^>]+>/g, "");
+  const ta = document.createElement("textarea");
+  ta.innerHTML = raw;
+  raw = ta.value;
+  raw = raw.replace(/\n\s*\n\s*\n+/g, "\n\n");
+  return raw.trim();
+}
+
+// --- parse an .apkg file ---
+async function parseApkg(file) {
+  deckName = file.name.replace(/\.(apkg|colpkg|zip)$/i, "") || "anki-deck";
+  setStatus('<span class="spin"></span>Datei wird entpackt…');
+
+  const zip = await JSZip.loadAsync(file);
+  let dbName = null;
+  for (const cand of ["collection.anki21", "collection.anki2"]) {
+    if (zip.file(cand)) { dbName = cand; break; }
+  }
+  if (!dbName) throw new Error("Keine Anki-Datenbank im Archiv gefunden.");
+
+  setStatus('<span class="spin"></span>Datenbank wird gelesen…');
+  const buf = await zip.file(dbName).async("uint8array");
+  await loadSQL();
+  const db = new SQL.Database(buf);
+
+  const res = db.exec("SELECT flds FROM notes ORDER BY id");
+  db.close();
+  if (!res.length) throw new Error("Keine Karten in der Datei gefunden.");
+
+  const strip = $("optClean").checked;
+  cards = [];
+  for (const row of res[0].values) {
+    const fields = row[0].split("\u001f").map(f => cleanHtml(f, strip));
+    while (fields.length && !fields[fields.length - 1]) fields.pop();
+    if (fields.length) cards.push(fields);
+  }
+  if (!cards.length) throw new Error("Karten waren leer.");
+}
+
+// --- render preview ---
+function renderPreview() {
+  preview.innerHTML = "";
+  if (!$("optPreview").checked || !cards.length) return;
+  const h = document.createElement("h2");
+  h.textContent = `Vorschau · ${Math.min(cards.length, 5)} von ${cards.length}`;
+  preview.appendChild(h);
+  cards.slice(0, 5).forEach(f => {
+    const d = document.createElement("div");
+    d.className = "pcard";
+    const q = document.createElement("div"); q.className = "q";
+    q.textContent = (f[0] || "").slice(0, 140) || "—";
+    d.appendChild(q);
+    if (f[1]) {
+      const a = document.createElement("div"); a.className = "a";
+      a.textContent = f[1].slice(0, 140);
+      d.appendChild(a);
+    }
+    preview.appendChild(d);
+  });
+}
+
+// --- build PDF with jsPDF ---
+function buildPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const M = 18, W = 210 - M * 2;
+  let y = M;
+
+  doc.setFont("times", "bold"); doc.setFontSize(20);
+  doc.text(deckName, M, y); y += 8;
+  doc.setFont("times", "normal"); doc.setFontSize(11);
+  doc.setTextColor(120);
+  doc.text(`${cards.length} Karten`, M, y); y += 10;
+  doc.setTextColor(31, 42, 56);
+
+  const labels = ["Vorderseite", "Rückseite", "Feld 3", "Feld 4", "Feld 5"];
+
+  cards.forEach((fields, i) => {
+    // card header bar
+    if (y > 270) { doc.addPage(); y = M; }
+    doc.setFillColor(45, 74, 107);
+    doc.rect(M, y, W, 7, "F");
+    doc.setTextColor(255); doc.setFont("times", "bold"); doc.setFontSize(10);
+    doc.text(`Karte ${i + 1}`, M + 2, y + 5);
+    y += 7;
+    doc.setTextColor(31, 42, 56);
+
+    fields.forEach((content, j) => {
+      const label = labels[j] || `Feld ${j + 1}`;
+      doc.setFont("times", "bold"); doc.setFontSize(8);
+      doc.setTextColor(120);
+      const lblLines = doc.splitTextToSize(label, 26);
+      doc.setFont("times", "normal"); doc.setFontSize(10.5);
+      doc.setTextColor(31, 42, 56);
+      const txtLines = doc.splitTextToSize(content || "—", W - 30);
+      const rows = Math.max(lblLines.length, txtLines.length);
+      const blockH = rows * 5 + 3;
+
+      if (y + blockH > 285) { doc.addPage(); y = M; }
+
+      // cell background for label column
+      doc.setFillColor(240, 243, 247);
+      doc.rect(M, y, 28, blockH, "F");
+      doc.setDrawColor(210);
+      doc.rect(M, y, 28, blockH);
+      doc.rect(M + 28, y, W - 28, blockH);
+
+      doc.setFont("times", "bold"); doc.setFontSize(8); doc.setTextColor(110);
+      doc.text(lblLines, M + 2, y + 5);
+      doc.setFont("times", "normal"); doc.setFontSize(10.5); doc.setTextColor(31, 42, 56);
+      doc.text(txtLines, M + 31, y + 5);
+      y += blockH;
+    });
+    y += 5;
+  });
+
+  doc.save(deckName + ".pdf");
+}
+
+// --- events ---
+async function handleFile(file) {
+  if (!file) return;
+  filenameEl.textContent = file.name;
+  go.disabled = true;
+  try {
+    await parseApkg(file);
+    renderPreview();
+    setStatus(`Bereit · <span class="count">${cards.length} Karten gefunden</span>`, "ok");
+    go.disabled = false;
+  } catch (e) {
+    cards = [];
+    preview.innerHTML = "";
+    setStatus("Fehler: " + e.message, "err");
+  }
+}
+
+fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
+
+["dragenter", "dragover"].forEach(ev =>
+  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev =>
+  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => {
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    handleFile(e.dataTransfer.files[0]);
+  }
+});
+
+go.addEventListener("click", () => {
+  if (!cards.length) return;
+  setStatus('<span class="spin"></span>PDF wird erstellt…');
+  setTimeout(() => {
+    try {
+      buildPDF();
+      setStatus(`PDF gespeichert · <span class="count">${cards.length} Karten</span>`, "ok");
+    } catch (e) {
+      setStatus("Fehler beim Erstellen: " + e.message, "err");
+    }
+  }, 30);
+});
+
+// re-render preview when toggled
+$("optPreview").addEventListener("change", renderPreview);
+</script>
+
 </body>
 </html>
