@@ -1,24 +1,343 @@
-import { useState, useRef } from "react";
-import * as mammoth from "mammoth";
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartei – Lernkarten aus PDF & Word</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  :root {
+    --ink: #1B2A41;
+    --ink-soft: #24354F;
+    --paper: #FDFDFB;
+    --marker: #FFD84D;
+    --muted: #8494AB;
+    --green: #2E7D5B;
+    --red: #C0564F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
 
-// ---------- Design-Tokens ----------
-// Palette: Tinte (#1B2A41), Papier (#FDFDFB), Textmarker-Gelb (#FFD84D),
-// Graublau (#5C6B80), Erfolg (#2E7D5B)
-const S = {
-  ink: "#1B2A41",
-  paper: "#FDFDFB",
-  marker: "#FFD84D",
-  muted: "#5C6B80",
-  green: "#2E7D5B",
-};
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .brand-tag {
+    background: var(--marker); color: var(--ink); font-weight: 800; font-size: 14px;
+    padding: 3px 8px; transform: rotate(-2deg); box-shadow: 0 2px 0 rgba(0,0,0,.15);
+  }
+  .brand-sub { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-async function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
-    r.onerror = () => rej(new Error("Datei konnte nicht gelesen werden"));
-    r.readAsDataURL(file);
-  });
+  h1 { font-size: 28px; margin-bottom: 6px; }
+  .lead { color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+
+  .dropzone {
+    border: 2px dashed var(--muted); border-radius: 16px; padding: 48px 24px;
+    text-align: center; cursor: pointer; background: rgba(255,255,255,.03);
+    transition: border-color .2s;
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--marker); }
+  .dropzone .icon { font-size: 44px; margin-bottom: 12px; }
+  .dropzone p { color: var(--paper); font-weight: 600; }
+  .dropzone small { color: var(--muted); }
+
+  .panel { background: rgba(255,255,255,.05); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+  .panel h2 { font-size: 15px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  select, input[type=text], textarea {
+    width: 100%; background: var(--ink-soft); border: 1px solid rgba(255,255,255,.12);
+    color: var(--paper); border-radius: 8px; padding: 9px 10px; font-size: 15px; font-family: inherit;
+  }
+  select:focus, input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--marker); outline-offset: 1px; }
+  textarea { min-height: 140px; resize: vertical; font-size: 13px; line-height: 1.5; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+
+  button { font-family: inherit; cursor: pointer; border: none; border-radius: 12px; font-weight: 700; }
+  .btn-primary {
+    width: 100%; padding: 15px; font-size: 17px; background: var(--marker); color: var(--ink);
+    transition: transform .1s;
+  }
+  .btn-primary:hover { transform: scale(1.01); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: rgba(255,255,255,.08); color: var(--paper); padding: 15px; font-size: 16px; width: 100%; }
+  .btn-link { background: none; color: var(--muted); text-decoration: underline; font-weight: 400; font-size: 14px; padding: 8px; }
+
+  .count-badge {
+    display: inline-block; background: var(--marker); color: var(--ink);
+    font-weight: 800; border-radius: 999px; padding: 2px 12px; font-size: 15px;
+  }
+  .preview-card { background: rgba(255,255,255,.05); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .preview-card .num { font-size: 11px; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .preview-card .q { font-weight: 600; }
+  .preview-card .a { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .empty-note {
+    background: rgba(220,80,80,.12); color: #F3B4B4; border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; line-height: 1.5;
+  }
+
+  /* Lernmodus */
+  .progress-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .bar { height: 6px; background: rgba(255,255,255,.1); border-radius: 999px; overflow: hidden; margin-bottom: 22px; }
+  .bar-fill { height: 100%; background: var(--marker); border-radius: 999px; transition: width .3s; }
+
+  .scene { perspective: 1200px; height: 300px; margin-bottom: 22px; }
+  .flip { position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
+          transition: transform .5s cubic-bezier(.4,.1,.2,1); cursor: pointer; }
+  .flip.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0; backface-visibility: hidden; border-radius: 14px;
+    background: var(--paper) repeating-linear-gradient(transparent, transparent 31px, #E4E8EE 31px, #E4E8EE 32px);
+    color: var(--ink); display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 24px; overflow-y: auto;
+  }
+  .face.back { transform: rotateY(180deg); }
+  .face .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+  .face.back .eyebrow { background: var(--marker); color: var(--ink); padding: 2px 8px; transform: rotate(-1deg); }
+  .face .text { font-size: 20px; font-weight: 600; line-height: 1.5; }
+  .face.back .text { font-weight: 400; font-size: 18px; }
+  .face .tap { font-size: 12px; color: var(--muted); margin-top: 20px; }
+  @media (prefers-reduced-motion: reduce) { .flip, .bar-fill { transition: none; } }
+
+  .answer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-repeat { background: rgba(255,255,255,.08); color: var(--paper); padding: 16px; font-size: 16px; }
+  .btn-known { background: var(--green); color: var(--paper); padding: 16px; font-size: 16px; }
+  .tap-hint { text-align: center; color: var(--muted); font-size: 14px; }
+
+  .done { text-align: center; padding: 40px 0; }
+  .done .icon { font-size: 60px; margin-bottom: 12px; }
+  .done .stats { color: var(--muted); margin: 8px 0 28px; }
+  .done .btns { max-width: 320px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+  .spinner {
+    width: 40px; height: 40px; border: 4px solid var(--marker); border-top-color: transparent;
+    border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .center { text-align: center; padding: 80px 0; }
+  .hidden { display: none !important; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-tag">KARTEI</div>
+    <span class="brand-sub" id="brandSub">Lernkarten aus PDF &amp; Word</span>
+  </div>
+
+  <!-- ===== Upload ===== -->
+  <section id="screen-upload">
+    <h1>Karteikarten hochladen</h1>
+    <p class="lead">PDF oder Word-Datei (.docx) auswählen. Danach stellt ihr selbst ein,
+      wie das Dokument in Frage und Antwort aufgeteilt wird – mit Live-Vorschau.</p>
+    <div class="dropzone" id="dropzone" tabindex="0">
+      <div class="icon">🗂️</div>
+      <p>Datei hier ablegen oder klicken</p>
+      <small>PDF oder .docx</small>
+      <input type="file" id="fileInput" accept=".pdf,.docx" class="hidden">
+    </div>
+    <div id="uploadError" class="empty-note hidden" style="margin-top:14px;"></div>
+  </section>
+
+  <!-- ===== Laden ===== -->
+  <section id="screen-loading" class="center hidden">
+    <div class="spinner"></div>
+    <p style="font-weight:600;">Text wird ausgelesen …</p>
+  </section>
+
+  <!-- ===== Einstellungen + Vorschau ===== -->
+  <section id="screen-config" class="hidden">
+    <h1>Aufteilung einstellen</h1>
+    <p class="lead">Wählt aus, wie euer Dokument aufgebaut ist. Die Vorschau unten zeigt sofort das Ergebnis.</p>
+
+    <div class="panel">
+      <h2>Aufteilungsregel</h2>
+      <label for="mode">Wie sind Frage und Antwort im Dokument markiert?</label>
+      <select id="mode">
+        <option value="prefix">Textmarkierungen (z. B. „Frage:" und „Antwort:")</option>
+        <option value="numbered">Nummerierte Karten (1., 2., 3. …)</option>
+        <option value="altParas">Absätze abwechselnd (Frage-Absatz, Antwort-Absatz)</option>
+        <option value="altLines">Zeilen abwechselnd (Frage-Zeile, Antwort-Zeile)</option>
+        <option value="separator">Trennzeichen in einer Zeile (z. B. Frage ; Antwort)</option>
+      </select>
+
+      <div id="opts-prefix">
+        <div class="row">
+          <div>
+            <label for="qPrefix">Frage beginnt mit</label>
+            <input type="text" id="qPrefix" value="Frage:">
+          </div>
+          <div>
+            <label for="aPrefix">Antwort beginnt mit</label>
+            <input type="text" id="aPrefix" value="Antwort:">
+          </div>
+        </div>
+        <p class="hint">Groß-/Kleinschreibung ist egal. Auch Kürzel wie „F:" und „A:" funktionieren.
+          Lasst ihr das Antwort-Feld leer, gilt: Die Frage endet beim ersten „?", der Rest ist die Antwort.</p>
+      </div>
+
+      <div id="opts-numbered" class="hidden">
+        <label for="aPrefixNum">Antwort beginnt mit (optional)</label>
+        <input type="text" id="aPrefixNum" value="">
+        <p class="hint">Jede Nummer („1.", „2)", …) startet eine neue Karte. Ohne Antwort-Markierung endet
+          die Frage beim ersten „?", der Rest der Karte ist die Antwort.</p>
+      </div>
+
+      <div id="opts-separator" class="hidden">
+        <label for="sep">Trennzeichen zwischen Frage und Antwort</label>
+        <input type="text" id="sep" value=";">
+        <p class="hint">Jede Zeile ist eine Karte, z. B. „Hauptstadt von Frankreich?; Paris".
+          Auch Tab funktioniert: gebt dafür \t ein.</p>
+      </div>
+
+      <p class="hint" id="hint-altParas" style="display:none;">Absätze (durch Leerzeilen getrennt) werden abwechselnd
+        als Frage und Antwort gelesen: 1. Absatz = Frage, 2. Absatz = Antwort, 3. Absatz = nächste Frage usw.</p>
+      <p class="hint" id="hint-altLines" style="display:none;">Zeilen werden abwechselnd gelesen:
+        1. Zeile = Frage, 2. Zeile = Antwort usw.</p>
+    </div>
+
+    <div class="panel">
+      <details>
+        <summary>Ausgelesenen Text prüfen &amp; korrigieren</summary>
+        <p class="hint" style="margin-bottom:8px;">Bei PDFs kommt der Text manchmal etwas unsauber an.
+          Hier könnt ihr ihn direkt bearbeiten – die Vorschau passt sich an.</p>
+        <textarea id="rawText" spellcheck="false"></textarea>
+      </details>
+    </div>
+
+    <div class="panel">
+      <h2>Vorschau <span class="count-badge" id="cardCount">0 Karten</span></h2>
+      <div id="previewList"></div>
+      <div id="previewEmpty" class="empty-note hidden">
+        Mit dieser Einstellung wurden keine Karten erkannt. Probiert eine andere Aufteilungsregel
+        oder passt die Markierungen an – oben unter „Ausgelesenen Text prüfen" seht ihr, wie euer Dokument ankommt.
+      </div>
+    </div>
+
+    <button class="btn-primary" id="startBtn" disabled>Lernen starten →</button>
+    <button class="btn-link" id="backToUpload" style="margin-top:10px;">Andere Datei hochladen</button>
+  </section>
+
+  <!-- ===== Lernmodus ===== -->
+  <section id="screen-study" class="hidden">
+    <div class="progress-row">
+      <span id="progressText"></span>
+      <span id="knownText"></span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+
+    <div class="scene">
+      <div class="flip" id="flipCard" role="button" tabindex="0" aria-label="Karte umdrehen">
+        <div class="face front">
+          <div class="eyebrow">FRAGE</div>
+          <div class="text" id="qText"></div>
+          <div class="tap">Tippen zum Umdrehen</div>
+        </div>
+        <div class="face back">
+          <div class="eyebrow">ANTWORT</div>
+          <div class="text" id="aText"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tap-hint" id="tapHint">Karte antippen, um die Antwort zu sehen</p>
+    <div class="answer-btns hidden" id="answerBtns">
+      <button class="btn-repeat" id="btnRepeat">↺ Wiederholen</button>
+      <button class="btn-known" id="btnKnown">✓ Gewusst</button>
+    </div>
+  </section>
+
+  <!-- ===== Ergebnis ===== -->
+  <section id="screen-done" class="done hidden">
+    <div class="icon" id="doneIcon">🏆</div>
+    <h1 id="doneTitle">Alles gewusst!</h1>
+    <p class="stats" id="doneStats"></p>
+    <div class="btns">
+      <button class="btn-primary hidden" id="btnRepeatSet">Nur Wiederholen-Karten üben</button>
+      <button class="btn-ghost" id="btnAll">Alle Karten nochmal</button>
+      <button class="btn-link" id="btnBackConfig">Zurück zu den Einstellungen</button>
+    </div>
+  </section>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+// ---------- Zustand ----------
+let cards = [];      // alle geparsten Karten
+let queue = [];      // aktueller Lerndurchgang
+let pos = 0, known = 0, flipped = false;
+let repeats = [];
+
+// ---------- Hilfen ----------
+const $ = (id) => document.getElementById(id);
+function show(screen) {
+  ["upload","loading","config","study","done"].forEach(s =>
+    $("screen-" + s).classList.toggle("hidden", s !== screen));
+}
+
+// ---------- Datei einlesen ----------
+const dropzone = $("dropzone"), fileInput = $("fileInput");
+dropzone.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("drag"); });
+dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag"));
+dropzone.addEventListener("drop", e => {
+  e.preventDefault(); dropzone.classList.remove("drag");
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+async function handleFile(file) {
+  $("uploadError").classList.add("hidden");
+  show("loading");
+  try {
+    let text;
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".pdf")) text = await pdfToText(file);
+    else if (name.endsWith(".docx")) text = await docxToText(file);
+    else throw new Error("Bitte eine PDF- oder Word-Datei (.docx) hochladen.");
+    if (!text.trim()) throw new Error("In der Datei wurde kein Text gefunden. Ist es evtl. ein Scan? Dann bitte den Text einfügen unter „Ausgelesenen Text prüfen“.");
+    $("brandSub").textContent = file.name;
+    $("rawText").value = text;
+    autoDetectMode(text);
+    updatePreview();
+    show("config");
+  } catch (err) {
+    const box = $("uploadError");
+    box.textContent = err.message || "Die Datei konnte nicht gelesen werden.";
+    box.classList.remove("hidden");
+    show("upload");
+  }
+}
+
+async function pdfToText(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let out = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    // Zeilen anhand der Y-Position rekonstruieren
+    let lines = [], lastY = null, line = [];
+    for (const item of content.items) {
+      const y = Math.round(item.transform[5]);
+      if (lastY !== null && Math.abs(y - lastY) > 3) { lines.push(line.join("")); line = []; }
+      line.push(item.str);
+      lastY = y;
+    }
+    if (line.length) lines.push(line.join(""));
+    out.push(lines.join("\n"));
+  }
+  return out.join("\n\n");
 }
 
 async function docxToText(file) {
@@ -27,271 +346,217 @@ async function docxToText(file) {
   return result.value;
 }
 
-const SYSTEM_PROMPT = `Du bekommst den Inhalt eines Karteikarten-Dokuments (Fragen und Antworten).
-Extrahiere ALLE Karteikarten daraus. Antworte AUSSCHLIESSLICH mit gültigem JSON, ohne Markdown, ohne Erklärung, ohne Codeblöcke, exakt in diesem Format:
-{"cards":[{"q":"Frage","a":"Antwort"}]}
-Regeln: Fragen und Antworten wortgetreu übernehmen, nur offensichtliche Formatierungsreste entfernen. Keine Karten erfinden. Halte q und a kompakt.`;
+// ---------- Parsen (regelbasiert, ohne KI) ----------
+function parseCards(text, cfg) {
+  const norm = text.replace(/\r/g, "");
+  const clean = s => s.replace(/\s+/g, " ").trim();
 
-async function parseWithClaude(content) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
-      messages: [{ role: "user", content }],
-    }),
-  });
-  const data = await response.json();
-  const text = (data.content || [])
-    .map((i) => (i.type === "text" ? i.text : ""))
-    .filter(Boolean)
-    .join("\n");
-  const clean = text.replace(/```json|```/g, "").trim();
-  const start = clean.indexOf("{");
-  const end = clean.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("Keine Karten erkannt");
-  const parsed = JSON.parse(clean.slice(start, end + 1));
-  if (!parsed.cards || !parsed.cards.length) throw new Error("Keine Karten erkannt");
-  return parsed.cards.map((c, i) => ({ id: i, q: c.q, a: c.a }));
-}
-
-export default function KarteikartenApp() {
-  const [screen, setScreen] = useState("upload"); // upload | loading | deck | study | done
-  const [cards, setCards] = useState([]);
-  const [queue, setQueue] = useState([]);
-  const [pos, setPos] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [known, setKnown] = useState(0);
-  const [repeats, setRepeats] = useState([]);
-  const [error, setError] = useState("");
-  const [fileName, setFileName] = useState("");
-  const inputRef = useRef(null);
-
-  async function handleFile(file) {
-    if (!file) return;
-    setError("");
-    setFileName(file.name);
-    setScreen("loading");
-    try {
-      let content;
-      if (file.name.toLowerCase().endsWith(".pdf")) {
-        const base64 = await fileToBase64(file);
-        content = [
-          { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } },
-          { type: "text", text: SYSTEM_PROMPT },
-        ];
-      } else if (file.name.toLowerCase().endsWith(".docx")) {
-        const text = await docxToText(file);
-        content = SYSTEM_PROMPT + "\n\nDokumentinhalt:\n" + text;
-      } else {
-        throw new Error("Bitte eine PDF- oder Word-Datei (.docx) hochladen");
+  if (cfg.mode === "prefix") {
+    const qp = cfg.qPrefix.trim().toLowerCase();
+    const ap = cfg.aPrefix.trim().toLowerCase();
+    if (!qp) return [];
+    const result = [];
+    let cur = null, target = "q";
+    for (const raw of norm.split("\n")) {
+      const line = raw.trim();
+      if (!line) continue;
+      const low = line.toLowerCase();
+      if (low.startsWith(qp)) {
+        if (cur) result.push(cur);
+        cur = { q: line.slice(qp.length).trim(), a: "" };
+        target = "q";
+      } else if (ap && cur && low.startsWith(ap)) {
+        cur.a += (cur.a ? " " : "") + line.slice(ap.length).trim();
+        target = "a";
+      } else if (cur) {
+        cur[target] += " " + line;
       }
-      const parsed = await parseWithClaude(content);
-      setCards(parsed);
-      setScreen("deck");
-    } catch (e) {
-      setError(e.message || "Etwas ist schiefgelaufen");
-      setScreen("upload");
     }
+    if (cur) result.push(cur);
+    return finalize(result, !ap);
   }
 
-  function startStudy(deck) {
-    setQueue(deck);
-    setPos(0);
-    setKnown(0);
-    setRepeats([]);
-    setFlipped(false);
-    setScreen("study");
-  }
-
-  function answer(gotIt) {
-    const card = queue[pos];
-    const nextRepeats = gotIt ? repeats : [...repeats, card];
-    const nextKnown = gotIt ? known + 1 : known;
-    setRepeats(nextRepeats);
-    setKnown(nextKnown);
-    setFlipped(false);
-    if (pos + 1 < queue.length) {
-      setTimeout(() => setPos(pos + 1), 150);
-    } else {
-      setTimeout(() => setScreen("done"), 150);
+  if (cfg.mode === "numbered") {
+    const ap = cfg.aPrefixNum.trim().toLowerCase();
+    const numRe = /^\s*\d+\s*[.)]\s+/;
+    const result = [];
+    let cur = null, target = "q";
+    for (const raw of norm.split("\n")) {
+      const line = raw.trim();
+      if (!line) continue;
+      const low = line.toLowerCase();
+      if (numRe.test(line)) {
+        if (cur) result.push(cur);
+        cur = { q: line.replace(numRe, "").trim(), a: "" };
+        target = "q";
+      } else if (ap && cur && low.startsWith(ap)) {
+        cur.a += (cur.a ? " " : "") + line.slice(ap.length).trim();
+        target = "a";
+      } else if (cur) {
+        cur[target] += " " + line;
+      }
     }
+    if (cur) result.push(cur);
+    return finalize(result, !ap);
   }
 
-  const card = queue[pos];
+  if (cfg.mode === "altParas" || cfg.mode === "altLines") {
+    const units = cfg.mode === "altParas"
+      ? norm.split(/\n\s*\n+/).map(u => clean(u)).filter(Boolean)
+      : norm.split("\n").map(u => u.trim()).filter(Boolean);
+    const result = [];
+    for (let i = 0; i + 1 < units.length; i += 2) {
+      result.push({ q: units[i], a: units[i + 1] });
+    }
+    return result.map(c => ({ q: clean(c.q), a: clean(c.a) })).filter(c => c.q && c.a);
+  }
 
-  return (
-    <div className="min-h-screen w-full" style={{ background: S.ink, fontFamily: "'Avenir Next', 'Segoe UI', system-ui, sans-serif" }}>
-      <style>{`
-        .flip-scene { perspective: 1200px; }
-        .flip-card { position: relative; width: 100%; height: 100%; transition: transform .5s cubic-bezier(.4,.1,.2,1); transform-style: preserve-3d; cursor: pointer; }
-        .flip-card.is-flipped { transform: rotateY(180deg); }
-        .flip-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; }
-        .flip-back { transform: rotateY(180deg); }
-        .card-lines { background-image: repeating-linear-gradient(transparent, transparent 31px, #E4E8EE 31px, #E4E8EE 32px); }
-        .marker-tag { box-shadow: 0 2px 0 rgba(0,0,0,.12); }
-        @media (prefers-reduced-motion: reduce) { .flip-card { transition: none; } }
-      `}</style>
-
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        {/* Kopfzeile */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="marker-tag px-2 py-1 text-sm font-bold rotate-[-2deg]" style={{ background: S.marker, color: S.ink }}>
-            KARTEI
-          </div>
-          <span className="text-sm tracking-wide" style={{ color: S.muted }}>
-            {fileName || "Lernkarten aus PDF & Word"}
-          </span>
-        </div>
-
-        {/* ---------- Upload ---------- */}
-        {screen === "upload" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-3" style={{ color: S.paper }}>
-              Karteikarten hochladen
-            </h1>
-            <p className="mb-6 leading-relaxed" style={{ color: S.muted }}>
-              PDF oder Word-Datei (.docx) auswählen. Die Fragen und Antworten werden
-              automatisch erkannt und in digitale Lernkarten umgewandelt.
-            </p>
-            <div
-              onClick={() => inputRef.current && inputRef.current.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
-              className="rounded-2xl border-2 border-dashed p-12 text-center cursor-pointer transition-colors hover:border-yellow-300"
-              style={{ borderColor: S.muted, background: "rgba(255,255,255,.03)" }}
-            >
-              <div className="text-5xl mb-4">🗂️</div>
-              <p className="font-semibold mb-1" style={{ color: S.paper }}>
-                Datei hier ablegen oder klicken
-              </p>
-              <p className="text-sm" style={{ color: S.muted }}>PDF oder .docx</p>
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".pdf,.docx"
-                className="hidden"
-                onChange={(e) => handleFile(e.target.files[0])}
-              />
-            </div>
-            {error && (
-              <div className="mt-4 rounded-lg px-4 py-3 text-sm" style={{ background: "rgba(220,80,80,.15)", color: "#F3B4B4" }}>
-                {error} – bitte erneut versuchen.
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ---------- Laden ---------- */}
-        {screen === "loading" && (
-          <div className="text-center py-24">
-            <div className="inline-block w-10 h-10 rounded-full border-4 border-t-transparent animate-spin mb-6" style={{ borderColor: S.marker, borderTopColor: "transparent" }} />
-            <p className="font-semibold" style={{ color: S.paper }}>Karten werden erkannt …</p>
-            <p className="text-sm mt-1" style={{ color: S.muted }}>Fragen und Antworten werden aus „{fileName}" extrahiert</p>
-          </div>
-        )}
-
-        {/* ---------- Stapel-Übersicht ---------- */}
-        {screen === "deck" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-1" style={{ color: S.paper }}>
-              {cards.length} Karten erkannt
-            </h1>
-            <p className="mb-6" style={{ color: S.muted }}>Kurz prüfen, dann loslernen.</p>
-            <button
-              onClick={() => startStudy(cards)}
-              className="w-full rounded-xl py-4 font-bold text-lg mb-8 transition-transform hover:scale-[1.01] active:scale-[0.99]"
-              style={{ background: S.marker, color: S.ink }}
-            >
-              Lernen starten →
-            </button>
-            <div className="space-y-3">
-              {cards.map((c, i) => (
-                <div key={c.id} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,.05)" }}>
-                  <p className="text-xs mb-1 tracking-wide" style={{ color: S.muted }}>KARTE {i + 1}</p>
-                  <p className="font-semibold" style={{ color: S.paper }}>{c.q}</p>
-                  <p className="text-sm mt-1" style={{ color: S.muted }}>{c.a}</p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => { setScreen("upload"); setFileName(""); }}
-              className="mt-6 text-sm underline"
-              style={{ color: S.muted }}
-            >
-              Andere Datei hochladen
-            </button>
-          </div>
-        )}
-
-        {/* ---------- Lernmodus ---------- */}
-        {screen === "study" && card && (
-          <div>
-            <div className="flex justify-between items-center mb-4 text-sm" style={{ color: S.muted }}>
-              <span>Karte {pos + 1} von {queue.length}</span>
-              <span>{known} gewusst</span>
-            </div>
-            <div className="h-1.5 rounded-full mb-6 overflow-hidden" style={{ background: "rgba(255,255,255,.1)" }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${(pos / queue.length) * 100}%`, background: S.marker }} />
-            </div>
-
-            <div className="flip-scene h-72 mb-6" onClick={() => setFlipped(!flipped)}>
-              <div className={`flip-card ${flipped ? "is-flipped" : ""}`}>
-                <div className="flip-face card-lines p-6 justify-center items-center text-center" style={{ background: S.paper }}>
-                  <p className="text-xs font-bold tracking-widest mb-3" style={{ color: S.muted }}>FRAGE</p>
-                  <p className="text-xl font-semibold leading-relaxed" style={{ color: S.ink }}>{card.q}</p>
-                  <p className="text-xs mt-6" style={{ color: S.muted }}>Tippen zum Umdrehen</p>
-                </div>
-                <div className="flip-face flip-back card-lines p-6 justify-center items-center text-center" style={{ background: S.paper }}>
-                  <p className="text-xs font-bold tracking-widest mb-3 px-2 py-0.5 rotate-[-1deg]" style={{ background: S.marker, color: S.ink }}>ANTWORT</p>
-                  <p className="text-lg leading-relaxed" style={{ color: S.ink }}>{card.a}</p>
-                </div>
-              </div>
-            </div>
-
-            {flipped ? (
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => answer(false)} className="rounded-xl py-4 font-bold" style={{ background: "rgba(255,255,255,.08)", color: S.paper }}>
-                  ↺ Wiederholen
-                </button>
-                <button onClick={() => answer(true)} className="rounded-xl py-4 font-bold" style={{ background: S.green, color: S.paper }}>
-                  ✓ Gewusst
-                </button>
-              </div>
-            ) : (
-              <p className="text-center text-sm" style={{ color: S.muted }}>Karte antippen, um die Antwort zu sehen</p>
-            )}
-          </div>
-        )}
-
-        {/* ---------- Ergebnis ---------- */}
-        {screen === "done" && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">{repeats.length === 0 ? "🏆" : "📚"}</div>
-            <h1 className="text-3xl font-bold mb-2" style={{ color: S.paper }}>
-              {repeats.length === 0 ? "Alles gewusst!" : "Durchgang geschafft"}
-            </h1>
-            <p className="mb-8" style={{ color: S.muted }}>
-              {known} von {queue.length} Karten gewusst
-              {repeats.length > 0 && ` · ${repeats.length} zum Wiederholen`}
-            </p>
-            <div className="space-y-3 max-w-xs mx-auto">
-              {repeats.length > 0 && (
-                <button onClick={() => startStudy(repeats)} className="w-full rounded-xl py-4 font-bold" style={{ background: S.marker, color: S.ink }}>
-                  Nur Wiederholen-Karten üben
-                </button>
-              )}
-              <button onClick={() => startStudy(cards)} className="w-full rounded-xl py-4 font-bold" style={{ background: "rgba(255,255,255,.08)", color: S.paper }}>
-                Alle Karten nochmal
-              </button>
-              <button onClick={() => setScreen("deck")} className="w-full text-sm underline pt-2" style={{ color: S.muted }}>
-                Zurück zur Übersicht
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  if (cfg.mode === "separator") {
+    let sep = cfg.sep;
+    if (sep === "\\t") sep = "\t";
+    if (!sep) return [];
+    const result = [];
+    for (const raw of norm.split("\n")) {
+      const line = raw.trim();
+      if (!line) continue;
+      const idx = line.indexOf(sep);
+      if (idx > 0) result.push({ q: line.slice(0, idx), a: line.slice(idx + sep.length) });
+    }
+    return result.map(c => ({ q: clean(c.q), a: clean(c.a) })).filter(c => c.q && c.a);
+  }
+  return [];
 }
+
+// Bei fehlender Antwort-Markierung: Frage endet beim ersten "?"
+function finalize(list, splitAtQuestionMark) {
+  const clean = s => s.replace(/\s+/g, " ").trim();
+  return list.map(c => {
+    let q = clean(c.q), a = clean(c.a);
+    if (splitAtQuestionMark && !a) {
+      const idx = q.indexOf("?");
+      if (idx > -1) { a = q.slice(idx + 1).trim(); q = q.slice(0, idx + 1).trim(); }
+    }
+    return { q, a };
+  }).filter(c => c.q && c.a);
+}
+
+// ---------- Automatische Voreinstellung ----------
+function autoDetectMode(text) {
+  const low = text.toLowerCase();
+  if (low.includes("frage:") || low.includes("frage :")) {
+    $("mode").value = "prefix"; $("qPrefix").value = "Frage:";
+    $("aPrefix").value = low.includes("antwort") ? "Antwort:" : "";
+  } else if (/^\s*f\s*:/mi.test(text)) {
+    $("mode").value = "prefix"; $("qPrefix").value = "F:";
+    $("aPrefix").value = /^\s*a\s*:/mi.test(text) ? "A:" : "";
+  } else if (/^\s*\d+\s*[.)]\s+/m.test(text)) {
+    $("mode").value = "numbered";
+  } else if (text.includes(";")) {
+    $("mode").value = "separator";
+  } else {
+    $("mode").value = "altParas";
+  }
+  syncModeUI();
+}
+
+// ---------- Einstellungen & Vorschau ----------
+function currentConfig() {
+  return {
+    mode: $("mode").value,
+    qPrefix: $("qPrefix").value,
+    aPrefix: $("aPrefix").value,
+    aPrefixNum: $("aPrefixNum").value,
+    sep: $("sep").value,
+  };
+}
+
+function syncModeUI() {
+  const m = $("mode").value;
+  $("opts-prefix").classList.toggle("hidden", m !== "prefix");
+  $("opts-numbered").classList.toggle("hidden", m !== "numbered");
+  $("opts-separator").classList.toggle("hidden", m !== "separator");
+  $("hint-altParas").style.display = m === "altParas" ? "block" : "none";
+  $("hint-altLines").style.display = m === "altLines" ? "block" : "none";
+}
+
+function updatePreview() {
+  cards = parseCards($("rawText").value, currentConfig());
+  $("cardCount").textContent = cards.length + (cards.length === 1 ? " Karte" : " Karten");
+  const list = $("previewList");
+  list.innerHTML = "";
+  cards.slice(0, 8).forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "preview-card";
+    const num = document.createElement("div"); num.className = "num"; num.textContent = "KARTE " + (i + 1);
+    const q = document.createElement("div"); q.className = "q"; q.textContent = c.q;
+    const a = document.createElement("div"); a.className = "a"; a.textContent = c.a;
+    div.append(num, q, a); list.appendChild(div);
+  });
+  if (cards.length > 8) {
+    const more = document.createElement("p");
+    more.className = "hint"; more.style.textAlign = "center";
+    more.textContent = "… und " + (cards.length - 8) + " weitere";
+    list.appendChild(more);
+  }
+  $("previewEmpty").classList.toggle("hidden", cards.length > 0);
+  $("startBtn").disabled = cards.length === 0;
+}
+
+["mode"].forEach(id => $(id).addEventListener("change", () => { syncModeUI(); updatePreview(); }));
+["qPrefix","aPrefix","aPrefixNum","sep","rawText"].forEach(id =>
+  $(id).addEventListener("input", updatePreview));
+$("backToUpload").addEventListener("click", () => { fileInput.value = ""; show("upload"); });
+
+// ---------- Lernmodus ----------
+function startStudy(deck) {
+  queue = deck.slice(); pos = 0; known = 0; repeats = []; flipped = false;
+  show("study"); renderCard();
+}
+
+function renderCard() {
+  const c = queue[pos];
+  $("qText").textContent = c.q;
+  $("aText").textContent = c.a;
+  $("flipCard").classList.remove("flipped");
+  flipped = false;
+  $("answerBtns").classList.add("hidden");
+  $("tapHint").classList.remove("hidden");
+  $("progressText").textContent = "Karte " + (pos + 1) + " von " + queue.length;
+  $("knownText").textContent = known + " gewusst";
+  $("barFill").style.width = (pos / queue.length * 100) + "%";
+}
+
+function flip() {
+  flipped = !flipped;
+  $("flipCard").classList.toggle("flipped", flipped);
+  $("answerBtns").classList.toggle("hidden", !flipped);
+  $("tapHint").classList.toggle("hidden", flipped);
+}
+$("flipCard").addEventListener("click", flip);
+$("flipCard").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
+
+function answer(gotIt) {
+  const c = queue[pos];
+  if (gotIt) known++; else repeats.push(c);
+  if (pos + 1 < queue.length) { pos++; renderCard(); }
+  else showDone();
+}
+$("btnKnown").addEventListener("click", () => answer(true));
+$("btnRepeat").addEventListener("click", () => answer(false));
+
+function showDone() {
+  show("done");
+  const perfect = repeats.length === 0;
+  $("doneIcon").textContent = perfect ? "🏆" : "📚";
+  $("doneTitle").textContent = perfect ? "Alles gewusst!" : "Durchgang geschafft";
+  $("doneStats").textContent = known + " von " + queue.length + " Karten gewusst" +
+    (perfect ? "" : " · " + repeats.length + " zum Wiederholen");
+  $("btnRepeatSet").classList.toggle("hidden", perfect);
+}
+$("btnRepeatSet").addEventListener("click", () => startStudy(repeats));
+$("btnAll").addEventListener("click", () => startStudy(cards));
+$("btnBackConfig").addEventListener("click", () => { updatePreview(); show("config"); });
+$("startBtn").addEventListener("click", () => startStudy(cards));
+</script>
+</body>
+</html>
