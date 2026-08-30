@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>WLW+ · Lernplattform Steuerrecht</title>
-<meta name="theme-color" content="#8fa5f0">
+<meta name="theme-color" content="#6facff">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,14 +13,14 @@
 <meta name="apple-mobile-web-app-title" content="WLW+">
 <style>
   :root{
-    --blue:#5b74dd; --blue-dark:#4257b5; --green:#77c366; --green-dark:#57a147;
-    --ink:#2a3350; --muted:#8a94b0; --bg-app:#eef1fb;
-    --grad-top:#8fa5f0; --grad-bot:#7b96ec; --desk-bg:#8badf7;
+    --blue:#3f87e6; --blue-dark:#2f6ac2; --green:#77c366; --green-dark:#57a147;
+    --ink:#2a3350; --muted:#8a94b0; --bg-app:#eef5ff;
+    --grad-top:#6facff; --grad-bot:#aacfff; --desk-bg:#8bbcff;
   }
   *{-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
   html,body{margin:0;padding:0;height:100%}
-  body{background:var(--desk-bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+  body{background:linear-gradient(180deg,var(--grad-top),var(--grad-bot)) fixed;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
   input,textarea{font-family:inherit;user-select:text;-webkit-user-select:text}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes sheetDown{to{transform:translateY(105%)}}
@@ -62,18 +62,18 @@
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 0 5px;cursor:pointer;min-height:44px}
   .tab:active{opacity:.6}
   .tab .ic{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:999px;transition:background .15s}
-  .tab.active .ic{background:#e3e9fc;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+  .tab.active .ic{background:#e0efff;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
   .tab .ic svg{width:22px;height:22px;display:block}
   .tab .lb{font-size:10.5px;font-weight:700}
   .tabRaised{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer}
-  .tabRaised .bub{width:44px;height:44px;border-radius:999px;background:linear-gradient(135deg,#8fa5f0,#5b74dd);box-shadow:0 3px 8px rgba(91,116,221,.35);display:flex;align-items:center;justify-content:center;color:#fff;margin-top:-10px;transition:transform .1s}
+  .tabRaised .bub{width:44px;height:44px;border-radius:999px;background:linear-gradient(180deg,#6facff,#3f87e6);box-shadow:0 3px 8px rgba(63,135,230,.35);display:flex;align-items:center;justify-content:center;color:#fff;margin-top:-10px;transition:transform .1s}
   .tabRaised .bub svg{width:23px;height:23px;display:block}
   .tabRaised:active .bub{transform:scale(.92)}
   .tabRaised .lb{font-size:10.5px;font-weight:800;color:var(--blue);margin-top:3px}
 
   /* ---------- Sticky sub-headers on gradient screens ---------- */
   .gradScreen{padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
-  .subHead{position:sticky;top:0;z-index:5;background:rgba(133,157,239,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
+  .subHead{position:sticky;top:0;z-index:5;background:rgba(122,178,255,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
   @media (max-width:767.98px), (hover:none), (pointer:coarse){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
   .backBtn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;padding:6px 10px 6px 0}
   .backBtn:active{opacity:.5}
@@ -90,8 +90,12 @@
   #deskHome{min-height:100vh;padding:34px 40px 60px;box-sizing:border-box}
   .dTitle{display:flex;align-items:center;justify-content:center;gap:9px;font-size:22px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(40,55,120,.25)}
   .dRingWrap{display:flex;justify-content:center;margin:26px 0 34px}
-  .dRing{width:172px;height:172px;border-radius:999px;display:flex;align-items:center;justify-content:center}
-  .dRingIn{width:148px;height:148px;border-radius:999px;background:var(--desk-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+  .ring{position:relative;display:flex;align-items:center;justify-content:center}
+  .ring::before{content:'';position:absolute;inset:0;border-radius:999px;background:var(--ring);
+    -webkit-mask:radial-gradient(closest-side,transparent calc(var(--hole) - 1.5%),#000 var(--hole));
+    mask:radial-gradient(closest-side,transparent calc(var(--hole) - 1.5%),#000 var(--hole))}
+  .dRing{width:172px;height:172px;--hole:86%}
+  .dRingIn{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
   .dRingIn .pct{font-size:34px;font-weight:800;line-height:1}
   .dRingIn .cap{font-size:11px;font-weight:700;letter-spacing:.12em;opacity:.85;margin-top:5px}
   .dStats{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:44px}
@@ -131,7 +135,7 @@
 
 <script>
 /* =============== Data (ported from design 2a) =============== */
-const B='#5b74dd', G='#77c366', GS='#57a147';
+const B='#3f87e6', G='#77c366', GS='#57a147';
 const FAECHER=[
   { name:'Abgabenordnung 2026', icon:'📜', img:'assets/abgabenordnung.png', tint:'#b1f5a3', color:'#3e8f2d', shade:'#2c6b1f', basePct:32,
     themes:[
@@ -259,7 +263,7 @@ function renderDeskHome(){
   el.innerHTML=`
     <div class="dTitle"><span style="font-size:24px">🌱</span> Blutiger Anfänger</div>
     <div class="dRingWrap">
-      <div class="dRing" style="background:conic-gradient(#7fcf7f ${ringPct*3.6}deg, rgba(255,255,255,.28) 0)">
+      <div class="dRing ring" style="--ring:conic-gradient(#7fcf7f ${ringPct*3.6}deg, rgba(255,255,255,.35) 0)">
         <div class="dRingIn"><div class="pct">${ringPct}%</div><div class="cap">GESAMT</div></div>
       </div>
     </div>
@@ -293,14 +297,14 @@ function scrFaecher(){
   }).join('');
   return `
   <div class="fade" style="padding-bottom:24px">
-    <div style="background:linear-gradient(165deg,#8fa5f0,#7b96ec);padding:calc(24px + env(safe-area-inset-top)) 20px 22px;border-radius:0 0 26px 26px">
+    <div style="background:linear-gradient(180deg,#6facff,#9cc6ff);padding:calc(24px + env(safe-area-inset-top)) 20px 22px;border-radius:0 0 26px 26px">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:14px;color:rgba(255,255,255,.85)">Guten Morgen, ${esc(S.charName)}</div>
         <div class="press" onclick="App.goTab('streak')" style="display:flex;align-items:center;gap:5px;background:#fff;border-radius:999px;padding:5px 12px;font-size:14px;font-weight:800;color:#e8862a">🔥 ${S.streak}</div>
       </div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:14px">
-        <div style="width:72px;height:72px;border-radius:999px;background:conic-gradient(#fff ${gesamtPct()}%, rgba(255,255,255,.25) 0);display:flex;align-items:center;justify-content:center;flex:none">
-          <div style="width:58px;height:58px;border-radius:999px;background:#7f99ee;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+        <div class="ring" style="width:72px;height:72px;--hole:81%;--ring:conic-gradient(#fff ${gesamtPct()}%, rgba(255,255,255,.3) 0);flex:none">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
             <div style="font-size:16px;font-weight:800;line-height:1">${gesamtPct()}%</div>
             <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;opacity:.8;margin-top:2px">GESAMT</div>
           </div>
@@ -379,7 +383,7 @@ function scrVideos(){
     const d=done[i], cur=i===S.vid;
     return `
     <div class="press" onclick="App.pickVid(${i})" style="display:flex;align-items:center;gap:12px;border:2px solid ${d?G:(cur?B:'#e5e9f6')};background:${d?G:'#fff'};border-radius:13px;padding:11px 14px">
-      <div style="width:26px;height:26px;border-radius:8px;background:${d?'rgba(255,255,255,.25)':(cur?'#e6ebfc':'#f0f2fa')};color:${d?'#fff':(cur?B:'#a9b2c9')};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none">${i+1}</div>
+      <div style="width:26px;height:26px;border-radius:8px;background:${d?'rgba(255,255,255,.25)':(cur?'#e4f0ff':'#f0f2fa')};color:${d?'#fff':(cur?B:'#a9b2c9')};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none">${i+1}</div>
       <div style="flex:1;font-size:13.5px;font-weight:700;color:${d?'#fff':(cur?'var(--ink)':'#8a94b0')};line-height:1.3">${esc(name)}</div>
       <div style="font-size:14px;font-weight:800;color:${d?'#fff':(cur?B:'#c3cad9')};flex:none">${d?'✓':'▶'}</div>
     </div>`;
@@ -393,8 +397,8 @@ function scrVideos(){
     <div style="padding:14px 18px 0">
       <div style="font-size:12px;font-weight:800;letter-spacing:.05em;color:#fff;text-transform:uppercase;margin-bottom:10px;text-shadow:0 1px 3px rgba(40,55,120,.25)">${esc(vt.t)}</div>
       <div style="background:#fff;border-radius:18px;box-shadow:0 2px 8px rgba(60,80,160,.1);overflow:hidden">
-        <div style="height:168px;background:#e6ebfc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
-          <div class="press" style="width:54px;height:54px;border-radius:999px;background:${B};display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 4px 12px rgba(91,116,221,.4)">▶</div>
+        <div style="height:168px;background:#e4f0ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+          <div class="press" style="width:54px;height:54px;border-radius:999px;background:${B};display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 4px 12px rgba(63,135,230,.4)">▶</div>
           <div style="font-size:12px;color:#7d88ad">Video abspielen</div>
         </div>
         <div style="padding:13px 16px"><div style="font-size:15px;font-weight:800;color:var(--ink);line-height:1.3">${esc(list[S.vid])}</div></div>
@@ -404,10 +408,10 @@ function scrVideos(){
         <div style="font-size:11px;font-weight:800;letter-spacing:.05em;color:#8a94b0;text-transform:uppercase;margin-bottom:9px">Paragraphen-Markierungen</div>
         <div style="display:flex;flex-wrap:wrap;gap:7px">
           ${shown.map(p=>`<div class="press" style="background:${B};color:#fff;font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${esc(p)}</div>`).join('')}
-          ${paras.length>4?`<div class="press" onclick="App.toggleParas()" style="background:#e6ebfc;color:${B};font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${S.parasOpen?'weniger anzeigen':'+'+(paras.length-4)+' weitere'}</div>`:''}
+          ${paras.length>4?`<div class="press" onclick="App.toggleParas()" style="background:#e4f0ff;color:${B};font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${S.parasOpen?'weniger anzeigen':'+'+(paras.length-4)+' weitere'}</div>`:''}
         </div>
       </div>`:''}
-      <div class="btn3d" onclick="App.nextVideo()" style="margin:12px auto 0;width:fit-content;background:${B};color:#fff;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:800;box-shadow:0 4px 0 ${'#4257b5'}">Nächstes Video →</div>
+      <div class="btn3d" onclick="App.nextVideo()" style="margin:12px auto 0;width:fit-content;background:${B};color:#fff;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:800;box-shadow:0 4px 0 ${'#2f6ac2'}">Nächstes Video →</div>
       <div style="font-size:14.5px;font-weight:800;color:#fff;margin:20px 0 10px;text-shadow:0 1px 3px rgba(40,55,120,.25)">Alle Videos</div>
       <div style="display:flex;flex-direction:column;gap:8px">${rows}</div>
       <div class="btn3d" onclick="App.toLK()" style="margin-top:16px;background:${G};color:#fff;border-radius:14px;padding:14px;text-align:center;font-size:15px;font-weight:800;box-shadow:0 4px 0 ${GS}">Zur Lernkontrolle →</div>
@@ -436,13 +440,13 @@ function scrLK(){
       </div>
       <div style="font-size:12px;font-weight:700;color:#8a94b0;margin-bottom:4px">${esc(q.topic)}</div>
       <div style="font-size:16.5px;font-weight:800;color:var(--ink);line-height:1.35">${esc(q.q)}</div>
-      ${q.scenario?`<div style="margin-top:10px;background:#eef2ff;border-radius:13px;padding:12px 14px;font-size:13.5px;color:#3a4570;line-height:1.5;font-weight:600">${esc(q.scenario)}</div>`:''}
+      ${q.scenario?`<div style="margin-top:10px;background:#ecf4ff;border-radius:13px;padding:12px 14px;font-size:13.5px;color:#3a4570;line-height:1.5;font-weight:600">${esc(q.scenario)}</div>`:''}
       <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px">${opts}</div>
       ${answered?`<div class="riseIn" style="margin-top:12px;background:${ok?'#eef8ea':'#fdeaea'};border-radius:14px;padding:13px 15px">
         <div style="font-size:14px;font-weight:800;color:${ok?GS:'#d64545'}">${ok?'Richtig!':'Nicht ganz.'}</div>
         <div style="font-size:13px;color:#4a5568;margin-top:3px;line-height:1.45">${esc(q.fb)}</div></div>`:''}
     </div>
-    ${answered?`<div class="btn3d riseIn" onclick="App.lkNext()" style="animation-delay:.08s;margin:14px 16px 0;background:${B};color:#fff;border-radius:14px;padding:14px;text-align:center;font-size:15px;font-weight:800;box-shadow:0 4px 0 #4257b5">${S.lkI===LK_QS.length-1?'Ergebnis anzeigen':'Nächste Aufgabe →'}</div>`:''}`;
+    ${answered?`<div class="btn3d riseIn" onclick="App.lkNext()" style="animation-delay:.08s;margin:14px 16px 0;background:${B};color:#fff;border-radius:14px;padding:14px;text-align:center;font-size:15px;font-weight:800;box-shadow:0 4px 0 #2f6ac2">${S.lkI===LK_QS.length-1?'Ergebnis anzeigen':'Nächste Aufgabe →'}</div>`:''}`;
   } else {
     inner=`
     <div style="margin:20px 16px 0;background:#fff;border-radius:20px;padding:26px 20px;text-align:center;box-shadow:0 2px 8px rgba(60,80,160,.1)">
@@ -478,7 +482,7 @@ function scrUF(){
     inner=`<div style="padding:14px 16px 0;display:flex;flex-direction:column;gap:9px">
       ${UF_CASES.map((title,i)=>`
       <div class="press" onclick="App.ufOpen(${i})" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:15px;padding:13px 15px;box-shadow:0 2px 8px rgba(40,55,120,.15)">
-        <div style="width:30px;height:30px;border-radius:9px;background:${i===0?G:'#eef2ff'};color:${i===0?'#fff':B};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none">${i+1}</div>
+        <div style="width:30px;height:30px;border-radius:9px;background:${i===0?G:'#ecf4ff'};color:${i===0?'#fff':B};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none">${i+1}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.35">${esc(title)}</div>
           <div style="font-size:11.5px;font-weight:700;color:#a9b2c9;margin-top:3px">Noch nicht bearbeitet</div>
@@ -493,12 +497,12 @@ function scrUF(){
         <div style="font-size:16px;font-weight:800;color:var(--ink);line-height:1.35">${esc(UF_CASES[S.ufCase])}</div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:#8a94b0;text-transform:uppercase;margin:14px 0 6px">Sachverhalt</div>
         ${UF_SACHVERHALT.map(t=>`<div style="font-size:13.5px;color:#3a4570;line-height:1.55;margin-bottom:9px">${esc(t)}</div>`).join('')}
-        <div style="background:#eef2ff;border-left:3px solid ${B};border-radius:0 12px 12px 0;padding:11px 13px;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.5">${esc(UF_FRAGE)}</div>
+        <div style="background:#ecf4ff;border-left:3px solid ${B};border-radius:0 12px 12px 0;padding:11px 13px;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.5">${esc(UF_FRAGE)}</div>
       </div>
       <div style="background:#fff;border-radius:18px;padding:15px 16px;box-shadow:0 2px 8px rgba(40,55,120,.15);margin-top:11px">
         <div style="font-size:12px;font-weight:800;color:var(--ink);margin-bottom:8px">Deine Lösung</div>
         <textarea id="ufText" oninput="App.ufSetText(this.value)" placeholder="Gib hier deine Lösung ein …" style="width:100%;box-sizing:border-box;border:2px solid #e5e9f6;border-radius:12px;padding:11px 13px;font-size:13.5px;color:var(--ink);line-height:1.5;outline:none;min-height:96px;resize:vertical;background:#fff">${esc(S.ufText)}</textarea>
-        <div class="btn3d" onclick="App.ufSubmit()" style="margin-top:10px;background:${B};color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:14px;font-weight:800;box-shadow:0 4px 0 #4257b5">Antwort abgeben</div>
+        <div class="btn3d" onclick="App.ufSubmit()" style="margin-top:10px;background:${B};color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:14px;font-weight:800;box-shadow:0 4px 0 #2f6ac2">Antwort abgeben</div>
         <div class="press" onclick="App.ufAskKI()" style="margin-top:8px;background:linear-gradient(135deg,#9b8ae0,#7d6bd0);color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:14px;font-weight:800">✨ KI-Korrektur anfragen</div>
       </div>
       ${S.ufKI?`<div style="background:#f4f0ff;border:2px solid #c9bdf0;border-radius:16px;padding:14px 15px;margin-top:11px">
@@ -528,7 +532,7 @@ function scrCommunity(){
     { pos:'🥉', av:'📚', tint:'#bfe8b4', name:'Km', title:'Wissensdurstig', streak:54, xp:24932, bg:'#fff' },
     { pos:'4', av:'👤', tint:'#e2e7f7', name:'Rebecca Popp', title:'Fortgeschrittener', streak:'', xp:22621, bg:'#fff' },
     { pos:'5', av:'😎', tint:'#f8de89', name:'Christian', title:'Wissensdurstig', streak:1, xp:11037, bg:'#fff' },
-    { pos:'6', av:S.avatar, tint:S.avBg, name:S.charName+' (Du)', title:'Blutiger Anfänger', streak:S.streak, xp:7393, bg:'#eef2ff' },
+    { pos:'6', av:S.avatar, tint:S.avBg, name:S.charName+' (Du)', title:'Blutiger Anfänger', streak:S.streak, xp:7393, bg:'#ecf4ff' },
   ];
   const rang=S.comTab==='rang';
   let inner='';
@@ -784,7 +788,7 @@ function confetti(){
   const wrap=document.createElement('div');
   wrap.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:60;overflow:hidden';
   shell.appendChild(wrap);
-  const colors=['#5b74dd','#77c366','#f5cf5a','#ef6f8e','#8b5fd0','#f6a13c'];
+  const colors=['#3f87e6','#77c366','#f5cf5a','#ef6f8e','#8b5fd0','#f6a13c'];
   const cx=shell.clientWidth/2, cy=shell.clientHeight*0.32;
   for(let i=0;i<22;i++){
     const d=document.createElement('div');
