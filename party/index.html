@@ -22,28 +22,22 @@
   html,body{margin:0;padding:0;height:100%}
   body{background:var(--desk-bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
   input,textarea{font-family:inherit;user-select:text;-webkit-user-select:text}
-  @property --rp{syntax:'<percentage>';initial-value:0%;inherits:false}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes sheetDown{to{transform:translateY(105%)}}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes dimOut{to{opacity:0}}
   @keyframes popIn{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
   @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  @keyframes cardIn{from{opacity:0;transform:translateX(var(--tx,0)) translateY(16px) scale(.985)}to{opacity:1;transform:translateX(var(--tx,0))}}
   @keyframes shakeX{0%,100%{transform:none}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-  @keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09) rotate(-2deg)}}
-  .fade{}
-  .cardIn{animation:cardIn .45s cubic-bezier(.22,1,.36,1) both}
+  .fade{animation:fadeIn .2s}
   .riseIn{animation:riseIn .3s cubic-bezier(.22,1,.36,1) both}
   .popIn{animation:popIn .34s cubic-bezier(.34,1.56,.64,1) both}
   .shakeX{animation:shakeX .38s cubic-bezier(.36,.07,.19,.97) both}
-  .flame{display:inline-block;animation:flamePulse 1.8s ease-in-out infinite;transform-origin:50% 85%}
   .press{transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;cursor:pointer;will-change:transform}
   .press:active{transform:scale(.96);transition-duration:.08s}
   .btn3d{transition:transform .2s cubic-bezier(.34,1.56,.64,1);cursor:pointer;will-change:transform}
   .btn3d:active{transform:translateY(3px) scale(.99);transition-duration:.08s}
-  .ringGrad{background:conic-gradient(#fff var(--rp,0%), rgba(255,255,255,.25) 0);transition:--rp 1s cubic-bezier(.22,1,.36,1)}
-  .barFill{transition:width .8s cubic-bezier(.22,1,.36,1)}
+
 
   /* ---------- App shell (the 2a mobile app) ---------- */
   #appShell{position:relative;height:100dvh;display:flex;flex-direction:column;background:var(--bg-app);overflow:hidden}
@@ -78,7 +72,7 @@
   .tabRaised .lb{font-size:10.5px;font-weight:800;color:var(--blue);margin-top:3px}
 
   /* ---------- Sticky sub-headers on gradient screens ---------- */
-  .gradScreen{padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
+  .gradScreen{animation:fadeIn .2s;padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
   .subHead{position:sticky;top:0;z-index:5;background:rgba(133,157,239,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
   @media (max-width:767.98px), (hover:none), (pointer:coarse){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
   .backBtn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;padding:6px 10px 6px 0}
@@ -96,7 +90,7 @@
   #deskHome{min-height:100vh;padding:34px 40px 60px;box-sizing:border-box}
   .dTitle{display:flex;align-items:center;justify-content:center;gap:9px;font-size:22px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(40,55,120,.25)}
   .dRingWrap{display:flex;justify-content:center;margin:26px 0 34px}
-  .dRing{width:172px;height:172px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:conic-gradient(#7fcf7f var(--rp,0%), rgba(255,255,255,.28) 0);transition:--rp 1.1s cubic-bezier(.22,1,.36,1)}
+  .dRing{width:172px;height:172px;border-radius:999px;display:flex;align-items:center;justify-content:center}
   .dRingIn{width:148px;height:148px;border-radius:999px;background:var(--desk-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
   .dRingIn .pct{font-size:34px;font-weight:800;line-height:1}
   .dRingIn .cap{font-size:11px;font-weight:700;letter-spacing:.12em;opacity:.85;margin-top:5px}
@@ -265,7 +259,7 @@ function renderDeskHome(){
   el.innerHTML=`
     <div class="dTitle"><span style="font-size:24px">🌱</span> Blutiger Anfänger</div>
     <div class="dRingWrap">
-      <div class="dRing" data-rp="${ringPct}">
+      <div class="dRing" style="background:conic-gradient(#7fcf7f ${ringPct*3.6}deg, rgba(255,255,255,.28) 0)">
         <div class="dRingIn"><div class="pct">${ringPct}%</div><div class="cap">GESAMT</div></div>
       </div>
     </div>
@@ -287,14 +281,14 @@ function scrFaecher(){
     const pctColor=started?(f.img?'#2c6b1f':GS):'#a9b2c9';
     const bar=started?(f.img?'#3e8f2d':G):'#c9d2ea';
     return `
-    <div class="press cardIn" onclick="App.openFach(${i})" style="background:${cardBg};border-radius:18px;padding:15px 17px;box-shadow:0 2px 6px rgba(60,80,160,.08);animation-delay:${80+i*55}ms">
+    <div class="press" onclick="App.openFach(${i})" style="background:${cardBg};border-radius:18px;padding:15px 17px;box-shadow:0 2px 6px rgba(60,80,160,.08)">
       <div style="display:flex;align-items:center;gap:13px">
         ${f.img?`<div style="width:52px;height:52px;flex:none;border-radius:13px;overflow:hidden;background-image:url(${f.img});background-size:cover;background-position:center"></div>`
                :`<div style="width:44px;height:44px;border-radius:13px;background:${f.tint};display:flex;align-items:center;justify-content:center;font-size:21px;flex:none">${f.icon}</div>`}
         <div style="flex:1;min-width:0;font-size:15.5px;font-weight:700;color:var(--ink)">${esc(f.name)}</div>
         <div style="font-size:13px;font-weight:800;color:${pctColor};flex:none">${pct}%</div>
       </div>
-      <div style="height:6px;background:${track};border-radius:3px;overflow:hidden;margin-top:11px"><div class="barFill" data-w="${pct}" style="height:100%;width:0%;background:${bar};border-radius:3px"></div></div>
+      <div style="height:6px;background:${track};border-radius:3px;overflow:hidden;margin-top:11px"><div style="height:100%;width:${pct}%;background:${bar};border-radius:3px;transition:width .4s"></div></div>
     </div>`;
   }).join('');
   return `
@@ -305,7 +299,7 @@ function scrFaecher(){
         <div class="press" onclick="App.goTab('streak')" style="display:flex;align-items:center;gap:5px;background:#fff;border-radius:999px;padding:5px 12px;font-size:14px;font-weight:800;color:#e8862a">🔥 ${S.streak}</div>
       </div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:14px">
-        <div class="ringGrad" data-rp="${gesamtPct()}" style="width:72px;height:72px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none">
+        <div style="width:72px;height:72px;border-radius:999px;background:conic-gradient(#fff ${gesamtPct()}%, rgba(255,255,255,.25) 0);display:flex;align-items:center;justify-content:center;flex:none">
           <div style="width:58px;height:58px;border-radius:999px;background:#7f99ee;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
             <div style="font-size:16px;font-weight:800;line-height:1">${gesamtPct()}%</div>
             <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;opacity:.8;margin-top:2px">GESAMT</div>
@@ -331,7 +325,7 @@ function scrPfad(){
       const bFilter=t.locked?'grayscale(1) opacity(.6)':'none';
       const icon=t.bigIcon||t.icon, bSize=t.bigIcon?'15px':'24px';
       return `
-      <div class="cardIn" style="display:flex;justify-content:center;padding:12px 0 74px;--tx:${off}px;transform:translateX(${off}px);animation-delay:${60+nodeIdx*50}ms">
+      <div style="display:flex;justify-content:center;padding:12px 0 74px;transform:translateX(${off}px)">
         <div style="position:relative">
           <div style="width:56px;height:56px;transform:rotate(45deg);border-radius:17px;background:${bBg};box-shadow:${bShadow};display:flex;align-items:center;justify-content:center;margin:4px">
             <div style="transform:rotate(-45deg);font-size:${bSize};white-space:nowrap;filter:${bFilter}">${icon}</div>
@@ -349,7 +343,7 @@ function scrPfad(){
     const done=t.st==='done';
     const num=fach.themes.slice(0,i+1).filter(x=>!x.badge).length;
     return `
-    <div class="cardIn" style="display:flex;justify-content:center;padding:11px 0 22px;--tx:${off}px;transform:translateX(${off}px);animation-delay:${60+nodeIdx*50}ms">
+    <div style="display:flex;justify-content:center;padding:11px 0 22px;transform:translateX(${off}px)">
       <div style="position:relative">
         <div class="btn3d" onclick="App.openTheme(${i})" style="width:64px;height:64px;border-radius:999px;background:${done?G:'#fff'};box-shadow:${done?'0 5px 0 '+GS:'0 5px 0 #c9d3f0'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:${done?'#fff':fach.color}">${done?'✓':num}</div>
         <div style="position:absolute;top:68px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(40,55,120,.25)">${esc(t.label)}</div>
@@ -365,7 +359,7 @@ function scrPfad(){
         <div style="flex:1;text-align:center;font-size:15.5px;font-weight:700;color:#fff;margin-right:62px">${esc(FAECHER[S.fachIdx].name)}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-        <div style="flex:1;height:5px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden"><div class="barFill" data-w="${pct}" style="height:100%;width:0%;background:#8fe07a;border-radius:3px"></div></div>
+        <div style="flex:1;height:5px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#8fe07a;border-radius:3px"></div></div>
         <div style="font-size:12px;font-weight:800;color:#fff">${pct}%</div>
       </div>
     </div>
@@ -615,7 +609,7 @@ function scrStreak(){
   <div class="fade" style="padding:calc(24px + env(safe-area-inset-top)) 18px 24px">
     <div style="font-size:27px;font-weight:800;color:var(--ink);margin:8px 0 14px">Streak</div>
     <div style="background:linear-gradient(150deg,#f6a13c,#e8862a);border-radius:22px;padding:24px;text-align:center;color:#fff;box-shadow:0 6px 18px rgba(232,134,42,.35);margin-bottom:12px">
-      <div style="font-size:52px;line-height:1"><span class="flame">🔥</span></div>
+      <div style="font-size:52px;line-height:1">🔥</div>
       <div style="font-size:42px;font-weight:800;line-height:1;margin-top:8px">${S.streak}</div>
       <div style="font-size:14px;font-weight:700;opacity:.9;margin-top:4px">Tage in Folge</div>
     </div>
@@ -733,12 +727,6 @@ function animCloseSheet(){
 }
 
 /* =============== Router / render =============== */
-let _navKey=null,_navDepth=0;
-const _depth=()=>{
-  if(S.tab!=='lernen') return 0;
-  const d={faecher:0,pfad:1,videos:2,lk:2,uf:2}[S.screen]??0;
-  return d+(S.screen==='uf'&&S.ufCase!==null?1:0);
-};
 function render(){
   const home=S.tab==='lernen'&&S.screen==='faecher';
   document.body.classList.toggle('deskHome',home);
@@ -750,24 +738,7 @@ function render(){
   else if(S.tab==='badges') html=scrBadges();
   else if(S.tab==='streak') html=scrStreak();
   const sc=document.getElementById('screen');
-  const key=S.tab+'|'+S.screen+'|'+S.fachIdx+'|'+(S.ufCase===null?'':S.ufCase);
-  const depth=_depth();
-  const navChanged=key!==_navKey;
   sc.innerHTML=html; sc.scrollTop=0;
-  if(navChanged&&_navKey!==null&&sc.firstElementChild){
-    let from;
-    if(depth>_navDepth)      from={opacity:0,transform:'translateX(38px)'};   // push deeper
-    else if(depth<_navDepth) from={opacity:0,transform:'translateX(-38px)'};  // pop back
-    else                     from={opacity:0,transform:'translateY(12px)'};   // tab switch
-    sc.firstElementChild.animate([from,{opacity:1,transform:'none'}],
-      {duration:300,easing:'cubic-bezier(.22,1,.36,1)'});
-  }
-  _navKey=key;_navDepth=depth;
-  // activate animated progress bars & rings on next frame
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    document.querySelectorAll('[data-w]').forEach(el=>{el.style.width=el.dataset.w+'%';});
-    document.querySelectorAll('[data-rp]').forEach(el=>{el.style.setProperty('--rp',el.dataset.rp+'%');});
-  }));
   renderTabbar(); renderSheet();
 }
 
