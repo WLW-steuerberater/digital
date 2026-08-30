@@ -33,22 +33,22 @@
   #appShell{position:relative;height:100dvh;display:flex;flex-direction:column;background:var(--bg-app);overflow:hidden}
   #screen{flex:1;overflow-y:auto;overflow-x:hidden}
   /* Desktop: app shell becomes a centered phone-like card for inner screens */
-  @media (min-width:768px){
+  @media (min-width:768px) and (hover:hover) and (pointer:fine){
     #appShell{width:430px;height:min(880px,calc(100vh - 48px));margin:24px auto;border-radius:34px;box-shadow:0 24px 60px rgba(30,45,110,.35);border:1px solid rgba(255,255,255,.35)}
     body.deskHome #appShell{display:none}
   }
-  @media (max-width:767.98px){
+  @media (max-width:767.98px), (hover:none), (pointer:coarse){
     #deskHome{display:none !important}
   }
   body:not(.deskHome) #deskHome{display:none}
-  @media (min-width:768px){
+  @media (min-width:768px) and (hover:hover) and (pointer:fine){
     body.deskHome{overflow:auto}
     body.deskHome #deskHome{display:block}
   }
 
   /* ---------- Tab bar ---------- */
   #tabbar{flex:none;display:flex;align-items:flex-end;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid rgba(60,80,160,.09);padding:8px 6px calc(14px + env(safe-area-inset-bottom))}
-  @media (min-width:768px){#tabbar{border-radius:0 0 33px 33px;padding-bottom:14px}}
+  @media (min-width:768px) and (hover:hover) and (pointer:fine){#tabbar{border-radius:0 0 33px 33px;padding-bottom:14px}}
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;cursor:pointer;min-height:44px}
   .tab:active{opacity:.6}
   .tab .ic{font-size:21px}
@@ -61,7 +61,7 @@
   /* ---------- Sticky sub-headers on gradient screens ---------- */
   .gradScreen{animation:fadeIn .2s;padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
   .subHead{position:sticky;top:0;z-index:5;background:rgba(133,157,239,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
-  @media (max-width:767.98px){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
+  @media (max-width:767.98px), (hover:none), (pointer:coarse){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
   .backBtn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;padding:6px 10px 6px 0}
   .backBtn:active{opacity:.5}
 
@@ -69,7 +69,7 @@
   #sheetWrap{position:absolute;inset:0;z-index:30}
   #sheetWrap .dim{position:absolute;inset:0;background:rgba(42,51,80,.42);animation:fadeIn .2s}
   #sheetWrap .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px 42px;animation:sheetUp .28s cubic-bezier(.32,.72,0,1)}
-  @media (min-width:768px){#sheetWrap .sheet{border-radius:24px 24px 33px 33px}}
+  @media (min-width:768px) and (hover:hover) and (pointer:fine){#sheetWrap .sheet{border-radius:24px 24px 33px 33px}}
 
   /* ---------- Desktop home (screenshot layout) ---------- */
   #deskHome{min-height:100vh;padding:34px 40px 60px;box-sizing:border-box}
@@ -734,7 +734,7 @@ function showInstallChip(){
   chip.id = 'installChip';
   chip.innerHTML = '📲&nbsp; Als App installieren';
   chip.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));z-index:99;background:#1c2433;color:#fff;font-size:13px;font-weight:800;border-radius:999px;padding:11px 18px;box-shadow:0 6px 18px rgba(20,30,70,.4);cursor:pointer;display:flex;align-items:center;animation:fadeIn .3s';
-  if (window.matchMedia('(min-width:768px)').matches) chip.style.bottom = '28px';
+  if (window.matchMedia('(min-width:768px) and (hover:hover) and (pointer:fine)').matches) chip.style.bottom = '28px';
   chip.onclick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
