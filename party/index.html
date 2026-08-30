@@ -41,7 +41,7 @@
   /* ---------- App shell (the 2a mobile app) ---------- */
   #appShell{position:relative;height:100dvh;display:flex;flex-direction:column;background:var(--bg-app);overflow:hidden}
   #screen{flex:1;position:relative;overflow:hidden}
-  .layer{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg-app)}
+  .layer{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg-app);touch-action:pan-y;will-change:transform}
   /* Desktop: app shell becomes a centered phone-like card for inner screens */
   @media (min-width:768px) and (hover:hover) and (pointer:fine){
     #appShell{width:430px;height:min(880px,calc(100vh - 48px));margin:24px auto;border-radius:34px;box-shadow:0 24px 60px rgba(30,45,110,.35);border:1px solid rgba(255,255,255,.35)}
@@ -808,6 +808,138 @@ function confetti(){
 /* =============== Haptics =============== */
 const hapt=(ms=8)=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 
+/* =============== Swipe gestures (tab pager + edge back) =============== */
+const TAB_ORDER=['home','community','badges','streak'];
+const tabIdx=()=> (S.tab==='lernen') ? (S.screen==='faecher'?0:-1) : TAB_ORDER.indexOf(S.tab);
+const htmlForTab=id=> id==='home'?scrFaecher() : id==='community'?scrCommunity() : id==='badges'?scrBadges() : scrStreak();
+const stateForTab=id=> id==='home'?{tab:'lernen',screen:'faecher',theme:null,ufCase:null}:{tab:id,theme:null};
+function backTarget(){
+  if(S.tab!=='lernen'||S.screen==='faecher') return null;
+  if(S.screen==='pfad')  return {patch:{screen:'faecher',theme:null}, html:()=>scrFaecher()};
+  if(S.screen==='videos'||S.screen==='lk') return {patch:{screen:'pfad',theme:null,lkPicked:null}, html:()=>scrPfad()};
+  if(S.screen==='uf'){
+    if(S.ufCase!==null) return {patch:{ufCase:null,ufML:false,ufKI:false}, html:()=>{const c=S.ufCase;S.ufCase=null;const h=scrUF();S.ufCase=c;return h;}};
+    return {patch:{screen:'pfad',theme:null}, html:()=>scrPfad()};
+  }
+  return null;
+}
+function syncSilentNav(keepLayer){
+  _navKey=S.tab+'|'+S.screen+'|'+S.fachIdx+'|'+(S.ufCase===null?'':S.ufCase);
+  const home=S.tab==='lernen'&&S.screen==='faecher';
+  document.body.classList.toggle('deskHome',home);
+  if(home) renderDeskHome();
+  if(keepLayer){keepLayer.style.transition='';keepLayer.style.transform='';keepLayer.style.boxShadow='';keepLayer.style.pointerEvents='';}
+  renderTabbar(); renderSheet();
+}
+function attachGestures(){
+  const sc=document.getElementById('screen');
+  const EASE='transform .28s cubic-bezier(.22,1,.36,1)';
+  let mode=null,locked=false,startX=0,startY=0,lastX=0,lastT=0,vx=0,W=0;
+  let cur=null,other=null,targetId=null,dir=0,bt=null,edge=false,lastDx=0;
+
+  const settle=(el,tf,done)=>{
+    el.style.transition=EASE; el.style.transform=tf;
+    let fin=false; const f=()=>{if(fin)return;fin=true;el.removeEventListener('transitionend',f);done&&done();};
+    el.addEventListener('transitionend',f); setTimeout(f,340);
+  };
+
+  sc.addEventListener('touchstart',e=>{
+    if(S.theme!==null) return;
+    if(/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    const t=e.touches[0];
+    startX=t.clientX; startY=t.clientY; lastX=startX; lastT=e.timeStamp; vx=0;
+    locked=false; mode='idle'; lastDx=0;
+    edge = startX<32 && backTarget()!==null;
+  },{passive:true});
+
+  sc.addEventListener('touchmove',e=>{
+    if(mode===null||mode==='scroll') return;
+    const t=e.touches[0];
+    const dx=t.clientX-startX, dy=t.clientY-startY;
+    const dt=Math.max(1,e.timeStamp-lastT);
+    vx=(t.clientX-lastX)/dt; lastX=t.clientX; lastT=e.timeStamp;
+    if(!locked){
+      if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){mode='scroll';return;}
+      if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2){
+        locked=true; W=sc.clientWidth;
+        cur=sc.querySelector('.layer:last-of-type')||sc.querySelector('.layer');
+        if(edge&&dx>0){
+          mode='back'; bt=backTarget();
+          other=document.createElement('div'); other.className='layer';
+          other.innerHTML=bt.html();
+          other.style.transform='translateX(-28%)';
+          sc.insertBefore(other,cur);
+          cur.style.boxShadow='-14px 0 34px rgba(25,55,120,.28)';
+        } else if(tabIdx()>=0){
+          dir=dx<0?1:-1;
+          const ti=tabIdx()+dir;
+          if(ti>=0&&ti<TAB_ORDER.length){
+            mode='pager'; targetId=TAB_ORDER[ti];
+            other=document.createElement('div'); other.className='layer';
+            other.innerHTML=htmlForTab(targetId);
+            other.style.transform=`translateX(${dir*100}%)`;
+            sc.appendChild(other);
+          } else { mode='rubber'; other=null; }
+        } else { mode='scroll'; return; }
+      } else return;
+    }
+    e.preventDefault();
+    if(mode==='pager'){
+      const dxc=dir===1?Math.min(0,dx):Math.max(0,dx); lastDx=dxc;
+      cur.style.transition='none'; other.style.transition='none';
+      cur.style.transform=`translateX(${dxc}px)`;
+      other.style.transform=`translateX(${dxc+dir*W}px)`;
+    } else if(mode==='rubber'){
+      lastDx=dx*0.32;
+      cur.style.transition='none';
+      cur.style.transform=`translateX(${lastDx}px)`;
+    } else if(mode==='back'){
+      const d=Math.max(0,dx); lastDx=d;
+      cur.style.transition='none'; other.style.transition='none';
+      cur.style.transform=`translateX(${d}px)`;
+      other.style.transform=`translateX(${-28+28*(d/W)}%)`;
+    }
+  },{passive:false});
+
+  const finish=()=>{
+    const c=cur,o=other,tid=targetId,d=dir,B=bt,m=mode;
+    mode=null;locked=false;other=null;cur=null;bt=null;
+    if(m==='pager'&&c&&o){
+      const commit=Math.abs(lastDx)>W*0.32||(d===1?vx<-0.45:vx>0.45);
+      if(commit){
+        hapt();
+        settle(o,'translateX(0)');
+        settle(c,`translateX(${-d*W}px)`,()=>{
+          c.remove();
+          Object.assign(S,stateForTab(tid));
+          syncSilentNav(o);
+        });
+      } else {
+        settle(c,'translateX(0)',()=>{c.style.transition='';});
+        settle(o,`translateX(${d*100}%)`,()=>o.remove());
+      }
+    } else if(m==='rubber'&&c){
+      settle(c,'translateX(0)',()=>{c.style.transition='';c.style.transform='';});
+    } else if(m==='back'&&c&&o){
+      const commit=lastDx>W*0.30||vx>0.5;
+      if(commit){
+        hapt();
+        settle(o,'translateX(0)');
+        settle(c,`translateX(${W}px)`,()=>{
+          c.remove();
+          Object.assign(S,B.patch);
+          syncSilentNav(o);
+        });
+      } else {
+        settle(c,'translateX(0)',()=>{c.style.transition='';c.style.boxShadow='';});
+        settle(o,'translateX(-28%)',()=>o.remove());
+      }
+    }
+  };
+  sc.addEventListener('touchend',finish);
+  sc.addEventListener('touchcancel',finish);
+}
+
 /* =============== Actions =============== */
 window.App={
   goHome:()=>{hapt();set({tab:'lernen',screen:'faecher',theme:null,ufCase:null});},
@@ -847,6 +979,7 @@ window.App={
   setAvBg:c=>set({avBg:c}),
 };
 render();
+attachGestures();
 window.addEventListener('resize',()=>{ /* re-evaluate desktop/mobile home split */ });
 
 /* =============== PWA =============== */
