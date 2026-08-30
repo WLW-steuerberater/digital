@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>WLW+ · Lernplattform Steuerrecht</title>
+<meta name="theme-color" content="#8fa5f0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WLW+">
 <style>
   :root{
     --blue:#5b74dd; --blue-dark:#4257b5; --green:#77c366; --green-dark:#57a147;
@@ -54,7 +61,7 @@
   /* ---------- Sticky sub-headers on gradient screens ---------- */
   .gradScreen{animation:fadeIn .2s;padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
   .subHead{position:sticky;top:0;z-index:5;background:rgba(133,157,239,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
-  @media (max-width:767.98px){.subHead{padding-top:max(20px, env(safe-area-inset-top))}}
+  @media (max-width:767.98px){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
   .backBtn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;padding:6px 10px 6px 0}
   .backBtn:active{opacity:.5}
 
@@ -709,6 +716,34 @@ window.App={
 };
 render();
 window.addEventListener('resize',()=>{ /* re-evaluate desktop/mobile home split */ });
+
+/* =============== PWA =============== */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+}
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isStandalone) showInstallChip();
+});
+function showInstallChip(){
+  if (document.getElementById('installChip')) return;
+  const chip = document.createElement('div');
+  chip.id = 'installChip';
+  chip.innerHTML = '📲&nbsp; Als App installieren';
+  chip.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));z-index:99;background:#1c2433;color:#fff;font-size:13px;font-weight:800;border-radius:999px;padding:11px 18px;box-shadow:0 6px 18px rgba(20,30,70,.4);cursor:pointer;display:flex;align-items:center;animation:fadeIn .3s';
+  if (window.matchMedia('(min-width:768px)').matches) chip.style.bottom = '28px';
+  chip.onclick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') chip.remove();
+    deferredPrompt = null;
+  };
+  document.body.appendChild(chip);
+}
 </script>
 </body>
 </html>
