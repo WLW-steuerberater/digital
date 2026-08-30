@@ -29,7 +29,6 @@
   @keyframes popIn{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
   @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   @keyframes shakeX{0%,100%{transform:none}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-  .fade{animation:fadeIn .2s}
   .riseIn{animation:riseIn .3s cubic-bezier(.22,1,.36,1) both}
   .popIn{animation:popIn .34s cubic-bezier(.34,1.56,.64,1) both}
   .shakeX{animation:shakeX .38s cubic-bezier(.36,.07,.19,.97) both}
@@ -41,7 +40,8 @@
 
   /* ---------- App shell (the 2a mobile app) ---------- */
   #appShell{position:relative;height:100dvh;display:flex;flex-direction:column;background:var(--bg-app);overflow:hidden}
-  #screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  #screen{flex:1;position:relative;overflow:hidden}
+  .layer{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg-app)}
   /* Desktop: app shell becomes a centered phone-like card for inner screens */
   @media (min-width:768px) and (hover:hover) and (pointer:fine){
     #appShell{width:430px;height:min(880px,calc(100vh - 48px));margin:24px auto;border-radius:34px;box-shadow:0 24px 60px rgba(30,45,110,.35);border:1px solid rgba(255,255,255,.35)}
@@ -72,7 +72,7 @@
   .tabRaised .lb{font-size:10.5px;font-weight:800;color:var(--blue);margin-top:3px}
 
   /* ---------- Sticky sub-headers on gradient screens ---------- */
-  .gradScreen{animation:fadeIn .2s;padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
+  .gradScreen{padding-bottom:28px;background:linear-gradient(180deg,var(--grad-top),var(--grad-bot));min-height:100%;box-sizing:border-box}
   .subHead{position:sticky;top:0;z-index:5;background:rgba(133,157,239,.93);backdrop-filter:blur(12px);padding:20px 16px 10px;border-bottom:1px solid rgba(255,255,255,.14)}
   @media (max-width:767.98px), (hover:none), (pointer:coarse){.subHead{padding-top:calc(14px + env(safe-area-inset-top))}}
   .backBtn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;padding:6px 10px 6px 0}
@@ -638,7 +638,11 @@ const TAB_ICONS={
   badges:(f)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.2"/><path d="m8.8 13.3-2 7.1 5.2-2.6 5.2 2.6-2-7.1"/><path d="m12 6.6.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 8.7l2-.3.9-1.8Z" fill="currentColor" stroke="none"/></svg>`,
   streak:(f)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c3.9 0 6.5-2.5 6.5-6.2 0-2.6-1.4-4.6-2.9-6.4-.3 1-.9 1.9-1.8 2.5.2-3-1-6.3-3.8-8.4.1 2.6-1.1 4.4-2.6 6.1-1.4 1.7-2.9 3.5-2.9 6.2 0 3.7 2.6 6.2 6.5 6.2Z"/><path d="M12 21.5c1.8 0 3-1.2 3-3 0-1.4-.9-2.3-1.7-3.3-.9 1-2 1.3-2.7 2.4-.4.5-.6 1-.6 1.6 0 1.4 1 2.3 2 2.3Z" fill="currentColor" stroke="none" opacity=".35"/></svg>`,
 };
+let _tabKey=null;
 function renderTabbar(){
+  const activeId=(S.tab==='lernen')?(S.screen==='faecher'?'home':'none'):S.tab;
+  if(activeId===_tabKey) return;
+  _tabKey=activeId;
   const defs=[
     { id:'home', label:'Home' },
     { id:'community', label:'Community' },
@@ -655,8 +659,12 @@ function renderTabbar(){
       <div class="lb" style="color:${active?B:'#8a94b0'}">${t.label}</div></div>`;
   }).join('');
 }
+let _sheetKey=null;
 function renderSheet(){
   const host=document.getElementById('sheetHost');
+  const key=S.theme===null?null:S.fachIdx+'-'+S.theme;
+  if(key===_sheetKey) return;
+  _sheetKey=key;
   if(S.theme===null){host.innerHTML='';return;}
   const fach=FAECHER[S.fachIdx];
   const t=fach.themes[S.theme];
@@ -727,6 +735,7 @@ function animCloseSheet(){
 }
 
 /* =============== Router / render =============== */
+let _navKey=null;
 function render(){
   const home=S.tab==='lernen'&&S.screen==='faecher';
   document.body.classList.toggle('deskHome',home);
@@ -737,8 +746,35 @@ function render(){
   } else if(S.tab==='community') html=scrCommunity();
   else if(S.tab==='badges') html=scrBadges();
   else if(S.tab==='streak') html=scrStreak();
+
   const sc=document.getElementById('screen');
-  sc.innerHTML=html; sc.scrollTop=0;
+  const key=S.tab+'|'+S.screen+'|'+S.fachIdx+'|'+(S.ufCase===null?'':S.ufCase);
+  const navChanged=key!==_navKey;
+  // finish any in-flight crossfade: keep only the newest layer
+  const layers=sc.querySelectorAll('.layer');
+  layers.forEach((l,i)=>{ if(i<layers.length-1) l.remove(); });
+  const old=sc.querySelector('.layer');
+
+  const layer=document.createElement('div');
+  layer.className='layer';
+  layer.innerHTML=html;
+
+  if(old && !navChanged){
+    // same screen re-render (quiz answer, video pick, tab within screen): swap in place, keep scroll
+    const st=old.scrollTop;
+    old.replaceWith(layer);
+    layer.scrollTop=st;
+  } else if(old){
+    // navigation: crossfade — old stays visible underneath until new is fully in
+    old.style.pointerEvents='none';
+    sc.appendChild(layer);
+    const anim=layer.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
+    anim.onfinish=()=>{ if(old.isConnected) old.remove(); };
+    setTimeout(()=>{ if(old.isConnected) old.remove(); },320);
+  } else {
+    sc.appendChild(layer);
+  }
+  _navKey=key;
   renderTabbar(); renderSheet();
 }
 
