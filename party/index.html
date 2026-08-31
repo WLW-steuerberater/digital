@@ -38,10 +38,12 @@
   .vgroup .vsubs>div{overflow:hidden;min-height:0}
   .vgroup .chev{display:inline-block;transition:transform .35s cubic-bezier(.22,1,.36,1)}
   .vgroup.open .chev{transform:rotate(180deg)}
-  .press{transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;cursor:pointer;will-change:transform}
-  .press:active{transform:scale(.96);transition-duration:.08s}
-  .btn3d{transition:transform .2s cubic-bezier(.34,1.56,.64,1);cursor:pointer;will-change:transform}
-  .btn3d:active{transform:translateY(3px) scale(.99);transition-duration:.08s}
+  .press{transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, filter .18s;cursor:pointer;will-change:transform}
+  .press:active,.press.pressing{transform:scale(.96);filter:brightness(.97);transition-duration:.05s}
+  .btn3d{transition:transform .18s cubic-bezier(.34,1.56,.64,1);cursor:pointer;will-change:transform}
+  .btn3d:active,.btn3d.pressing{transform:translateY(3px) scale(.99);transition-duration:.05s}
+  .dCard.pressing{transform:scale(.98)}
+  .dStat.pressing{transform:scale(.96)}
 
 
   /* ---------- App shell (the 2a mobile app) ---------- */
@@ -871,9 +873,9 @@ function render(){
     // navigation: crossfade — old stays visible underneath until new is fully in
     old.style.pointerEvents='none';
     sc.appendChild(layer);
-    const anim=layer.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
+    const anim=layer.animate([{opacity:0},{opacity:1}],{duration:130,easing:'ease-out'});
     anim.onfinish=()=>{ if(old.isConnected) old.remove(); };
-    setTimeout(()=>{ if(old.isConnected) old.remove(); },320);
+    setTimeout(()=>{ if(old.isConnected) old.remove(); },260);
   } else {
     sc.appendChild(layer);
   }
@@ -953,6 +955,51 @@ window.App={
 };
 render();
 window.addEventListener('resize',()=>{ renderTabbar(); });
+
+/* =============== Instant touch response =============== */
+(function(){
+  const SEL='.press,.btn3d,.dCard,.dStat';
+  let pressed=null, lastScroll=0, tapStart=0, sx=0, sy=0, tapEl=null, cancelled=false;
+  // iOS only applies :active when a touchstart listener exists
+  document.addEventListener('touchstart',()=>{},{passive:true});
+  // know when a layer is scrolling (tap-to-stop-scroll must not trigger actions)
+  document.addEventListener('scroll',()=>{lastScroll=performance.now();},{capture:true,passive:true});
+
+  const clearPress=()=>{ if(pressed){pressed.classList.remove('pressing');pressed=null;} };
+  document.addEventListener('pointerdown',e=>{
+    const el=e.target.closest&&e.target.closest(SEL);
+    clearPress();
+    if(el){ el.classList.add('pressing'); pressed=el; }
+  },{passive:true});
+  document.addEventListener('pointerup',clearPress,{passive:true});
+  document.addEventListener('pointercancel',clearPress,{passive:true});
+  document.addEventListener('pointermove',e=>{
+    if(pressed&&e.pointerType==='touch'&&(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10)) clearPress();
+  },{passive:true});
+
+  // Fast tap: fire the element's onclick on touchend instead of waiting for the click event
+  document.addEventListener('touchstart',e=>{
+    const t=e.touches[0]; sx=t.clientX; sy=t.clientY; tapStart=performance.now();
+    cancelled = (performance.now()-lastScroll)<120 || e.touches.length>1;
+    tapEl=e.target.closest&&e.target.closest('[onclick]');
+    if(tapEl&&/INPUT|TEXTAREA|SELECT|A/.test(e.target.tagName)) tapEl=null;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10) cancelled=true;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!tapEl||cancelled||performance.now()-tapStart>400){tapEl=null;return;}
+    const el=tapEl; tapEl=null;
+    synthetic=true; el.click(); synthetic=false;   // our own click passes
+    swallowUntil=performance.now()+600;            // the browser's ghost click (any target) is dropped
+  },{passive:true});
+  let synthetic=false, swallowUntil=0;
+  document.addEventListener('click',e=>{
+    if(synthetic) return;
+    if(performance.now()<swallowUntil){ e.stopImmediatePropagation(); e.preventDefault(); swallowUntil=0; }
+  },true);
+})();
 
 /* =============== PWA =============== */
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
