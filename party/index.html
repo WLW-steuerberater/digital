@@ -23,6 +23,7 @@
   body{background:linear-gradient(180deg,var(--grad-top),var(--grad-bot)) fixed;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
   input,textarea{font-family:inherit;user-select:text;-webkit-user-select:text}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes sheetIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @keyframes sheetDown{to{transform:translateY(105%)}}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes dimOut{to{opacity:0}}
@@ -32,6 +33,11 @@
   .riseIn{animation:riseIn .3s cubic-bezier(.22,1,.36,1) both}
   .popIn{animation:popIn .34s cubic-bezier(.34,1.56,.64,1) both}
   .shakeX{animation:shakeX .38s cubic-bezier(.36,.07,.19,.97) both}
+  .vgroup .vsubs{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,1,.36,1)}
+  .vgroup.open .vsubs{grid-template-rows:1fr}
+  .vgroup .vsubs>div{overflow:hidden;min-height:0}
+  .vgroup .chev{display:inline-block;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .vgroup.open .chev{transform:rotate(180deg)}
   .press{transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;cursor:pointer;will-change:transform}
   .press:active{transform:scale(.96);transition-duration:.08s}
   .btn3d{transition:transform .2s cubic-bezier(.34,1.56,.64,1);cursor:pointer;will-change:transform}
@@ -77,10 +83,11 @@
 
   /* ---------- Bottom sheet ---------- */
   #sheetWrap{position:absolute;inset:0;z-index:30}
-  #sheetWrap .dim{position:absolute;inset:0;background:rgba(42,51,80,.42);animation:fadeIn .2s}
-  #sheetWrap .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px 42px;animation:sheetUp .32s cubic-bezier(.32,.72,0,1);will-change:transform;touch-action:none}
-  #sheetWrap.closing .sheet{animation:sheetDown .24s cubic-bezier(.5,0,.75,0) forwards}
-  #sheetWrap.closing .dim{animation:dimOut .24s ease forwards}
+  #sheetWrap .dim{position:absolute;inset:0;background:rgba(42,51,80,.42);animation:fadeIn .32s ease-out}
+  #sheetWrap .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:26px 26px 0 0;padding:10px 20px calc(30px + env(safe-area-inset-bottom));animation:sheetUp .48s cubic-bezier(.2,.9,.2,1);will-change:transform;touch-action:none;box-shadow:0 -12px 40px rgba(25,45,100,.18)}
+  #sheetWrap .sheet .si{animation:sheetIn .42s cubic-bezier(.22,1,.36,1) both}
+  #sheetWrap.closing .sheet{animation:sheetDown .26s cubic-bezier(.5,0,.75,0) forwards}
+  #sheetWrap.closing .dim{animation:dimOut .26s ease forwards}
   @media (min-width:768px) and (hover:hover) and (pointer:fine){#sheetWrap .sheet{border-radius:24px 24px 33px 33px}}
 
   /* ---------- Desktop home (screenshot layout) ---------- */
@@ -137,11 +144,17 @@ const FAECHER=[
   { name:'Abgabenordnung 2026', icon:'📜', img:'assets/abgabenordnung.png', tint:'#b1f5a3', color:'#3e8f2d', shade:'#2c6b1f', basePct:32,
     themes:[
       { t:'Grundsätze des Besteuerungsverfahrens', label:'Grundsätze', icon:'📖', st:'done',
-        vids:['Ablauf des Besteuerungsverfahrens','Besteuerungsgrundsätze','Steuerrechtsverhältnis','Untersuchungsgrundsatz','Mitwirkungspflichten','Folgen der Verletzung der Mitwirkungspflicht'],
-        vinit:[false,true,true,true,false,false],
+        vids:[
+          { t:'Ablauf des Besteuerungsverfahrens', subs:['Überblick & Beteiligte','Ermittlungsverfahren','Festsetzung & Erhebung'] },
+          'Besteuerungsgrundsätze','Steuerrechtsverhältnis','Untersuchungsgrundsatz',
+          { t:'Mitwirkungspflichten', subs:['Allgemeine Mitwirkung (§ 90 AO)','Erhöhte Mitwirkung bei Auslandssachverhalten'] },
+          'Folgen der Verletzung der Mitwirkungspflicht'],
+        vinit:{'0.0':true,'0.1':true,'1':true,'2':true},
         paras:['§ 85 AO','§ 88 AO','§ 90 AO','§ 118 AO','§ 149 AO','§ 150 AO','§ 152 AO'] },
       { t:'Steuerverwaltungsakt', label:'Verwaltungsakt', icon:'📜', st:'current',
-        vids:['Begriff des Verwaltungsakts','Bekanntgabe von Steuerbescheiden','Wirksamkeit & Fehlerfolgen'],
+        vids:['Begriff des Verwaltungsakts',
+          { t:'Bekanntgabe von Steuerbescheiden', subs:['Bekanntgabe im Inland','Bekanntgabe an Bevollmächtigte','Drei-Tages-Fiktion (§ 122 Abs. 2 AO)'] },
+          'Wirksamkeit & Fehlerfolgen'],
         paras:['§ 118 AO','§ 119 AO','§ 122 AO','§ 124 AO','§ 125 AO','§ 129 AO'] },
       { badge:true, icon:'💪', bigIcon:'📄💪', title:'§ 118 - Profi', sub:'Andere lernen die VA-Definition auswendig. Du lebst sie.', locked:true },
       { t:'Verjährung im Steuerverfahren', label:'Verjährung', icon:'⏳', st:'locked' },
@@ -235,7 +248,7 @@ const DESK_CARDS=[
 /* =============== State =============== */
 let S={
   tab:'lernen', screen:'faecher', fachIdx:0, theme:null,
-  vTheme:0, vid:0, vmap:{},
+  vTheme:0, vid:'0', vmap:{}, vopen:{},
   lkI:0, lkPicked:null, lkScore:0, lkDone:false,
   ufCase:null, ufText:'', ufML:false, ufKI:false,
   comTab:'rang', avatar:'😊', avBg:'#c4ecec', charName:'Anna',
@@ -368,21 +381,60 @@ function scrPfad(){
   </div>`;
 }
 
-function scrVideos(){
-  const fach=FAECHER[S.fachIdx];
-  const vt=fach.themes[S.vTheme]||fach.themes[0];
-  const list=vt.vids||['Einführung ins Thema','Grundbegriffe & Definitionen','Vertiefung & Beispiele'];
+function videoTheme(){ const f=FAECHER[S.fachIdx]; return f.themes[S.vTheme]||f.themes[0]; }
+function videoList(vt){ return vt.vids||['Einführung ins Thema','Grundbegriffe & Definitionen','Vertiefung & Beispiele']; }
+function videoItems(vt){
+  const items=[];
+  videoList(vt).forEach((v,i)=>{
+    if(typeof v==='string') items.push({id:String(i),label:String(i+1),title:v,group:null});
+    else v.subs.forEach((s,j)=>items.push({id:i+'.'+j,label:(i+1)+'.'+(j+1),title:s,group:i}));
+  });
+  return items;
+}
+function videoDone(vt){
   const key=S.fachIdx+'-'+S.vTheme;
-  const done=S.vmap[key]||list.map((x,i)=>vt.st==='done'?true:(vt.vinit||[])[i]||false);
+  if(S.vmap[key]) return S.vmap[key];
+  const d={};
+  if(vt.st==='done') videoItems(vt).forEach(it=>d[it.id]=true);
+  else if(vt.vinit) Object.assign(d,vt.vinit);
+  return d;
+}
+function scrVideos(){
+  const vt=videoTheme();
+  const list=videoList(vt);
+  const items=videoItems(vt);
+  const done=videoDone(vt);
+  const key=S.fachIdx+'-'+S.vTheme;
+  if(!items.some(it=>it.id===S.vid)) S.vid=items[0].id;
+  const curItem=items.find(it=>it.id===S.vid);
   const paras=vt.paras||[];
   const shown=S.parasOpen?paras:paras.slice(0,4);
-  const rows=list.map((name,i)=>{
-    const d=done[i], cur=i===S.vid;
+  const row=(it,sub)=>{
+    const d=!!done[it.id], cur=it.id===S.vid;
     return `
-    <div class="press" onclick="App.pickVid(${i})" style="display:flex;align-items:center;gap:12px;border:2px solid ${d?G:(cur?B:'#e5e9f6')};background:${d?G:'#fff'};border-radius:13px;padding:11px 14px">
-      <div style="width:26px;height:26px;border-radius:8px;background:${d?'rgba(255,255,255,.25)':(cur?'#e4f0ff':'#f0f2fa')};color:${d?'#fff':(cur?B:'#a9b2c9')};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none">${i+1}</div>
-      <div style="flex:1;font-size:13.5px;font-weight:700;color:${d?'#fff':(cur?'var(--ink)':'#8a94b0')};line-height:1.3">${esc(name)}</div>
+    <div class="press" onclick="App.pickVid('${it.id}')" style="display:flex;align-items:center;gap:12px;${sub?'padding:11px 14px 11px 18px;border-top:1px solid #edf1fa;':'border:2px solid '+(d?G:(cur?B:'#e5e9f6'))+';border-radius:13px;padding:11px 14px;'}background:${d?G:(sub&&cur?'#ecf4ff':'#fff')}">
+      <div style="min-width:${sub?'36px':'26px'};height:26px;padding:0 6px;border-radius:8px;background:${d?'rgba(255,255,255,.25)':(cur?'#e4f0ff':'#f0f2fa')};color:${d?'#fff':(cur?B:'#a9b2c9')};display:flex;align-items:center;justify-content:center;font-size:${sub?'11px':'12px'};font-weight:800;flex:none">${it.label}</div>
+      <div style="flex:1;font-size:13.5px;font-weight:700;color:${d?'#fff':(cur?'var(--ink)':'#8a94b0')};line-height:1.3">${esc(it.title)}</div>
       <div style="font-size:14px;font-weight:800;color:${d?'#fff':(cur?B:'#c3cad9')};flex:none">${d?'✓':'▶'}</div>
+    </div>`;
+  };
+  const rows=list.map((v,i)=>{
+    if(typeof v==='string') return row(items.find(it=>it.id===String(i)),false);
+    const subs=items.filter(it=>it.group===i);
+    const nDone=subs.filter(it=>done[it.id]).length, all=nDone===subs.length;
+    const hasCur=subs.some(it=>it.id===S.vid);
+    const open=hasCur||!!(S.vopen[key]&&S.vopen[key][i]);
+    return `
+    <div id="vg${i}" class="vgroup ${open?'open':''}" style="border:2px solid ${all?G:(hasCur?B:'#e5e9f6')};border-radius:13px;background:#fff;overflow:hidden">
+      <div class="press" onclick="App.toggleGroup(${i})" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${all?G:'#fff'}">
+        <div style="width:26px;height:26px;border-radius:8px;background:${all?'rgba(255,255,255,.25)':(hasCur?'#e4f0ff':'#f0f2fa')};color:${all?'#fff':(hasCur?B:'#a9b2c9')};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:700;color:${all?'#fff':(hasCur?'var(--ink)':'#5d6785')};line-height:1.3">${esc(v.t)}</div>
+          <div style="font-size:11px;font-weight:700;color:${all?'rgba(255,255,255,.8)':'#a9b2c9'};margin-top:2px">${subs.length} Videos · ${nDone}/${subs.length} gesehen</div>
+        </div>
+        <div class="chev" style="font-size:13px;color:${all?'#fff':'#a9b2c9'};flex:none">▾</div>
+      </div>
+      <div class="vsubs"><div>${subs.map(it=>row(it,true)).join('')}</div></div>
     </div>`;
   }).join('');
   return `
@@ -398,14 +450,17 @@ function scrVideos(){
           <div class="press" style="width:54px;height:54px;border-radius:999px;background:${B};display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 4px 12px rgba(63,135,230,.4)">▶</div>
           <div style="font-size:12px;color:#7d88ad">Video abspielen</div>
         </div>
-        <div style="padding:13px 16px"><div style="font-size:15px;font-weight:800;color:var(--ink);line-height:1.3">${esc(list[S.vid])}</div></div>
+        <div style="padding:13px 16px;display:flex;align-items:center;gap:10px">
+          <div style="background:#e4f0ff;color:${B};font-size:11px;font-weight:800;border-radius:7px;padding:4px 8px;flex:none">Video ${curItem.label}</div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);line-height:1.3">${esc(curItem.title)}</div>
+        </div>
       </div>
       ${paras.length?`
       <div style="margin-top:12px;background:#fff;border-radius:15px;padding:13px 15px;box-shadow:0 2px 6px rgba(60,80,160,.08)">
         <div style="font-size:11px;font-weight:800;letter-spacing:.05em;color:#8a94b0;text-transform:uppercase;margin-bottom:9px">Paragraphen-Markierungen</div>
         <div style="display:flex;flex-wrap:wrap;gap:7px">
           ${shown.map(p=>`<div class="press" style="background:${B};color:#fff;font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${esc(p)}</div>`).join('')}
-          ${paras.length>4?`<div class="press" onclick="App.toggleParas()" style="background:#e4f0ff;color:${B};font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${S.parasOpen?'weniger anzeigen':'+'+(paras.length-4)+' weitere'}</div>`:''}
+          ${paras.length>4?`<div class="press" onclick="App.toggleParas()" style="background:#e4f0ff;color:${B};font-size:11.5px;font-weight:800;border-radius:8px;padding:6px 11px">${S.parasOpen?'weniger':'+'+(paras.length-4)+' weitere'}</div>`:''}
         </div>
       </div>`:''}
       <div class="btn3d" onclick="App.nextVideo()" style="margin:12px auto 0;width:fit-content;background:${B};color:#fff;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:800;box-shadow:0 4px 0 ${'#2f6ac2'}">Nächstes Video →</div>
@@ -730,12 +785,12 @@ function renderSheet(){
     <div class="dim" onclick="App.closeSheet()"></div>
     <div class="sheet">
       <div style="width:38px;height:5px;border-radius:3px;background:#dde3f5;margin:0 auto 14px"></div>
-      <div style="font-size:11.5px;font-weight:800;letter-spacing:.06em;color:${B};text-transform:uppercase">Thema ${num}</div>
-      <div style="font-size:19px;font-weight:800;color:var(--ink);margin:4px 0 16px;line-height:1.3">${esc(t.t)}</div>
+      <div class="si" style="animation-delay:.08s;font-size:11.5px;font-weight:800;letter-spacing:.06em;color:${B};text-transform:uppercase">Thema ${num}</div>
+      <div class="si" style="animation-delay:.11s;font-size:19px;font-weight:800;color:var(--ink);margin:4px 0 16px;line-height:1.3">${esc(t.t)}</div>
       <div style="display:flex;flex-direction:column;gap:9px">
         ${units.map((u,i)=>{
           const st=states[i];
-          return `<div class="press" onclick="${u.tap}" style="display:flex;align-items:center;gap:13px;border:2px solid ${st==='done'?'#cfe9c8':'#e5e9f6'};background:${st==='done'?'#eef8ea':'#fff'};border-radius:15px;padding:13px 15px">
+          return `<div class="press si" onclick="${u.tap}" style="animation-delay:${.16+i*.05}s;display:flex;align-items:center;gap:13px;border:2px solid ${st==='done'?'#cfe9c8':'#e5e9f6'};background:${st==='done'?'#eef8ea':'#fff'};border-radius:15px;padding:13px 15px">
             <div style="font-size:20px;flex:none">${u.icon}</div>
             <div style="flex:1;font-size:14.5px;font-weight:700;color:var(--ink)">${u.name}</div>
             <div style="font-size:13px;font-weight:800;color:${st==='done'?GS:B};flex:none">${st==='done'?'✓':'›'}</div>
@@ -779,7 +834,7 @@ function animCloseSheet(){
   if(!wrap){ set({theme:null}); return; }
   if(wrap.classList.contains('closing')) return;
   wrap.classList.add('closing');
-  setTimeout(()=>set({theme:null}),230);
+  setTimeout(()=>{S.theme=null;renderSheet();},250);
 }
 
 /* =============== Router / render =============== */
@@ -859,24 +914,30 @@ window.App={
   comTab:t=>set({comTab:t}),
   openFach:i=>{hapt();set({tab:'lernen',screen:'pfad',fachIdx:i,theme:null});},
   backToFaecher:()=>set({screen:'faecher',theme:null}),
-  openTheme:i=>{hapt();set({theme:i});},
+  openTheme:i=>{hapt();S.theme=i;renderSheet();},
   closeSheet:()=>animCloseSheet(),
   deskCard:i=>{const c=DESK_CARDS[i]; if(c.action)c.action();},
   toPfad:()=>set({screen:'pfad',theme:null,lkPicked:null}),
-  toVideos:()=>set({screen:'videos',vTheme:S.theme,theme:null,vid:0,parasOpen:false}),
+  toVideos:()=>set({screen:'videos',vTheme:S.theme,theme:null,vid:'0',parasOpen:false}),
   toLKFromSheet:()=>set({screen:'lk',vTheme:S.theme,theme:null,lkI:0,lkPicked:null,lkScore:0}),
   toLK:()=>set({screen:'lk',lkI:0,lkPicked:null,lkScore:0,theme:null}),
   toUF:()=>set({screen:'uf',theme:null,ufCase:null,ufText:'',ufML:false,ufKI:false}),
-  pickVid:i=>set({vid:i}),
+  pickVid:id=>set({vid:id}),
+  toggleGroup:i=>{
+    const key=S.fachIdx+'-'+S.vTheme;
+    const o=S.vopen[key]||(S.vopen[key]={});
+    const g=document.getElementById('vg'+i);
+    const nowOpen=g?!g.classList.contains('open'):!o[i];
+    o[i]=nowOpen;
+    if(g) g.classList.toggle('open',nowOpen);
+  },
   toggleParas:()=>set({parasOpen:!S.parasOpen}),
   nextVideo:()=>{
-    const fach=FAECHER[S.fachIdx], vt=fach.themes[S.vTheme]||fach.themes[0];
-    const list=vt.vids||['Einführung ins Thema','Grundbegriffe & Definitionen','Vertiefung & Beispiele'];
-    const key=S.fachIdx+'-'+S.vTheme;
-    const done=(S.vmap[key]||list.map((x,i)=>vt.st==='done'?true:(vt.vinit||[])[i]||false)).slice();
-    done[S.vid]=true;
-    const next=done.findIndex(d=>!d);
-    set({vmap:{...S.vmap,[key]:done},vid:next===-1?S.vid:next});
+    const vt=videoTheme(), items=videoItems(vt), key=S.fachIdx+'-'+S.vTheme;
+    const done={...videoDone(vt)}; done[S.vid]=true;
+    const idx=items.findIndex(it=>it.id===S.vid);
+    const after=items.slice(idx+1).find(it=>!done[it.id]) || items.find(it=>!done[it.id]);
+    set({vmap:{...S.vmap,[key]:done},vid:after?after.id:S.vid});
   },
   lkPick:i=>{ if(S.lkPicked!==null)return; const q=LK_QS[S.lkI]; hapt(i===q.ok?10:24); set({lkPicked:i,lkScore:S.lkScore+(i===q.ok?1:0)}); },
   lkNext:()=>{const finishing=S.lkI+1>=LK_QS.length; set({lkI:S.lkI+1,lkPicked:null,lkDone:true}); if(finishing){hapt(16);setTimeout(confetti,180);} },
